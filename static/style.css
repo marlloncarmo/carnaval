@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-/* ... (Previous Root and Dark Mode Variables) ... */
+/* ... (Previous styles) ... */
 :root {
     --primary-accent: #E91E63;
     --background-color: #f4f6f8;
@@ -54,10 +54,9 @@ body {
     background: var(--card-background);
     border-bottom: 1px solid var(--border-color);
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0 1.5em; z-index: 500;
+    padding: 0 1em; z-index: 500;
 }
 
-/* --- UPDATED HEADER LOGO --- */
 .header-logo {
     display: flex;
     flex-direction: column;
@@ -72,15 +71,10 @@ body {
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 6px; /* Space between mask and text */
+    gap: 6px; 
 }
 
-/* Title Mask Icon */
-.title-icon {
-    width: 20px;
-    height: 20px;
-    fill: var(--primary-accent);
-}
+.title-icon { width: 20px; height: 20px; fill: var(--primary-accent); }
 
 .header-logo .site-subtitle {
     font-size: 0.65em;
@@ -90,32 +84,30 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* --- UPDATED AUTHOR LINK --- */
-.author-link {
-    color: #2196F3; /* Blue */
-    text-decoration: underline;
-    font-weight: 600;
-}
+.author-link { color: #2196F3; text-decoration: underline; font-weight: 600; }
 .author-link:hover { color: #1976D2; }
 
-/* HEADER ACTIONS (WhatsApp + Theme) */
 .header-actions { display: flex; align-items: center; gap: 12px; }
 
-/* --- NEW WHATSAPP BUTTON --- */
-.whatsapp-btn {
+/* HEADER BUTTONS */
+.whatsapp-btn, .support-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    color: #25D366; /* Official WhatsApp Green */
     transition: transform 0.2s, background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    background: none;
 }
-.whatsapp-btn:hover {
-    transform: scale(1.1);
-    background-color: rgba(37, 211, 102, 0.1);
-}
+
+.whatsapp-btn { color: #25D366; }
+.whatsapp-btn:hover { transform: scale(1.1); background-color: rgba(37, 211, 102, 0.1); }
+
+.support-btn { color: #E91E63; }
+.support-btn:hover { transform: scale(1.1); background-color: rgba(233, 30, 99, 0.1); }
 
 /* THEME SWITCH */
 .theme-switch { position: relative; display: flex; align-items: center; justify-content: space-between; width: 50px; height: 26px; background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: 30px; cursor: pointer; padding: 0 4px; overflow: hidden; }
@@ -125,8 +117,7 @@ body.dark-mode .switch-thumb { transform: translateX(24px); }
 .sun-icon { left: 6px; color: #f39c12; }
 .moon-icon { right: 6px; color: #9b59b6; }
 
-/* ... (Rest of CSS remains unchanged) ... */
-/* MAIN */
+/* MAIN CONTENT */
 .main-content-area {
     flex: 1; height: calc(100dvh - var(--header-height));
     position: relative; overflow: hidden; 
@@ -176,6 +167,7 @@ body.dark-mode .leaflet-control-reset a {
 input:checked + .slider { background-color: var(--primary-accent); }
 input:checked + .slider:before { transform: translateX(16px); }
 
+/* LIST */
 .events-list-container {
     height: 100%; overflow-y: auto;
     padding-right: 8px; padding-bottom: 4em;
@@ -186,6 +178,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .events-list-container::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
 .total-count { margin-top: 0; margin-bottom: 0.8em; font-size: 0.85em; color: var(--text-secondary); }
 
+/* FILTERS */
 .filters-wrapper { background: var(--card-background); padding: 0.8em; border-radius: 12px; margin-bottom: 1em; border: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .filtros-container form { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: flex-end; }
 .filtro-item { flex: 1; min-width: 100px; }
@@ -195,6 +188,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .btn-limpar { padding: 8px 12px; font-size: 0.85rem; color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; cursor: pointer; }
 .filter-actions-row { display: flex; gap: 10px; align-items: center; width: auto; }
 
+/* COMPACT CARDS */
 .eventos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8em; }
 .evento-card { 
     background: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; 
@@ -252,6 +246,119 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .meta-row.address-row span { font-size: 0.75em; line-height: 1.2; }
 
 .card-desc { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-color); font-size: 0.75rem; color: var(--text-primary); line-height: 1.3; }
+
+/* --- MODAL STYLES --- */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 2000; 
+    left: 0; top: 0; 
+    width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.5); 
+    backdrop-filter: blur(3px);
+}
+.modal.show { display: block; }
+
+.modal-content {
+    background-color: var(--card-background);
+    margin: 15% auto;
+    padding: 20px;
+    width: 90%; max-width: 400px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+    text-align: center;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.close-modal:hover { color: var(--primary-accent); }
+
+.modal-body h3 { margin-top: 0; color: var(--primary-accent); }
+.modal-body p { font-size: 0.9em; color: var(--text-primary); }
+
+/* QR Code Container */
+.qr-container {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff; 
+    display: inline-block;
+}
+.pix-img { width: 100%; max-width: 200px; display: block; }
+
+/* COPY PIX BOX */
+.pix-copy-wrapper {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.pix-label {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: block;
+    font-weight: 600;
+}
+
+.pix-copy-box {
+    display: flex;
+    align-items: center;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 40px;
+}
+
+.pix-copy-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0 10px;
+    font-size: 0.85em;
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    width: 100%; 
+}
+
+.copy-btn {
+    background-color: var(--primary-accent);
+    color: white;
+    border: none;
+    height: 100%;
+    width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.copy-btn:hover { background-color: #d81b60; }
+.copy-btn.copied { background-color: #27ae60; }
+
+/* Nubank Button */
+.nubank-btn {
+    display: inline-block;
+    background-color: #820AD1;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+.nubank-btn:hover { background-color: #6D08AF; }
 
 .mobile-filter-btn { display: none; }
 .mobile-filter-modal { display: none; }
