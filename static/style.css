@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
+/* ... (Previous Root and Dark Mode Variables) ... */
 :root {
     --primary-accent: #E91E63;
     --background-color: #f4f6f8;
@@ -10,12 +11,11 @@
     --header-height: 60px;
     --shadow-color: rgba(44, 62, 80, 0.1);
     
-    /* Status Colors */
-    --status-live: #27ae60;   /* Green */
-    --status-soon: #2196F3;   /* Blue (Changed from Orange) */
-    --status-ending: #d35400; /* Darker Orange */
-    --status-today: #8e44ad;  /* Purple */
-    --status-ended: #95a5a6;  /* Gray */
+    --status-live: #27ae60;
+    --status-soon: #2196F3;
+    --status-ending: #d35400;
+    --status-today: #8e44ad;
+    --status-ended: #95a5a6;
 }
 
 body.dark-mode {
@@ -56,8 +56,66 @@ body {
     display: flex; justify-content: space-between; align-items: center;
     padding: 0 1.5em; z-index: 500;
 }
-.header-logo h2 { margin: 0; font-size: 1.2rem; color: var(--primary-accent); }
-.header-actions { display: flex; align-items: center; }
+
+/* --- UPDATED HEADER LOGO --- */
+.header-logo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1;
+}
+
+.header-logo .site-title { 
+    margin: 0; 
+    font-size: 1rem; 
+    color: var(--primary-accent); 
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Space between mask and text */
+}
+
+/* Title Mask Icon */
+.title-icon {
+    width: 20px;
+    height: 20px;
+    fill: var(--primary-accent);
+}
+
+.header-logo .site-subtitle {
+    font-size: 0.65em;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+/* --- UPDATED AUTHOR LINK --- */
+.author-link {
+    color: #2196F3; /* Blue */
+    text-decoration: underline;
+    font-weight: 600;
+}
+.author-link:hover { color: #1976D2; }
+
+/* HEADER ACTIONS (WhatsApp + Theme) */
+.header-actions { display: flex; align-items: center; gap: 12px; }
+
+/* --- NEW WHATSAPP BUTTON --- */
+.whatsapp-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #25D366; /* Official WhatsApp Green */
+    transition: transform 0.2s, background-color 0.2s;
+}
+.whatsapp-btn:hover {
+    transform: scale(1.1);
+    background-color: rgba(37, 211, 102, 0.1);
+}
 
 /* THEME SWITCH */
 .theme-switch { position: relative; display: flex; align-items: center; justify-content: space-between; width: 50px; height: 26px; background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: 30px; cursor: pointer; padding: 0 4px; overflow: hidden; }
@@ -67,6 +125,7 @@ body.dark-mode .switch-thumb { transform: translateX(24px); }
 .sun-icon { left: 6px; color: #f39c12; }
 .moon-icon { right: 6px; color: #9b59b6; }
 
+/* ... (Rest of CSS remains unchanged) ... */
 /* MAIN */
 .main-content-area {
     flex: 1; height: calc(100dvh - var(--header-height));
@@ -78,7 +137,6 @@ main { flex: 1; display: flex; flex-direction: column; height: 100%; min-height:
 
 .main-content-grid { display: grid; grid-template-columns: 35% 65%; gap: 1.5em; height: 100%; width: 100%; min-height: 0; }
 
-/* MAP */
 .map-container {
     height: 100%; width: 100%;
     border-radius: 12px; overflow: hidden;
@@ -118,7 +176,6 @@ body.dark-mode .leaflet-control-reset a {
 input:checked + .slider { background-color: var(--primary-accent); }
 input:checked + .slider:before { transform: translateX(16px); }
 
-/* LIST */
 .events-list-container {
     height: 100%; overflow-y: auto;
     padding-right: 8px; padding-bottom: 4em;
@@ -129,7 +186,6 @@ input:checked + .slider:before { transform: translateX(16px); }
 .events-list-container::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
 .total-count { margin-top: 0; margin-bottom: 0.8em; font-size: 0.85em; color: var(--text-secondary); }
 
-/* FILTERS */
 .filters-wrapper { background: var(--card-background); padding: 0.8em; border-radius: 12px; margin-bottom: 1em; border: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .filtros-container form { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: flex-end; }
 .filtro-item { flex: 1; min-width: 100px; }
@@ -139,70 +195,43 @@ input:checked + .slider:before { transform: translateX(16px); }
 .btn-limpar { padding: 8px 12px; font-size: 0.85rem; color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; cursor: pointer; }
 .filter-actions-row { display: flex; gap: 10px; align-items: center; width: auto; }
 
-/* CARD & STATUS STYLES */
 .eventos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8em; }
-
 .evento-card { 
-    background: var(--card-background); 
-    border: 1px solid var(--border-color); 
-    border-radius: 8px; 
+    background: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; 
     padding: 0.8em; 
-    position: relative; 
-    transition: transform 0.2s; 
-    box-shadow: 0 2px 4px var(--shadow-color); 
-    display: flex; flex-direction: column; cursor: pointer;
-    overflow: hidden; /* For tag positioning */
+    position: relative; transition: transform 0.2s; box-shadow: 0 2px 4px var(--shadow-color); display: flex; flex-direction: column; cursor: pointer;
+    overflow: hidden; 
 }
 .evento-card:hover { transform: translateY(-3px); border-color: var(--primary-accent); }
 .evento-card.highlighted { border: 2px solid var(--primary-accent); background-color: rgba(233, 30, 99, 0.04); transform: scale(1.01); }
 body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.15); }
 
-/* STATUS CARD BACKGROUNDS & BORDERS */
 .status-bg-em-andamento { background-color: rgba(39, 174, 96, 0.08); border-color: rgba(39, 174, 96, 0.4); }
-/* UPDATED: Blue background tint for Em Breve */
 .status-bg-em-breve { background-color: rgba(33, 150, 243, 0.08); border-color: rgba(33, 150, 243, 0.4); }
 .status-bg-encerrando { background-color: rgba(211, 84, 0, 0.08); border-color: rgba(211, 84, 0, 0.4); }
 .status-bg-hoje { background-color: rgba(142, 68, 173, 0.08); border-color: rgba(142, 68, 173, 0.4); }
 .status-bg-encerrado { opacity: 0.8; background-color: rgba(149, 165, 166, 0.1); }
 
-/* STATUS TAG */
 .status-tag {
-    position: absolute;
-    top: 0; left: 0;
-    font-size: 0.65em;
-    padding: 3px 10px;
-    border-radius: 0 0 8px 0; /* Corner rounding */
-    font-weight: 700;
-    color: white;
-    z-index: 2;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    position: absolute; top: 0; left: 0; font-size: 0.65em; padding: 3px 10px; border-radius: 0 0 8px 0;
+    font-weight: 700; color: white; z-index: 2; text-transform: uppercase; letter-spacing: 0.5px;
 }
-
 .status-em-andamento { background-color: var(--status-live); padding-left: 18px; }
-/* Live Dot */
 .status-em-andamento::before {
-    content: ''; position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
-    width: 6px; height: 6px; background-color: white; border-radius: 50%;
-    animation: pulse 1.5s infinite;
+    content: ''; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background-color: white; border-radius: 50%; animation: pulse 1.5s infinite;
 }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); } 70% { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); } }
-
 .status-em-breve { background-color: var(--status-soon); }
 .status-encerrando { background-color: var(--status-ending); }
 .status-hoje { background-color: var(--status-today); }
 .status-encerrado { background-color: var(--status-ended); font-weight: 500; }
 
-/* Add Padding to Card Header so Title doesn't hit Tag */
 .evento-card.status-bg-em-andamento .card-header,
 .evento-card.status-bg-em-breve .card-header,
 .evento-card.status-bg-encerrando .card-header,
 .evento-card.status-bg-hoje .card-header,
-.evento-card.status-bg-encerrado .card-header {
-    padding-top: 18px; 
-}
+.evento-card.status-bg-encerrado .card-header { padding-top: 18px; }
 
-/* Card Header */
 .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4em; }
 .card-header h2 { font-size: 1rem; margin: 0; color: var(--primary-accent); line-height: 1.2; padding-right: 10px; flex: 1; }
 
@@ -227,7 +256,6 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .mobile-filter-btn { display: none; }
 .mobile-filter-modal { display: none; }
 
-/* MOBILE */
 @media (max-width: 768px) {
     .container { padding: 0; }
     .main-content-grid { display: flex; flex-direction: column; gap: 0; }
