@@ -99,23 +99,19 @@ def fetch_carnival_data():
                 is_kids = True
                 clean_desc = re.sub(r'(?i)(bloco)?\s*infantil|criança|baby|👶', '', clean_desc)
 
-            # 2. LGBT (Aggressive Emoji Regex for Flag)
-            # Matches 🏳️‍🌈 (White Flag + VS16 + ZWJ + Rainbow) and variants
+            # 2. LGBT
             if "lgbt" in desc_lower or "gay" in desc_lower or "diversidade" in desc_lower or "🏳" in descricao_orig:
                 is_lgbt = True
-                # Remove keywords
                 clean_desc = re.sub(r'(?i)lgbt\w*|gay|diversidade', '', clean_desc)
-                # Remove The Flag Emojis (Complex Unicode)
-                clean_desc = re.sub(r'🏳️?‍?🌈', '', clean_desc) 
+                clean_desc = clean_desc.replace('🏳️‍🌈', '').replace('🏳‍🌈', '') 
+                clean_desc = re.sub(r'[\U0001F3F3\uFE0F\u200D\U0001F308]', '', clean_desc)
 
             # 3. PET
             if "pet" in desc_lower or "cachorro" in desc_lower or "animal" in desc_lower or "🐶" in descricao_orig or "🐕" in descricao_orig:
                 is_pet = True
                 clean_desc = re.sub(r'(?i)pet|cachorro|animal|🐶|🐕', '', clean_desc)
 
-            # 4. Final Cleanup
-            # Remove punctuation left behind (e.g. "Infantil, Pet" -> becomes ",")
-            clean_desc = re.sub(r'^\W+|\W+$', '', clean_desc) # Trim leading/trailing non-word chars
+            clean_desc = re.sub(r'^\W+|\W+$', '', clean_desc) 
             clean_desc = clean_desc.strip()
             
             tamanho_raw = row.get("TAMANHO", "").lower()
@@ -156,7 +152,7 @@ def fetch_carnival_data():
                 "tamanho": tamanho_score,
                 "lat": lat,
                 "lon": lon,
-                "status": "futuro",
+                "status": "futuro", 
                 "is_kids": is_kids,
                 "is_lgbt": is_lgbt,
                 "is_pet": is_pet
@@ -169,17 +165,69 @@ def fetch_carnival_data():
 
 def events_status_logic(eventos):
     now = datetime.now()
+    
+    # FOR TESTING (Uncomment to test specific date/time)
+    # now = datetime(2025, 3, 3, 13, 0) 
+
     for e in eventos:
-        if not e['_dt_obj']: continue
+        if not e['_dt_obj']: 
+            e['status'] = 'futuro'
+            e['status_label'] = ''
+            e['sort_weight'] = 3
+            continue
+            
         dt = e['_dt_obj']
+        
+        # Diff in hours: 
+        # Negative = Event already started
+        # Positive = Event in future
         diff = (dt - now).total_seconds() / 3600
         
-        if -4 < diff <= 0: e['status'] = 'iniciando'
-        elif 0 < diff <= 2: e['status'] = 'em_breve'
-        elif diff < -12: e['status'] = 'encerrado'
-        else: e['status'] = 'futuro'
+        # --- NEW LOGIC & SORTING WEIGHTS ---
+        # Weight 0: Em Breve / Em Andamento (Top)
+        # Weight 1: Encerrando
+        # Weight 2: Hoje
+        # Weight 3: Futuro (Standard)
+        # Weight 4: Encerrado (Bottom)
+
+        # 1. Em Breve (< 2 hours to start)
+        if 0 < diff <= 2:
+            e['status'] = 'em-breve'
+            e['status_label'] = 'Em Breve'
+            e['sort_weight'] = 0
             
-    eventos.sort(key=lambda x: x['_dt_obj'] if x['_dt_obj'] else datetime.max)
+        # 2. Em Andamento (Started up to 3 hours ago)
+        elif -3 <= diff <= 0:
+            e['status'] = 'em-andamento'
+            e['status_label'] = 'Em Andamento'
+            e['sort_weight'] = 0
+            
+        # 3. Encerrando (Started 3 to 5 hours ago)
+        elif -5 <= diff < -3:
+            e['status'] = 'encerrando'
+            e['status_label'] = 'Encerrando'
+            e['sort_weight'] = 1
+            
+        # 4. Encerrado (Started more than 5 hours ago)
+        elif diff < -5:
+            e['status'] = 'encerrado'
+            e['status_label'] = 'Encerrado'
+            e['sort_weight'] = 4
+            
+        # 5. Hoje (Same day, but not in specific windows above)
+        elif dt.date() == now.date():
+            e['status'] = 'hoje'
+            e['status_label'] = 'Hoje'
+            e['sort_weight'] = 2
+            
+        # 6. Futuro
+        else:
+            e['status'] = 'futuro'
+            e['status_label'] = ''
+            e['sort_weight'] = 3
+            
+    # Sort first by Weight (Status Priority), then by Date
+    eventos.sort(key=lambda x: (x['sort_weight'], x['_dt_obj'] if x['_dt_obj'] else datetime.max))
     return eventos
 
 def filtrar_eventos(eventos_todos, args):
