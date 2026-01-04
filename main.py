@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, make_response
 import os
 import requests
 import csv
@@ -85,17 +85,13 @@ def fetch_carnival_data():
             bairro = row.get("Bairro", "").strip()
             endereco = row.get("LOCAL DA CONCENTRAÇÃO", "").strip()
             
-            # --- MUSICAL STYLE LOGIC ---
             raw_categoria = row.get("ESTILO MUSICAL", "Outros").strip()
             
-            # 1. Display Version (Summarized)
             if len(raw_categoria) > 25 or "," in raw_categoria or " e " in raw_categoria:
                 categoria_display = "Variado"
             else:
                 categoria_display = raw_categoria
 
-            # 2. Extract Individual Styles for Dropdown
-            # Split by comma, slash, or " e "
             parts = re.split(r'[;,/]\s*|\s+e\s+', raw_categoria)
             for part in parts:
                 clean_part = part.strip().title()
@@ -160,8 +156,8 @@ def fetch_carnival_data():
                 "endereco": endereco,
                 "data": data_formatada,
                 "_dt_obj": dt_obj,
-                "categoria": raw_categoria,         # Full String for searching
-                "categoria_display": categoria_display, # Summarized for UI
+                "categoria": raw_categoria,
+                "categoria_display": categoria_display,
                 "descricao": clean_desc,
                 "tamanho": tamanho_score,
                 "lat": lat,
@@ -220,16 +216,17 @@ def events_status_logic(eventos):
     return eventos
 
 def filtrar_eventos(eventos_todos, args):
+    has_active_filters = False
+    
     filtro_data = args.get('data_filtro')
     filtro_bairro = args.get('bairro')
     filtro_estilo = args.get('categoria')
     quick_filters = args.getlist('quick_filter') 
-    
     busca = args.get('q', '').lower()
     ne_lat = args.get('ne_lat')
-    ne_lng = args.get('ne_lng')
-    sw_lat = args.get('sw_lat')
-    sw_lng = args.get('sw_lng')
+    
+    if filtro_data or filtro_bairro or filtro_estilo or quick_filters or busca or ne_lat:
+        has_active_filters = True
 
     eventos_filtrados = eventos_todos
     now = datetime.now()
@@ -276,13 +273,16 @@ def filtrar_eventos(eventos_todos, args):
     if filtro_bairro:
         eventos_filtrados = [e for e in eventos_filtrados if e['local'] == filtro_bairro]
 
-    # UPDATED: Partial Match for Style
     if filtro_estilo:
         eventos_filtrados = [e for e in eventos_filtrados if filtro_estilo.lower() in e['categoria'].lower()]
 
     if busca:
         eventos_filtrados = [e for e in eventos_filtrados if busca in e['titulo'].lower() or busca in e['endereco'].lower()]
         
+    ne_lng = args.get('ne_lng')
+    sw_lat = args.get('sw_lat')
+    sw_lng = args.get('sw_lng')
+
     if ne_lat and ne_lng and sw_lat and sw_lng:
         try:
             n_lat = float(ne_lat)
@@ -299,26 +299,33 @@ def filtrar_eventos(eventos_todos, args):
         except ValueError:
             pass
     
-    return eventos_filtrados
+    return eventos_filtrados, has_active_filters
 
 @app.route('/')
 def mostrar_eventos():
-    eventos_todos, estilos = fetch_carnival_data() # Unpack styles
-    eventos_filtrados = filtrar_eventos(eventos_todos, request.args)
+    eventos_todos, estilos = fetch_carnival_data()
+    eventos_filtrados, has_filters = filtrar_eventos(eventos_todos, request.args)
 
     bairros = sorted(list(set([e['local'] for e in eventos_todos if e['local']])))
     
-    return render_template('index.html', 
+    # Disable caching for the main page
+    response = make_response(render_template('index.html', 
                            eventos=eventos_filtrados,
                            bairros=bairros,
-                           estilos=estilos, # Pass processed unique styles
+                           estilos=estilos,
                            total=len(eventos_filtrados),
-                           google_maps_api_key=GOOGLE_MAPS_API_KEY)
+                           has_filters=has_filters,
+                           google_maps_api_key=GOOGLE_MAPS_API_KEY))
+    
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.route('/api/eventos')
 def api_eventos():
     eventos_todos, _ = fetch_carnival_data()
-    eventos_filtrados = filtrar_eventos(eventos_todos, request.args)
+    eventos_filtrados, _ = filtrar_eventos(eventos_todos, request.args)
     geocoded = [e for e in eventos_filtrados if e['lat'] and e['lon']]
     for e in geocoded:
         if '_dt_obj' in e: del e['_dt_obj']

@@ -22,7 +22,7 @@
             <div class="filters-wrapper" id="filters-desktop-wrapper">
                 <div class="filtros-container">
                     
-                    <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}">
+                    <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}" autocomplete="off">
                         
                         <div class="quick-filters">
                             <div class="filter-group">
@@ -122,7 +122,7 @@
 
                         <div class="filter-actions-row filter-footer">
                             <button type="submit" class="btn-filtrar">Filtrar</button>
-                            <a href="{{ url_for('mostrar_eventos') }}" class="btn-limpar" onclick="clearMapBounds()">Limpar</a>
+                            <button type="button" class="btn-limpar" onclick="resetApp()">Limpar</button>
                         </div>
                     </form>
                 </div>
@@ -197,7 +197,7 @@
                                 <div class="card-actions">
                                     {% if evento.lat and evento.lon %}
                                     <button class="directions-btn" onclick="getDirections({{ evento.lat }}, {{ evento.lon }}, event)">
-                                        🚗 Como Chegar 🚶
+                                        🚗 Como Chegar
                                     </button>
                                     {% endif %}
                                     
@@ -238,7 +238,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
 <script>
-    // SVG ICONS for JS
+    const hasActiveFilters = {{ 'true' if has_filters else 'false' }};
+
     const ICONS = {
         kids: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19 13H17.91C17.64 10.09 15.33 7.78 12.41 7.54V6C12.41 3.69 13.95 1.78 16.1 1.22C16.7 1.06 17.07 0.43 16.91 -0.17C16.75 -0.77 16.12 -1.14 15.52 -0.98C12.59 0.04 10.37 2.22 10.04 5H9.96C6.66 5.37 4 8.27 4 11.75V15H6V18C6 19.66 7.34 21 9 21C10.66 21 12 19.66 12 18V15H15.5V18C15.5 19.66 16.84 21 18.5 21C20.16 21 21.5 19.66 21.5 18V16.29C23.05 15.38 24 13.62 24 11.75V11C24 10.45 23.55 10 23 10C22.45 10 22 10.45 22 11V11.75C22 12.85 21.1 13.75 20 13.75V13H19ZM9 18C8.45 18 8 17.55 8 17V15H10V17C10 17.55 9.55 18 9 18ZM18.5 18C17.95 18 17.5 17.55 17.5 17V16H19.5V17C19.5 17.55 19.05 18 18.5 18Z" transform="translate(0, 2)"/> </svg>`,
         lgbt: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" stroke="none"><rect x="2" y="4" width="28" height="4" fill="#FF4B4B"/><rect x="2" y="8" width="28" height="4" fill="#FFB04B"/><rect x="2" y="12" width="28" height="4" fill="#FFEB3B"/><rect x="2" y="16" width="28" height="4" fill="#4CAF50"/><rect x="2" y="20" width="28" height="4" fill="#2196F3"/><rect x="2" y="24" width="28" height="4" fill="#9C27B0"/></svg>`,
@@ -254,10 +255,27 @@
         'hoje': '#8e44ad', 'encerrado': '#95a5a6', 'futuro': '#E91E63'
     };
 
-    function clearMapBounds() {
-        ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng', 'center_lat', 'center_lng', 'zoom'].forEach(id => {
-            document.getElementById(id).value = '';
+    function cleanUrlParams() {
+        const url = new URL(window.location);
+        const paramsToRemove = [
+            'ne_lat', 'ne_lng', 'sw_lat', 'sw_lng', 'center_lat', 'center_lng', 'zoom',
+            'quick_filter', 'status_filter', 'data_filtro', 'periodo_dia', 'bairro', 'categoria', 'q'
+        ];
+        let changed = false;
+        paramsToRemove.forEach(param => {
+            if (url.searchParams.has(param)) {
+                url.searchParams.delete(param);
+                changed = true;
+            }
         });
+        if (changed) {
+            window.history.replaceState({}, '', url);
+        }
+    }
+
+    function resetApp() {
+        localStorage.removeItem('mapState');
+        window.location.href = '/';
     }
 
     function getDirections(destLat, destLon, event) {
@@ -320,10 +338,13 @@
         applyFavoritesUI();
     }
 
+    // UPDATED: Counts visible cards and updates text
     function applyFavoritesUI() {
         const favs = getFavorites();
         const cards = document.querySelectorAll('.evento-card');
         const showOnly = document.getElementById('show-favorites-only').checked;
+        
+        let visibleCount = 0;
 
         cards.forEach(card => {
             const id = card.dataset.id;
@@ -333,12 +354,23 @@
             else card.classList.remove('is-favorite');
 
             if (showOnly) {
-                if (!isFav) card.style.display = 'none';
-                else card.style.display = 'flex';
+                if (!isFav) {
+                    card.style.display = 'none';
+                } else {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                }
             } else {
                 card.style.display = 'flex';
+                visibleCount++;
             }
         });
+
+        // Update the Total Count Text
+        const totalElement = document.querySelector('.total-count');
+        if (totalElement) {
+            totalElement.textContent = `${visibleCount} blocos encontrados.`;
+        }
 
         if (window.markersMap && window.markersFeatureGroup) {
             Object.keys(window.markersMap).forEach(id => {
@@ -366,6 +398,10 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     
+    // Capture filters before cleaning (if any exist)
+    const activeParams = new URLSearchParams(window.location.search);
+    cleanUrlParams();
+
     flatpickr("#data_filtro", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m", locale: "pt", disableMobile: "true" });
 
     const favToggle = document.getElementById('show-favorites-only');
@@ -374,23 +410,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const mapElement = document.getElementById('map');
     if (mapElement) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const savedLat = urlParams.get('center_lat');
-        const savedLng = urlParams.get('center_lng');
-        const savedZoom = urlParams.get('zoom');
+        const formLat = document.getElementById('center_lat').value;
+        const formLng = document.getElementById('center_lng').value;
+        const formZoom = document.getElementById('zoom').value;
 
         let initialView = [-19.9167, -43.9345];
         let initialZoom = 13;
         let isSavedState = false;
 
-        if (savedLat && savedLng && savedZoom) {
-            initialView = [parseFloat(savedLat), parseFloat(savedLng)];
-            initialZoom = parseInt(savedZoom);
+        // Prioritize explicit search (Search Area)
+        if (formLat && formLng && formZoom) {
+            initialView = [parseFloat(formLat), parseFloat(formLng)];
+            initialZoom = parseInt(formZoom);
             isSavedState = true;
+        } 
+        else {
+            const savedMapState = localStorage.getItem('mapState');
+            if (savedMapState) {
+                try {
+                    const parsedState = JSON.parse(savedMapState);
+                    if (parsedState.lat && parsedState.lng && parsedState.zoom) {
+                        initialView = [parsedState.lat, parsedState.lng];
+                        initialZoom = parsedState.zoom;
+                    }
+                } catch(e) { console.error("Map state error", e); }
+            }
         }
 
         window.mapInstance = L.map('map', { zoomControl: false }).setView(initialView, initialZoom);
         L.control.zoom({ position: 'topleft' }).addTo(window.mapInstance);
+
+        window.mapInstance.on('moveend', function() {
+            const center = window.mapInstance.getCenter();
+            const zoom = window.mapInstance.getZoom();
+            const state = { lat: center.lat, lng: center.lng, zoom: zoom };
+            localStorage.setItem('mapState', JSON.stringify(state));
+            
+            const searchBtn = document.getElementById('search-in-map-btn');
+            if(searchBtn) searchBtn.classList.add('visible');
+        });
 
         const ResetViewControl = L.Control.extend({
             options: { position: 'topright' },
@@ -411,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         window.mapInstance.addControl(new ResetViewControl());
 
-        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { className: 'map-tiles' });
+        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', className: 'map-tiles' });
         const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], className: 'satellite-tiles' });
 
         const savedStyle = document.getElementById('map_style').value;
@@ -435,7 +493,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const searchBtn = document.getElementById('search-in-map-btn');
-        window.mapInstance.on('moveend', () => { if(searchBtn) searchBtn.classList.add('visible'); });
         if(searchBtn) {
             searchBtn.addEventListener('click', () => { 
                 const bounds = window.mapInstance.getBounds();
@@ -484,10 +541,10 @@ document.addEventListener('DOMContentLoaded', function () {
         window.markersFeatureGroup = L.featureGroup();
         window.markersMap = {};
         
-        const currentParams = new URLSearchParams(window.location.search);
-        ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'].forEach(k => currentParams.delete(k));
+        const apiParams = new URLSearchParams(activeParams);
+        ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'].forEach(k => apiParams.delete(k));
         
-        fetch("{{ url_for('api_eventos') }}?" + currentParams.toString())
+        fetch("{{ url_for('api_eventos') }}?" + apiParams.toString())
             .then(response => response.json())
             .then(eventos => {
                 eventos.forEach(evento => {
@@ -520,8 +577,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <span style="font-size:0.85em; color:#666;">${evento.data}</span><br>
                                 <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;">
-                                    <button onclick="getDirections(${evento.lat}, ${evento.lon}, event)" class="directions-btn" style="margin-top: 0; flex: 1;">
-                                        🚗 Como Chegar 🚶
+                                    <button onclick="getDirections(${evento.lat}, ${evento.lon}, event)" class="directions-btn-small" style="margin-top: 0; flex: 1;">
+                                        🚗 Como Chegar
                                     </button>
                                     ${iconsHtml}
                                 </div>
@@ -531,7 +588,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
                 window.markersFeatureGroup.addTo(window.mapInstance);
-                if (!isSavedState && window.markersFeatureGroup.getLayers().length > 0) {
+                
+                // IF Filters Active AND NOT a Saved State ("Search in Area"), then Fit Bounds.
+                if (hasActiveFilters && !isSavedState && window.markersFeatureGroup.getLayers().length > 0) {
                     window.mapInstance.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [30, 30] });
                 }
                 
