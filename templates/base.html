@@ -14,10 +14,16 @@
     <meta name="theme-color" content="#E91E63">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/carnaval-mask-icon.png') }}">
 
+    <!-- Vercel Web Analytics -->
     <script type="module">
         import { inject } from 'https://cdn.jsdelivr.net/npm/@vercel/analytics/+esm';
         inject();
     </script>
+    <!-- Fallback for analytics tracking via Vercel Insights -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
 
     {% block head %}{% endblock %}
 </head>
