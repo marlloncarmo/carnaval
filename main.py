@@ -130,6 +130,11 @@ def filtrar_eventos(eventos_todos, args):
         target_sizes = []
         target_periods = []
 
+        if 'sab_oficial' in quick_filters: target_dates.append(datetime(2026, 2, 14).date())
+        if 'dom_oficial' in quick_filters: target_dates.append(datetime(2026, 2, 15).date())
+        if 'seg_oficial' in quick_filters: target_dates.append(datetime(2026, 2, 16).date())
+        if 'ter_oficial' in quick_filters: target_dates.append(datetime(2026, 2, 17).date())
+
         if 'hoje' in quick_filters: target_dates.append(now.date())
         if 'amanha' in quick_filters: target_dates.append(now.date() + timedelta(days=1))
         

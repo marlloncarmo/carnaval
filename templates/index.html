@@ -25,6 +25,26 @@
                     <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}" autocomplete="off">
                         
                         <div class="quick-filters">
+                            
+                            <div class="filter-group">
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="sab_oficial" {% if 'sab_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span class="chip-destaque">Sáb 14</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="dom_oficial" {% if 'dom_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span class="chip-destaque">Dom 15</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="seg_oficial" {% if 'seg_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span class="chip-destaque">Seg 16</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="ter_oficial" {% if 'ter_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span class="chip-destaque">Ter 17</span>
+                                </label>
+                            </div>
+
                             <div class="filter-group">
                                 <label class="chip-checkbox">
                                     <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
@@ -35,6 +55,7 @@
                                     <span>Amanhã</span>
                                 </label>
                             </div>
+
                             <div class="filter-group">
                                 <label class="chip-checkbox">
                                     <input type="checkbox" name="quick_filter" value="em-andamento" {% if 'em-andamento' in request.args.getlist('quick_filter') %}checked{% endif %}>
@@ -49,6 +70,7 @@
                                     <span>Encerrando</span>
                                 </label>
                             </div>
+
                             <div class="filter-group">
                                 <label class="chip-checkbox">
                                     <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
@@ -63,6 +85,7 @@
                                     <span>Grandes</span>
                                 </label>
                             </div>
+
                             <div class="filter-group">
                                 <label class="chip-checkbox">
                                     <input type="checkbox" name="quick_filter" value="manha" {% if 'manha' in request.args.getlist('quick_filter') %}checked{% endif %}>
@@ -322,15 +345,15 @@
 
     // UPDATED: Check for expanded class to stop unwanted map moves
     function toggleCard(card) {
-        // Fecha outros cards abertos
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
         
-        // Alterna o estado do card atual
+        // Toggle the state
         card.classList.toggle('expanded');
         
-        // Se o card foi fechado, não faz nada no mapa
+        // FIX: If the card was just closed (class removed), stop here.
+        // This prevents the map from moving when closing a card.
         if (!card.classList.contains('expanded')) {
             return;
         }
@@ -342,43 +365,28 @@
         if (window.mapInstance && !isNaN(lat) && !isNaN(lon)) {
             
             // --- INÍCIO DO CÁLCULO DE CENTRALIZAÇÃO ---
-            const targetZoom = 16; // Zoom ao clicar
-            
-            // AJUSTE AQUI A POSIÇÃO VERTICAL DO MARCADOR:
-            // -50 (Negativo) = O marcador fica ABAIXO do centro da tela.
-            //  150 (Positivo) = O marcador fica ACIMA do centro (bom se tiver botão embaixo).
-            //  0  = Exatamente no centro.
-            const offsetPixels = -50; 
+            const targetZoom = 16;
+            const offsetPixels = -50; // Centralização abaixo do centro
 
-            // 1. Projeta a coordenada (lat/lon) para pixels
             const targetPoint = window.mapInstance.project([lat, lon], targetZoom);
-            
-            // 2. Desloca o centro do mapa
-            // Se 'offsetPixels' é negativo (-50), subtraímos do Y. O centro do mapa sobe, o marcador desce visualmente.
             const newTargetPoint = targetPoint.add([0, offsetPixels]);
-            
-            // 3. Converte de volta para Lat/Lon
             const newLatLon = window.mapInstance.unproject(newTargetPoint, targetZoom);
 
-            // 4. Move o mapa suavemente
             window.mapInstance.flyTo(newLatLon, targetZoom, { duration: 1.2 });
             // --- FIM DO CÁLCULO ---
             
-            // Lógica visual do marcador (pulo e popup)
             if (window.markersMap[id]) {
                 const current = window.markersMap[id];
                 const markerElement = current.marker.getElement(); 
-                
-                // Efeito de pulso no marcador
                 if (markerElement) {
                     markerElement.classList.remove('marker-active-pulse');
-                    void markerElement.offsetWidth; // Força reflow
+                    void markerElement.offsetWidth; 
                     markerElement.classList.add('marker-active-pulse');
                     setTimeout(() => { markerElement.classList.remove('marker-active-pulse'); }, 1000);
                 }
-                
-                // Traz para frente e abre o balão
                 current.marker.bringToFront();
+                
+                // Open popup shortly after start
                 setTimeout(() => {
                     current.marker.openPopup();
                 }, 300);
