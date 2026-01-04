@@ -22,30 +22,30 @@
             <div class="filters-wrapper" id="filters-desktop-wrapper">
                 <div class="filtros-container">
                     
-                    <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}">
-                        <div class="quick-filters">
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Hoje</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Amanhã</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Grandes</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Médios</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Pequenos</span>
-                            </label>
-                        </div>
+                    <div class="quick-filters">
+                        <label class="chip-checkbox">
+                            <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                            <span>Hoje</span>
+                        </label>
+                        <label class="chip-checkbox">
+                            <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                            <span>Amanhã</span>
+                        </label>
+                        <label class="chip-checkbox">
+                            <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                            <span>Grandes</span>
+                        </label>
+                        <label class="chip-checkbox">
+                            <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                            <span>Médios</span>
+                        </label>
+                        <label class="chip-checkbox">
+                            <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                            <span>Pequenos</span>
+                        </label>
+                    </div>
 
+                    <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}">
                         <input type="hidden" id="ne_lat" name="ne_lat" value="{{ request.args.get('ne_lat', '') }}">
                         <input type="hidden" id="ne_lng" name="ne_lng" value="{{ request.args.get('ne_lng', '') }}">
                         <input type="hidden" id="sw_lat" name="sw_lat" value="{{ request.args.get('sw_lat', '') }}">
@@ -182,7 +182,7 @@
                             <div class="expand-content">
                                 <div class="card-actions">
                                     {% if evento.lat and evento.lon %}
-                                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ evento.lat }},{{ evento.lon }}" target="_blank" class="directions-btn" onclick="event.stopPropagation();">
+                                    <a href="http://googleusercontent.com/maps.google.com/?q={{ evento.lat }},{{ evento.lon }}" target="_blank" class="directions-btn" onclick="event.stopPropagation();">
                                         🚗 Como Chegar
                                     </a>
                                     {% endif %}
@@ -224,7 +224,6 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
 <script>
-    // ... (Keep existing PWA and Color logic) ...
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); });
     }
@@ -240,14 +239,10 @@
         });
     }
 
-    // 1. UPDATED toggleCard: Unselect others
     function toggleCard(card) {
-        // Collapse all OTHER cards
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
-
-        // Toggle clicked card
         card.classList.toggle('expanded');
         
         const id = card.dataset.id;
@@ -256,7 +251,6 @@
 
         if (window.mapInstance && lat && lon) {
             window.mapInstance.setView([lat, lon], 16, { animate: true, duration: 1.0 });
-            // Pulse logic...
             if (window.markersMap[id]) {
                 const current = window.markersMap[id];
                 const markerElement = current.marker.getElement(); 
@@ -271,7 +265,6 @@
         }
     }
 
-    // 3. FAVORITES VISIBILITY LOGIC
     function getFavorites() {
         return JSON.parse(localStorage.getItem('my_blocos') || '[]');
     }
@@ -301,202 +294,219 @@
             else card.classList.remove('is-favorite');
 
             if (showOnly) {
-                // Important: Keep grid layout logic. 
-                // Only hide if NOT a favorite.
                 if (!isFav) card.style.display = 'none';
                 else card.style.display = 'flex';
             } else {
                 card.style.display = 'flex';
             }
         });
-        
-        // Update Total Count Text if filtering
-        const visibleCount = document.querySelectorAll('.evento-card[style="display: flex;"]').length;
-        // Optional: Update text, but server-side count is currently static in this template
-    }
 
-    // ... (Keep existing DOMContentLoaded logic) ...
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr("#data_filtro", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m", locale: "pt", disableMobile: "true" });
+        if (window.markersMap && window.markersFeatureGroup) {
+            Object.keys(window.markersMap).forEach(id => {
+                const markerObj = window.markersMap[id];
+                const isFav = favs.includes(id);
 
-        const favToggle = document.getElementById('show-favorites-only');
-        if(favToggle) { favToggle.addEventListener('change', applyFavoritesUI); }
-        applyFavoritesUI();
-
-        // ... (Existing Map Initialization) ...
-        const mapElement = document.getElementById('map');
-        if (mapElement) {
-            // Paste the full map logic from previous steps here
-            const urlParams = new URLSearchParams(window.location.search);
-            const savedLat = urlParams.get('center_lat');
-            const savedLng = urlParams.get('center_lng');
-            const savedZoom = urlParams.get('zoom');
-
-            let initialView = [-19.9167, -43.9345];
-            let initialZoom = 13;
-            let isSavedState = false;
-
-            if (savedLat && savedLng && savedZoom) {
-                initialView = [parseFloat(savedLat), parseFloat(savedLng)];
-                initialZoom = parseInt(savedZoom);
-                isSavedState = true;
-            }
-
-            window.mapInstance = L.map('map', { zoomControl: false }).setView(initialView, initialZoom);
-            L.control.zoom({ position: 'topleft' }).addTo(window.mapInstance);
-
-            const ResetViewControl = L.Control.extend({
-                options: { position: 'topright' },
-                onAdd: function(map) {
-                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom leaflet-control-reset');
-                    const button = L.DomUtil.create('a', '', container);
-                    button.title = "Visualizar Todos";
-                    button.href = "#";
-                    button.onclick = function(e) {
-                        e.preventDefault();
-                        if (window.markersFeatureGroup) {
-                            map.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [20, 20] });
+                if (showOnly) {
+                    if (isFav) {
+                        if (!window.markersFeatureGroup.hasLayer(markerObj.marker)) {
+                            window.markersFeatureGroup.addLayer(markerObj.marker);
                         }
-                        return false;
-                    };
-                    return container;
+                    } else {
+                        if (window.markersFeatureGroup.hasLayer(markerObj.marker)) {
+                            window.markersFeatureGroup.removeLayer(markerObj.marker);
+                        }
+                    }
+                } else {
+                    if (!window.markersFeatureGroup.hasLayer(markerObj.marker)) {
+                        window.markersFeatureGroup.addLayer(markerObj.marker);
+                    }
                 }
             });
-            window.mapInstance.addControl(new ResetViewControl());
+        }
+    }
 
-            const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', className: 'map-tiles' });
-            const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], className: 'satellite-tiles' });
+document.addEventListener('DOMContentLoaded', function () {
+    
+    flatpickr("#data_filtro", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m", locale: "pt", disableMobile: "true" });
 
-            const savedStyle = document.getElementById('map_style').value;
-            const satToggle = document.getElementById('satellite-toggle');
-            
-            if (savedStyle === 'satellite') { satelliteLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = true; } 
-            else { gpsLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = false; }
+    const favToggle = document.getElementById('show-favorites-only');
+    if(favToggle) { favToggle.addEventListener('change', applyFavoritesUI); }
+    applyFavoritesUI();
 
-            if (satToggle) {
-                satToggle.addEventListener('change', function() {
-                    if (this.checked) {
-                        if (window.mapInstance.hasLayer(gpsLayer)) window.mapInstance.removeLayer(gpsLayer);
-                        satelliteLayer.addTo(window.mapInstance);
-                        document.getElementById('map_style').value = 'satellite';
-                    } else {
-                        if (window.mapInstance.hasLayer(satelliteLayer)) window.mapInstance.removeLayer(satelliteLayer);
-                        gpsLayer.addTo(window.mapInstance);
-                        document.getElementById('map_style').value = 'gps';
-                    }
-                });
-            }
+    const mapElement = document.getElementById('map');
+    if (mapElement) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const savedLat = urlParams.get('center_lat');
+        const savedLng = urlParams.get('center_lng');
+        const savedZoom = urlParams.get('zoom');
 
-            const searchBtn = document.getElementById('search-in-map-btn');
-            window.mapInstance.on('moveend', () => { if(searchBtn) searchBtn.classList.add('visible'); });
-            if(searchBtn) {
-                searchBtn.addEventListener('click', () => { 
-                    const bounds = window.mapInstance.getBounds();
-                    const center = window.mapInstance.getCenter();
-                    const zoom = window.mapInstance.getZoom();
-                    document.getElementById('ne_lat').value = bounds.getNorthEast().lat;
-                    document.getElementById('ne_lng').value = bounds.getNorthEast().lng;
-                    document.getElementById('sw_lat').value = bounds.getSouthWest().lat;
-                    document.getElementById('sw_lng').value = bounds.getSouthWest().lng;
-                    document.getElementById('center_lat').value = center.lat;
-                    document.getElementById('center_lng').value = center.lng;
-                    document.getElementById('zoom').value = zoom;
-                    document.getElementById('filter-form').submit();
-                });
-            }
+        let initialView = [-19.9167, -43.9345];
+        let initialZoom = 13;
+        let isSavedState = false;
 
-            const locateBtn = document.getElementById('locate-btn');
-            let userMarker = null; let watchId = null; let isFollowing = false;
-            if (locateBtn) {
-                locateBtn.addEventListener('click', function() {
-                    if (watchId !== null) {
-                        isFollowing = true;
-                        locateBtn.classList.add('active'); 
-                        if (userMarker) window.mapInstance.setView(userMarker.getLatLng(), 17);
-                        return;
-                    }
-                    if (navigator.geolocation) {
-                        locateBtn.classList.add('active'); 
-                        isFollowing = true;
-                        watchId = navigator.geolocation.watchPosition(function(position) {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            const newLatLng = [lat, lng];
-                            if (!userMarker) {
-                                const userIcon = L.divIcon({ className: 'user-location-marker', html: '<div class="user-dot"></div><div class="user-pulse"></div>', iconSize: [40, 40], iconAnchor: [20, 20] });
-                                userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
-                                userMarker.bindPopup("<b>Você está aqui</b>");
-                            } else { userMarker.setLatLng(newLatLng); }
-                            if (isFollowing) window.mapInstance.setView(newLatLng, 17, { animate: true });
-                        }, function(error) { alert("Erro GPS."); locateBtn.classList.remove('active'); }, { enableHighAccuracy: true });
-                        window.mapInstance.on('dragstart', function() { isFollowing = false; locateBtn.classList.remove('active'); });
-                    }
-                });
-            }
-
-            window.markersFeatureGroup = L.featureGroup();
-            window.markersMap = {};
-            
-            const currentParams = new URLSearchParams(window.location.search);
-            ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'].forEach(k => currentParams.delete(k));
-            
-            fetch("{{ url_for('api_eventos') }}?" + currentParams.toString())
-                .then(response => response.json())
-                .then(eventos => {
-                    eventos.forEach(evento => {
-                        if (evento.status === 'encerrado') return; 
-                        if (evento.lat && evento.lon) {
-                            let radiusSize = 6; 
-                            if (evento.tamanho === 2) radiusSize = 10;
-                            if (evento.tamanho === 3) radiusSize = 16;
-                            const markerColor = statusColors[evento.status] || '#E91E63';
-                            const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
-                            const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
-                            if (evento.id) window.markersMap[evento.id] = { marker: marker, style: defaultStyle };
-                            
-                            const popupContent = `
-                                <div style="font-family: 'Poppins', sans-serif;">
-                                    <strong style="color: ${markerColor};">${evento.titulo}</strong><br>
-                                    <span style="font-size:0.8em; background:#eee; padding:1px 4px; border-radius:3px; margin-right:5px;">${evento.tamanho == 3 ? "Grande" : "Pequeno"}</span>
-                                    <span style="font-size:0.85em; color:#666;">${evento.data}</span><br>
-                                    <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
-                                    <a href="https://www.google.com/maps/dir/?api=1&destination=${evento.lat},${evento.lon}" target="_blank" style="display:block; margin-top:8px; background:${markerColor}; color:white; text-align:center; padding:4px; border-radius:4px; text-decoration:none; font-size:0.8em;">🚗 Como Chegar</a>
-                                </div>
-                            `;
-                            marker.bindPopup(popupContent);
-                        }
-                    });
-                    window.markersFeatureGroup.addTo(window.mapInstance);
-                    if (!isSavedState && window.markersFeatureGroup.getLayers().length > 0) {
-                        window.mapInstance.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [30, 30] });
-                    }
-                })
-                .catch(err => console.error(err));
+        if (savedLat && savedLng && savedZoom) {
+            initialView = [parseFloat(savedLat), parseFloat(savedLng)];
+            initialZoom = parseInt(savedZoom);
+            isSavedState = true;
         }
 
-        // ... (Mobile logic) ...
-        const mobileBtn = document.getElementById('mobile-filter-btn');
-        const modal = document.getElementById('mobile-filter-modal');
-        const closeBtn = document.getElementById('close-modal-btn');
-        const form = document.getElementById('filter-form');
-        const mobileContainer = document.getElementById('mobile-filters-container');
-        const desktopWrapper = document.querySelector('.filtros-container');
+        window.mapInstance = L.map('map', { zoomControl: false }).setView(initialView, initialZoom);
+        L.control.zoom({ position: 'topleft' }).addTo(window.mapInstance);
 
-        function adjustFilterLayout() {
-            if (window.innerWidth <= 768) {
-                if (form && mobileContainer && !mobileContainer.contains(form)) mobileContainer.appendChild(form);
-            } else {
-                if (form && desktopWrapper && !desktopWrapper.contains(form)) desktopWrapper.appendChild(form);
+        const ResetViewControl = L.Control.extend({
+            options: { position: 'topright' },
+            onAdd: function(map) {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom leaflet-control-reset');
+                const button = L.DomUtil.create('a', '', container);
+                button.title = "Visualizar Todos";
+                button.href = "#";
+                button.onclick = function(e) {
+                    e.preventDefault();
+                    if (window.markersFeatureGroup) {
+                        map.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [20, 20] });
+                    }
+                    return false;
+                };
+                return container;
             }
-        }
-        window.addEventListener('resize', adjustFilterLayout);
-        adjustFilterLayout();
+        });
+        window.mapInstance.addControl(new ResetViewControl());
 
-        if (mobileBtn) {
-            mobileBtn.addEventListener('click', () => modal.classList.add('show'));
-            closeBtn.addEventListener('click', () => modal.classList.remove('show'));
-            window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', className: 'map-tiles' });
+        const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], className: 'satellite-tiles' });
+
+        const savedStyle = document.getElementById('map_style').value;
+        const satToggle = document.getElementById('satellite-toggle');
+        
+        if (savedStyle === 'satellite') { satelliteLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = true; } 
+        else { gpsLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = false; }
+
+        if (satToggle) {
+            satToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    if (window.mapInstance.hasLayer(gpsLayer)) window.mapInstance.removeLayer(gpsLayer);
+                    satelliteLayer.addTo(window.mapInstance);
+                    document.getElementById('map_style').value = 'satellite';
+                } else {
+                    if (window.mapInstance.hasLayer(satelliteLayer)) window.mapInstance.removeLayer(satelliteLayer);
+                    gpsLayer.addTo(window.mapInstance);
+                    document.getElementById('map_style').value = 'gps';
+                }
+            });
         }
-    });
+
+        const searchBtn = document.getElementById('search-in-map-btn');
+        window.mapInstance.on('moveend', () => { if(searchBtn) searchBtn.classList.add('visible'); });
+        if(searchBtn) {
+            searchBtn.addEventListener('click', () => { 
+                const bounds = window.mapInstance.getBounds();
+                const center = window.mapInstance.getCenter();
+                const zoom = window.mapInstance.getZoom();
+                document.getElementById('ne_lat').value = bounds.getNorthEast().lat;
+                document.getElementById('ne_lng').value = bounds.getNorthEast().lng;
+                document.getElementById('sw_lat').value = bounds.getSouthWest().lat;
+                document.getElementById('sw_lng').value = bounds.getSouthWest().lng;
+                document.getElementById('center_lat').value = center.lat;
+                document.getElementById('center_lng').value = center.lng;
+                document.getElementById('zoom').value = zoom;
+                document.getElementById('filter-form').submit();
+            });
+        }
+
+        const locateBtn = document.getElementById('locate-btn');
+        let userMarker = null; let watchId = null; let isFollowing = false;
+        if (locateBtn) {
+            locateBtn.addEventListener('click', function() {
+                if (watchId !== null) {
+                    isFollowing = true;
+                    locateBtn.classList.add('active'); 
+                    if (userMarker) window.mapInstance.setView(userMarker.getLatLng(), 17);
+                    return;
+                }
+                if (navigator.geolocation) {
+                    locateBtn.classList.add('active'); 
+                    isFollowing = true;
+                    watchId = navigator.geolocation.watchPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const newLatLng = [lat, lng];
+                        if (!userMarker) {
+                            const userIcon = L.divIcon({ className: 'user-location-marker', html: '<div class="user-dot"></div><div class="user-pulse"></div>', iconSize: [40, 40], iconAnchor: [20, 20] });
+                            userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
+                            userMarker.bindPopup("<b>Você está aqui</b>");
+                        } else { userMarker.setLatLng(newLatLng); }
+                        if (isFollowing) window.mapInstance.setView(newLatLng, 17, { animate: true });
+                    }, function(error) { alert("Erro GPS."); locateBtn.classList.remove('active'); }, { enableHighAccuracy: true });
+                    window.mapInstance.on('dragstart', function() { isFollowing = false; locateBtn.classList.remove('active'); });
+                }
+            });
+        }
+
+        window.markersFeatureGroup = L.featureGroup();
+        window.markersMap = {};
+        
+        const currentParams = new URLSearchParams(window.location.search);
+        ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'].forEach(k => currentParams.delete(k));
+        
+        fetch("{{ url_for('api_eventos') }}?" + currentParams.toString())
+            .then(response => response.json())
+            .then(eventos => {
+                eventos.forEach(evento => {
+                    if (evento.status === 'encerrado') return; 
+                    if (evento.lat && evento.lon) {
+                        let radiusSize = 6; 
+                        if (evento.tamanho === 2) radiusSize = 10;
+                        if (evento.tamanho === 3) radiusSize = 16;
+                        const markerColor = statusColors[evento.status] || '#E91E63';
+                        const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
+                        const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
+                        if (evento.id) window.markersMap[evento.id] = { marker: marker, style: defaultStyle };
+                        
+                        // FIXED: Javascript Template Literal here, NOT Jinja syntax
+                        const popupContent = `
+                            <div style="font-family: 'Poppins', sans-serif;">
+                                <strong style="color: ${markerColor};">${evento.titulo}</strong><br>
+                                <span style="font-size:0.8em; background:#eee; padding:1px 4px; border-radius:3px; margin-right:5px;">${evento.tamanho == 3 ? "Grande" : "Pequeno"}</span>
+                                <span style="font-size:0.85em; color:#666;">${evento.data}</span><br>
+                                <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
+                                <a href="http://googleusercontent.com/maps.google.com/?q=${evento.lat},${evento.lon}" target="_blank" style="display:block; margin-top:8px; background:${markerColor}; color:white; text-align:center; padding:4px; border-radius:4px; text-decoration:none; font-size:0.8em;">🚗 Como Chegar</a>
+                            </div>
+                        `;
+                        marker.bindPopup(popupContent);
+                    }
+                });
+                window.markersFeatureGroup.addTo(window.mapInstance);
+                if (!isSavedState && window.markersFeatureGroup.getLayers().length > 0) {
+                    window.mapInstance.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [30, 30] });
+                }
+                
+                applyFavoritesUI();
+            })
+            .catch(err => console.error(err));
+    }
+
+    const mobileBtn = document.getElementById('mobile-filter-btn');
+    const modal = document.getElementById('mobile-filter-modal');
+    const closeBtn = document.getElementById('close-modal-btn');
+    const form = document.getElementById('filter-form');
+    const mobileContainer = document.getElementById('mobile-filters-container');
+    const desktopWrapper = document.querySelector('.filtros-container');
+
+    function adjustFilterLayout() {
+        if (window.innerWidth <= 768) {
+            if (form && mobileContainer && !mobileContainer.contains(form)) mobileContainer.appendChild(form);
+        } else {
+            if (form && desktopWrapper && !desktopWrapper.contains(form)) desktopWrapper.appendChild(form);
+        }
+    }
+    window.addEventListener('resize', adjustFilterLayout);
+    adjustFilterLayout();
+
+    if (mobileBtn) {
+        mobileBtn.addEventListener('click', () => modal.classList.add('show'));
+        closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+    }
+});
 </script>
 {% endblock %}
