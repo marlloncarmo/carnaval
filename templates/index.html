@@ -312,7 +312,6 @@
         window.location.href = '/';
     }
 
-    // UPDATED: User-provided structure (No Emojis)
     function shareBlock(id, title, date, event) {
         event.stopPropagation();
         
@@ -343,19 +342,49 @@
         }
     }
 
-    // UPDATED: Check for expanded class to stop unwanted map moves
+    // --- LÓGICA DE SELEÇÃO PELO MAPA (Move para o topo) ---
+    function selectCardFromMap(id) {
+        const card = document.querySelector(`.evento-card[data-id="${id}"]`);
+        const container = document.querySelector('.events-list-container');
+
+        if (card) {
+            // Reseta todos para ordem 0
+            document.querySelectorAll('.evento-card').forEach(c => {
+                c.style.order = '0'; 
+                c.classList.remove('expanded');
+                c.classList.remove('highlighted');
+            });
+            
+            // Joga SOMENTE este para o topo (-1)
+            card.style.order = '-1';
+            
+            // Expande e destaca
+            card.classList.add('expanded');
+            card.classList.add('highlighted');
+            setTimeout(() => card.classList.remove('highlighted'), 2000); 
+
+            // Rola a lista para o topo
+            if (container) {
+                container.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    }
+
+    // --- LÓGICA DE CLIQUE NA LISTA (Não muda ordem) ---
     function toggleCard(card) {
+        // Fecha outros cards
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
         
-        // Toggle the state
+        // Alterna o estado do atual (apenas expande/colhe)
         card.classList.toggle('expanded');
         
-        // FIX: If the card was just closed (class removed), stop here.
-        // This prevents the map from moving when closing a card.
+        // NOTA: Removemos a lógica de style.order daqui.
+        // Clicar na lista NÃO altera a posição do card.
+
         if (!card.classList.contains('expanded')) {
-            return;
+             return;
         }
 
         const id = card.dataset.id;
@@ -364,16 +393,14 @@
 
         if (window.mapInstance && !isNaN(lat) && !isNaN(lon)) {
             
-            // --- INÍCIO DO CÁLCULO DE CENTRALIZAÇÃO ---
             const targetZoom = 16;
-            const offsetPixels = -50; // Centralização abaixo do centro
+            const offsetPixels = -50; 
 
             const targetPoint = window.mapInstance.project([lat, lon], targetZoom);
             const newTargetPoint = targetPoint.add([0, offsetPixels]);
             const newLatLon = window.mapInstance.unproject(newTargetPoint, targetZoom);
 
             window.mapInstance.flyTo(newLatLon, targetZoom, { duration: 1.2 });
-            // --- FIM DO CÁLCULO ---
             
             if (window.markersMap[id]) {
                 const current = window.markersMap[id];
@@ -386,7 +413,7 @@
                 }
                 current.marker.bringToFront();
                 
-                // Open popup shortly after start
+                // Abre o popup, mas isso não afeta a ordem da lista
                 setTimeout(() => {
                     current.marker.openPopup();
                 }, 300);
@@ -636,6 +663,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         const markerColor = statusColors[evento.status] || '#E91E63';
                         const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
                         const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
+                        
+                        // LIGAÇÃO DO CLICK NO MAPA COM A LISTA
+                        marker.on('click', () => {
+                            selectCardFromMap(evento.id);
+                        });
+                        
+                        // --- NOVO: SE FECHAR O POPUP, O CARD VOLTA PRO LUGAR ORIGINAL ---
+                        marker.on('popupclose', () => {
+                            const card = document.querySelector(`.evento-card[data-id="${evento.id}"]`);
+                            if (card) {
+                                card.style.order = '0'; // Reseta a ordem
+                            }
+                        });
+
                         if (evento.id) window.markersMap[evento.id] = { marker: marker, style: defaultStyle };
                         
                         let iconsHtml = '<div style="display:flex; gap:4px; flex-shrink: 0;">'; 
