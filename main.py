@@ -223,7 +223,6 @@ def filtrar_eventos(eventos_todos, args):
     filtro_data = args.get('data_filtro')
     filtro_bairro = args.get('bairro')
     filtro_estilo = args.get('categoria')
-    filtro_status = args.get('status_filter')
     quick_filters = args.getlist('quick_filter') 
     
     busca = args.get('q', '').lower()
@@ -235,12 +234,6 @@ def filtrar_eventos(eventos_todos, args):
     eventos_filtrados = eventos_todos
     now = datetime.now()
 
-    if filtro_status:
-        if filtro_status == 'hoje':
-            eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() == now.date()]
-        else:
-            eventos_filtrados = [e for e in eventos_filtrados if e['status'] == filtro_status]
-
     if quick_filters:
         target_dates = []
         target_sizes = []
@@ -248,6 +241,9 @@ def filtrar_eventos(eventos_todos, args):
 
         if 'hoje' in quick_filters: target_dates.append(now.date())
         if 'amanha' in quick_filters: target_dates.append(now.date() + timedelta(days=1))
+        
+        target_statuses = [s for s in ['em-andamento', 'em-breve', 'encerrando'] if s in quick_filters]
+        
         if 'grande' in quick_filters: target_sizes.append(3)
         if 'medio' in quick_filters: target_sizes.append(2)
         if 'pequeno' in quick_filters: target_sizes.append(1)
@@ -257,6 +253,8 @@ def filtrar_eventos(eventos_todos, args):
         
         if target_dates:
             eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() in target_dates]
+        if target_statuses:
+            eventos_filtrados = [e for e in eventos_filtrados if e['status'] in target_statuses]
         if target_sizes:
             eventos_filtrados = [e for e in eventos_filtrados if e['tamanho'] in target_sizes]
         if target_periods:

@@ -37,6 +37,20 @@
                             </div>
                             <div class="filter-group">
                                 <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="em-andamento" {% if 'em-andamento' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Em Andamento</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="em-breve" {% if 'em-breve' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Em Breve</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="encerrando" {% if 'encerrando' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Encerrando</span>
+                                </label>
+                            </div>
+                            <div class="filter-group">
+                                <label class="chip-checkbox">
                                     <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
                                     <span>Pequenos</span>
                                 </label>                    
@@ -78,16 +92,6 @@
                             <div class="filtro-item">
                                 <label for="data_filtro">Data:</label>
                                 <input type="text" id="data_filtro" name="data_filtro" value="{{ request.args.get('data_filtro', '') }}" placeholder="Selecione..." style="background-color: var(--background-color);">
-                            </div>
-                            
-                            <div class="filtro-item">
-                                <label for="status_filter">Status:</label>
-                                <select name="status_filter" id="status_filter">
-                                    <option value="">Todos</option>
-                                    <option value="em-andamento" {% if request.args.get('status_filter') == 'em-andamento' %}selected{% endif %}>Em Andamento 🟢</option>
-                                    <option value="em-breve" {% if request.args.get('status_filter') == 'em-breve' %}selected{% endif %}>Em Breve 🔵</option>
-                                    <option value="encerrado" {% if request.args.get('status_filter') == 'encerrado' %}selected{% endif %}>Encerrados ⚫</option>
-                                </select>
                             </div>
 
                             <div class="filtro-item">
