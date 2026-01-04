@@ -1,0 +1,406 @@
+{
+    "R. Augusto Franco, 100, São João Batista - São João Batista": {
+        "lat": -19.824155,
+        "lon": -43.960919
+    },
+    "Av. Abrahão Caram, 996, São José - São José": {
+        "lat": -19.8629024,
+        "lon": -43.9710156
+    },
+    "R. Antônio Peixoto, 450, Caiçara - Caiçara": {
+        "lat": -19.9017916,
+        "lon": -44.0259644
+    },
+    "Praça do Ciclista, Funcionários - Funcionários": {
+        "lat": -19.9282837,
+        "lon": -43.92791500000001
+    },
+    "R. Henrique Badaró Portugal, 68, Buritis - Buritis": {
+        "lat": -19.9757328,
+        "lon": -43.9762662
+    },
+    "Praça Santa Rita, Esplanada - Esplanada": {
+        "lat": -19.9069499,
+        "lon": -43.9073553
+    },
+    "Av. Olegário Maciel, 1808, Lourdes - Lourdes": {
+        "lat": -19.9298078,
+        "lon": -43.9472747
+    },
+    "R. Tomé de Souza, 845, Savassi - Savassi": {
+        "lat": -19.9371421,
+        "lon": -43.9348503
+    },
+    "R. Aarão Reis, 570, Centro - Centro": {
+        "lat": -19.9197027,
+        "lon": -43.9347003
+    },
+    "R. Vinte e Cinco de Agosto, 400, Aparecida - Aparecida": {
+        "lat": -19.8919624,
+        "lon": -43.9571854
+    },
+    "Av. Oscar Paschoal, 8, São José - São José": {
+        "lat": -19.8636676,
+        "lon": -43.9736578
+    },
+    "R. David Campista, 42, Floresta - Floresta": {
+        "lat": -19.9162007,
+        "lon": -43.9287003
+    },
+    "R. Doutor Mário Magalhães, 605, Itapoã - Itapoã": {
+        "lat": -19.841867,
+        "lon": -43.9561521
+    },
+    "Av. dos Engenheiros, 612, Castelo - Castelo": {
+        "lat": -19.8909525,
+        "lon": -43.9993603
+    },
+    "Rua Sergipe, 833, Savassi - Savassi": {
+        "lat": -19.9333542,
+        "lon": -43.936564
+    },
+    "R. Fagundes Varela, 99, Lagoinha - Lagoinha": {
+        "lat": -19.9068317,
+        "lon": -43.9471899
+    },
+    "R. Alberto Cintra, 342, União - União": {
+        "lat": -19.8821182,
+        "lon": -43.9287898
+    },
+    "Av. Augusto de Lima, 1883, Centro - Centro": {
+        "lat": -19.9206247,
+        "lon": -43.9540977
+    },
+    "R. Marechal Deodoro, 51, Floresta - Floresta": {
+        "lat": -19.9171879,
+        "lon": -43.927314
+    },
+    "Praça da Bandeira, Mangabeiras - Mangabeiras": {
+        "lat": -19.9490389,
+        "lon": -43.9196821
+    },
+    "R. Curitiba, 8, Centro - Centro": {
+        "lat": -19.9125842,
+        "lon": -43.9397796
+    },
+    "Praça da Estação, Centro - Centro": {
+        "lat": -19.9168158,
+        "lon": -43.933902
+    },
+    "Av. dos Andradas, 3560, Pompéia - Pompéia": {
+        "lat": -19.9157048,
+        "lon": -43.9087888
+    },
+    "Praça Carlos Chagas, 59, Santo Agostinho - Santo Agostinho": {
+        "lat": -19.9305556,
+        "lon": -43.9494444
+    },
+    "R. dos Topógrafos, 207, Alípio de Melo - Alípio de Melo": {
+        "lat": -19.8914495,
+        "lon": -44.00099729999999
+    },
+    "R. Levindo Lopes, 231, Savassi - Savassi": {
+        "lat": -19.9380331,
+        "lon": -43.9395071
+    },
+    "Av. Alvares Cabral, 377, Lourdes - Lourdes": {
+        "lat": -19.9264832,
+        "lon": -43.9383512
+    },
+    "Av. Saramenha, 1470, Guarani - Guarani": {
+        "lat": -19.8429014,
+        "lon": -43.91929469999999
+    },
+    "Av. Afonso Pena, 546, Centro - Centro": {
+        "lat": -19.9184726,
+        "lon": -43.9394317
+    },
+    "R. Itararé, 469, Concórdia - Concórdia": {
+        "lat": -19.9000845,
+        "lon": -43.9383395
+    },
+    "R. Mármore, 157, Santa Tereza - Santa Tereza": {
+        "lat": -19.9155765,
+        "lon": -43.9207993
+    },
+    "Praça Duque de Caxias, Santa Tereza - Santa Tereza": {
+        "lat": -19.9164193,
+        "lon": -43.917815
+    },
+    "Praça da Liberdade, Savassi - Savassi": {
+        "lat": -19.9329185,
+        "lon": -43.938381
+    },
+    "R. Afonso Pena Júnior, 179, Cidade Nova - Cidade Nova": {
+        "lat": -19.8906641,
+        "lon": -43.9253836
+    },
+    "Av. José Cândido da Silveira, 1647, União - União": {
+        "lat": -19.88525,
+        "lon": -43.91747
+    },
+    "R. Professor Moraes, 226, Savassi - Savassi": {
+        "lat": -19.9351877,
+        "lon": -43.9307915
+    },
+    "Praça Zamenhof, Floresta - Floresta": {
+        "lat": -19.9165254,
+        "lon": -43.9291933
+    },
+    "R. dos Otoni, 87, Santa Efigênia - Santa Efigênia": {
+        "lat": -19.9274582,
+        "lon": -43.9211968
+    },
+    "Av. Mem de Sá, 1882, Santa Efigênia - Santa Efigênia": {
+        "lat": -19.9316097,
+        "lon": -43.9076387
+    },
+    "R. Cachoeira Dourada, 53, Paraíso - Paraíso": {
+        "lat": -19.917141,
+        "lon": -43.90935899999999
+    },
+    "R. Antônio de Albuquerque, 469, Savassi - Savassi": {
+        "lat": -19.938413,
+        "lon": -43.93493300000001
+    },
+    "Av. Washington Luiz, 21, São Bernardo - São Bernardo": {
+        "lat": -19.8495345,
+        "lon": -43.9395585
+    },
+    "R. Itanhandu, 17, Carlos Prates - Carlos Prates": {
+        "lat": -19.9139294,
+        "lon": -43.96750979999999
+    },
+    "R. Mármore, 255, Santa Tereza - Santa Tereza": {
+        "lat": -19.9157597,
+        "lon": -43.9200381
+    },
+    "R. Monte Branco, 30, Nova Suissa - Nova Suissa": {
+        "lat": -19.9312668,
+        "lon": -43.9770321
+    },
+    "R. Itapema, 185, Anchieta - Anchieta": {
+        "lat": -19.9493591,
+        "lon": -43.92726560000001
+    },
+    "Av. Amazonas, 507, Centro - Centro": {
+        "lat": -19.9197953,
+        "lon": -43.9394511
+    },
+    "Av. João Pinheiro, 607, Lourdes - Lourdes": {
+        "lat": -19.9305523,
+        "lon": -43.9373205
+    },
+    "Av. Álvares Cabral, 340, Centro - Centro": {
+        "lat": -19.9259772,
+        "lon": -43.9383348
+    },
+    "R. Jornalista Geraldo Resende, 482, Serrano - Serrano": {
+        "lat": -19.8826594,
+        "lon": -44.0132884
+    },
+    "R. Versilia, 50, Bandeirantes - Bandeirantes": {
+        "lat": -19.8601936,
+        "lon": -43.9819144
+    },
+    "Av. Brasil, 1285, Santa Efigênia - Santa Efigênia": {
+        "lat": -19.9296771,
+        "lon": -43.930887
+    },
+    "Rua Ceará, 1434, Funcionários - Funcionários": {
+        "lat": -19.9337926,
+        "lon": -43.929013
+    },
+    "R. Nilo Aparecida Pinto, 425, Planalto - Planalto": {
+        "lat": -19.8300309,
+        "lon": -43.9557209
+    },
+    "R. Marechal Deodoro, 200, Floresta - Floresta": {
+        "lat": -19.9176487,
+        "lon": -43.92873489999999
+    },
+    "Av. dos Engenheiros, 500, Castelo - Castelo": {
+        "lat": -19.8915224,
+        "lon": -43.9978719
+    },
+    "Praça Arcângelo Maleta, Santa Lúcia - Santa Lúcia": {
+        "lat": -19.9674586,
+        "lon": -43.9516284
+    },
+    "R. Hortência, 523, Esplanada - Esplanada": {
+        "lat": -19.9077748,
+        "lon": -43.9062798
+    },
+    "R. Fernandes Tourinho, 604, Savassi - Savassi": {
+        "lat": -19.9383775,
+        "lon": -43.9395785
+    },
+    "Av. Getúlio Vargas, 820, Savassi - Savassi": {
+        "lat": -19.9354798,
+        "lon": -43.93133659999999
+    },
+    "R. Juda, 386, Glória - Glória": {
+        "lat": -19.8956251,
+        "lon": -44.0104852
+    },
+    "Praça do Papa, Mangabeiras - Mangabeiras": {
+        "lat": -19.9576128,
+        "lon": -43.914761
+    },
+    "R. Marília de Dirceu, 104, Lourdes - Lourdes": {
+        "lat": -19.933848,
+        "lon": -43.9460817
+    },
+    "R. Henrique Badaró Portugal, 157, Buritis - Buritis": {
+        "lat": -19.975114,
+        "lon": -43.9765634
+    },
+    "Av. Antônio Abrahão Caram, 1001, São Luiz - São Luiz": {
+        "lat": -19.8636771,
+        "lon": -43.9720372
+    },
+    "Av. Afonso Pena, 1537, Funcionários - Funcionários": {
+        "lat": -19.9257538,
+        "lon": -43.9336937
+    },
+    "R. Christina Maria Assis, 551, Califórnia - Califórnia": {
+        "lat": -19.9275265,
+        "lon": -44.0162073
+    },
+    "R. Divinópolis, 215, Santa Tereza - Santa Tereza": {
+        "lat": -19.9155896,
+        "lon": -43.9123878
+    },
+    "R. Garota de Ipanema, 307, Etelvina Carneiro - Etelvina Carneiro": {
+        "lat": -19.8118848,
+        "lon": -43.93580040000001
+    },
+    "Av. Magenta, 536, Vitória - Vitória": {
+        "lat": -19.8628238,
+        "lon": -43.889592
+    },
+    "R. Silva Jardim, 25, Floresta - Floresta": {
+        "lat": -19.9156682,
+        "lon": -43.9280625
+    },
+    "Praça Alaska, Sion - Sion": {
+        "lat": -19.9572393,
+        "lon": -43.933955
+    },
+    "R. Sergipe, 833, Funcionários - Funcionários": {
+        "lat": -19.9333542,
+        "lon": -43.936564
+    },
+    "R. São Cosme, 105, Nova Glória - Nova Glória": {
+        "lat": -19.9072156,
+        "lon": -44.0136702
+    },
+    "Av. Augusto de Lima, 1883, Barro Preto - Barro Preto": {
+        "lat": -19.9206247,
+        "lon": -43.9540977
+    },
+    "R. Tigre 175, São Salvador - São Salvador": {
+        "lat": -19.8931446,
+        "lon": -44.0118593
+    },
+    "R. Maestro Dele Andrade, 1065, Santa Efigênia - Santa Efigênia": {
+        "lat": -19.9280744,
+        "lon": -43.91336769999999
+    },
+    "R. Marcos Donato de Lima, 399, Ribeiro de Abreu - Ribeiro de Abreu": {
+        "lat": -19.8185923,
+        "lon": -43.9024898
+    },
+    "R. João Ramalho, 250, Glória - Glória": {
+        "lat": -19.9002703,
+        "lon": -44.0159814
+    },
+    "Av. dos Engenheiros, 600, Castelo - Castelo": {
+        "lat": -19.8910861,
+        "lon": -43.9992064
+    },
+    "Praça Rui Barbosa, Centro - Centro": {
+        "lat": -19.9164883,
+        "lon": -43.9351371
+    },
+    "R. Antônio Giarola, 41, Céu Azul - Céu Azul": {
+        "lat": -19.8186068,
+        "lon": -43.9972175
+    },
+    "R. Sergipe, 939, Funcionários - Funcionários": {
+        "lat": -19.9348271,
+        "lon": -43.9372176
+    },
+    "R. Marechal Deodoro, 210, Floresta - Floresta": {
+        "lat": -19.9176918,
+        "lon": -43.9288517
+    },
+    "Alameda das Palmeiras, 839, São José - São José": {
+        "lat": -19.8609342,
+        "lon": -43.9681114
+    },
+    "R. Alvarenga Peixoto, 1301, Santo Agostinho - Santo Agostinho": {
+        "lat": -19.9289835,
+        "lon": -43.9521855
+    },
+    "Av. José Cândido da Silveira, 1900, União - União": {
+        "lat": -19.885138,
+        "lon": -43.916771
+    },
+    "R. dos Metalúrgicos, 116, Alípio de Melo - Alípio de Melo": {
+        "lat": -19.8919101,
+        "lon": -44.0001511
+    },
+    "Av. Augusto de Lima, 1845, Barro Preto - Barro Preto": {
+        "lat": -19.9207829,
+        "lon": -43.9540157
+    },
+    "R. dos Tabaiares, 93, Floresta - Floresta": {
+        "lat": -19.9180896,
+        "lon": -43.9326414
+    },
+    "R. Mármore, 169, Santa Tereza - Santa Tereza": {
+        "lat": -19.915624,
+        "lon": -43.9207512
+    },
+    "R. Bragança, 4, Coqueiros - Coqueiros": {
+        "lat": -19.8988846,
+        "lon": -44.0243415
+    },
+    "R. Conselheiro Rocha, 2539, Santa Tereza - Santa Tereza": {
+        "lat": -19.9168838,
+        "lon": -43.9116325
+    },
+    "R. Michel Jeha, 178, São Bento - São Bento": {
+        "lat": -19.9540964,
+        "lon": -43.9484285
+    },
+    "R. Adamina, 349, Santa Tereza - Santa Tereza": {
+        "lat": -19.9175975,
+        "lon": -43.9187232
+    },
+    "Av. Bandeirantes, 240, Sion - Sion": {
+        "lat": -19.9572474,
+        "lon": -43.9303899
+    },
+    "R. Piauí, 628, Santa Efigênia - Santa Efigênia": {
+        "lat": -19.9270216,
+        "lon": -43.9257899
+    },
+    "R. Fernandes Tourinho, 513, Savassi - Savassi": {
+        "lat": -19.9387156,
+        "lon": -43.939464
+    },
+    "Rua Manoel dos Reis, 70, Jaraguá - Jaraguá": {
+        "lat": -19.8544473,
+        "lon": -43.9521798
+    },
+    "-": {
+        "lat": -19.919052,
+        "lon": -43.9386685
+    },
+    "Rua José Coutinho, 160, Centro - Savassi": {
+        "lat": -19.919168,
+        "lon": -43.9386558
+    }
+}

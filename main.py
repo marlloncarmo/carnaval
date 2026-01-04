@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, make_response
+from flask import Flask, render_template, request, jsonify, send_from_directory, make_response, url_for
 import os
 import requests
 import csv
@@ -17,16 +17,33 @@ SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1s_Vm7BCW1ZYtCf79CKZ7clF
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 CACHE_FILE = 'latlon_cache.json'
 
-# --- 1. GLOBAL CACHE FOR DATA ---
-# Cache structure: {'data': [eventos], 'styles': [styles], 'timestamp': datetime}
+# --- SOLUÇÃO DE CACHE (VERSIONAMENTO) ---
+# Adiciona um timestamp na URL dos arquivos estáticos (CSS/JS)
+def dated_url_for(endpoint, **values):
+    if endpoint == 'static':
+        filename = values.get('filename', None)
+        if filename:
+            file_path = os.path.join(app.root_path, endpoint, filename)
+            try:
+                values['q'] = int(os.path.getmtime(file_path))
+            except OSError:
+                pass
+    return url_for(endpoint, **values)
+
+@app.context_processor
+def override_url_for():
+    return dict(url_for=dated_url_for)
+
+# --- 1. GLOBAL CACHE FOR DATA (Eventos) ---
 DATA_CACHE = {
     'data': [],
     'styles': [],
     'timestamp': None
 }
-CACHE_DURATION_MINUTES = 30  # Refresh CSV every 5 minutes
+CACHE_DURATION_MINUTES = 30  # Atualiza o CSV a cada 30 minutos
 
-def load_cache():
+# Carrega o cache de Lat/Lon (apenas leitura neste arquivo)
+def load_geo_cache():
     if os.path.exists(CACHE_FILE):
         try:
             with open(CACHE_FILE, 'r', encoding='utf-8') as f:
@@ -35,64 +52,42 @@ def load_cache():
             return {}
     return {}
 
-def save_cache(cache_data):
-    try:
-        with open(CACHE_FILE, 'w', encoding='utf-8') as f:
-            json.dump(cache_data, f, ensure_ascii=False, indent=4)
-    except Exception as e:
-        print(f"Error saving cache: {e}")
-
-geo_cache = load_cache()
+# Variável global com as coordenadas carregadas na inicialização
+geo_cache = load_geo_cache()
 
 # --- 2. BRASILIA TIME HELPER ---
 def get_brasilia_time():
     """Returns the current naive datetime in Brasilia Time (UTC-3)."""
-    # Get UTC time (naive)
     utc_now = datetime.utcnow()
-    # Subtract 3 hours to get Brasilia time
     return utc_now - timedelta(hours=3)
 
+# Função simplificada: Apenas LEITURA do cache
+# A atualização das coordenadas agora é feita pelo script 'atualizar_geo.py'
 def get_lat_lon(address, neighborhood):
     global geo_cache
+    
     key = f"{address} - {neighborhood}".strip()
     
     if not key:
         return None, None
 
+    # Se estiver no cache, retorna. Se não, retorna None (sem travar o site).
     if key in geo_cache:
         return geo_cache[key]['lat'], geo_cache[key]['lon']
-
-    if not GOOGLE_MAPS_API_KEY:
-        return None, None
-
-    search_query = f"{address}, {neighborhood}, Belo Horizonte, MG" if address else f"{neighborhood}, Belo Horizonte, MG"
-    url = f"https://maps.googleapis.com/maps/api/geocode/json?address={search_query}&key={GOOGLE_MAPS_API_KEY}"
-    
-    try:
-        response = requests.get(url, timeout=3)
-        data = response.json()
-        
-        if data['status'] == 'OK':
-            location = data['results'][0]['geometry']['location']
-            lat, lon = location['lat'], location['lng']
-            geo_cache[key] = {'lat': lat, 'lon': lon}
-            save_cache(geo_cache)
-            return lat, lon
-    except Exception as e:
-        print(f"Geocoding connection error: {e}")
     
     return None, None
 
 def fetch_carnival_data():
     global DATA_CACHE
     
-    # Check if cache is valid
     now_br = get_brasilia_time()
+    
+    # Verifica se o cache de dados (CSV) ainda é válido
     if DATA_CACHE['timestamp'] and (now_br - DATA_CACHE['timestamp']).total_seconds() < (CACHE_DURATION_MINUTES * 60):
-        # Recalculate status logic on cached data (time changes, data stays same)
+        # Apenas recalcula o status (Em breve, Agora, etc) sem baixar o CSV de novo
         return events_status_logic(DATA_CACHE['data']), DATA_CACHE['styles']
 
-    # If cache expired or empty, fetch from Google Sheets
+    # Se o cache expirou, baixa do Google Sheets
     eventos = []
     unique_styles = set()
     
@@ -177,6 +172,7 @@ def fetch_carnival_data():
                 except:
                     data_formatada = f"{data_raw} {hora_raw}"
 
+            # Busca latitude/longitude no cache local (sem API call)
             lat, lon = get_lat_lon(endereco, bairro)
 
             eventos.append({
@@ -198,8 +194,7 @@ def fetch_carnival_data():
                 "is_pet": is_pet
             })
             
-        # Update Cache
-        DATA_CACHE['data'] = events_status_logic(eventos) # Store unsorted initially? No, logic sorts.
+        DATA_CACHE['data'] = events_status_logic(eventos)
         DATA_CACHE['styles'] = sorted(list(unique_styles))
         DATA_CACHE['timestamp'] = now_br
             
@@ -209,14 +204,9 @@ def fetch_carnival_data():
     return DATA_CACHE['data'], DATA_CACHE['styles']
 
 def events_status_logic(eventos_raw):
-    # Create a shallow copy so we don't mutate the cached list permanently if we re-run logic
     eventos = [e.copy() for e in eventos_raw]
-    
-    # 3. USE BRASILIA TIME HERE
     now = get_brasilia_time()
     
-    # now = datetime(2025, 3, 3, 13, 0) # Testing Override
-
     for e in eventos:
         if not e['_dt_obj']: 
             e['status'] = 'futuro'
@@ -269,8 +259,6 @@ def filtrar_eventos(eventos_todos, args):
         has_active_filters = True
 
     eventos_filtrados = eventos_todos
-    
-    # 4. USE BRASILIA TIME FOR FILTERING
     now = get_brasilia_time()
 
     if quick_filters:
@@ -358,7 +346,7 @@ def mostrar_eventos():
                            has_filters=has_filters,
                            google_maps_api_key=GOOGLE_MAPS_API_KEY))
     
-    # 5. KEEP NO-CACHE FOR HTML (Ensures Status tags update on refresh)
+    # Headers para garantir que o HTML (status dos blocos) esteja sempre fresco
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
@@ -372,8 +360,6 @@ def api_eventos():
     for e in geocoded:
         if '_dt_obj' in e: del e['_dt_obj']
     
-    # We can allow the API to be cached briefly by the browser if desired, 
-    # but for real-time status consistency, keeping it fresh is safer.
     return jsonify(geocoded)
 
 @app.route('/manifest.json')
