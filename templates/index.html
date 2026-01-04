@@ -55,55 +55,56 @@
                         <input type="hidden" id="zoom" name="zoom" value="{{ request.args.get('zoom', '') }}">
                         <input type="hidden" id="map_style" name="map_style" value="{{ request.args.get('map_style', 'gps') }}">
 
-                        <div class="filtro-item">
-                            <label for="data_filtro">Data:</label>
-                            <input type="text" id="data_filtro" name="data_filtro" value="{{ request.args.get('data_filtro', '') }}" placeholder="Selecione..." style="background-color: var(--background-color);">
-                        </div>
-                        
-                        <div class="filtro-item">
-                            <label for="status_filter">Status:</label>
-                            <select name="status_filter" id="status_filter">
-                                <option value="">Todos</option>
-                                <option value="hoje" {% if request.args.get('status_filter') == 'hoje' %}selected{% endif %}>Hoje (Tudo) 🟣</option>
-                                <option value="em-andamento" {% if request.args.get('status_filter') == 'em-andamento' %}selected{% endif %}>Em Andamento 🟢</option>
-                                <option value="em-breve" {% if request.args.get('status_filter') == 'em-breve' %}selected{% endif %}>Em Breve 🔵</option>
-                                <option value="encerrado" {% if request.args.get('status_filter') == 'encerrado' %}selected{% endif %}>Encerrados ⚫</option>
-                            </select>
-                        </div>
+                        <div class="filters-grid">
+                            <div class="filtro-item">
+                                <label for="data_filtro">Data:</label>
+                                <input type="text" id="data_filtro" name="data_filtro" value="{{ request.args.get('data_filtro', '') }}" placeholder="Selecione..." style="background-color: var(--background-color);">
+                            </div>
+                            
+                            <div class="filtro-item">
+                                <label for="status_filter">Status:</label>
+                                <select name="status_filter" id="status_filter">
+                                    <option value="">Todos</option>
+                                    <option value="em-andamento" {% if request.args.get('status_filter') == 'em-andamento' %}selected{% endif %}>Em Andamento 🟢</option>
+                                    <option value="em-breve" {% if request.args.get('status_filter') == 'em-breve' %}selected{% endif %}>Em Breve 🔵</option>
+                                    <option value="encerrado" {% if request.args.get('status_filter') == 'encerrado' %}selected{% endif %}>Encerrados ⚫</option>
+                                </select>
+                            </div>
 
-                        <div class="filtro-item">
-                            <label for="periodo_dia">Período:</label>
-                            <select name="periodo_dia" id="periodo_dia">
-                                <option value="">Todos</option>
-                                <option value="manha" {% if request.args.get('periodo_dia') == 'manha' %}selected{% endif %}>Manhã</option>
-                                <option value="tarde" {% if request.args.get('periodo_dia') == 'tarde' %}selected{% endif %}>Tarde</option>
-                                <option value="noite" {% if request.args.get('periodo_dia') == 'noite' %}selected{% endif %}>Noite</option>
-                            </select>
-                        </div>
+                            <div class="filtro-item">
+                                <label for="periodo_dia">Período:</label>
+                                <select name="periodo_dia" id="periodo_dia">
+                                    <option value="">Todos</option>
+                                    <option value="manha" {% if request.args.get('periodo_dia') == 'manha' %}selected{% endif %}>Manhã</option>
+                                    <option value="tarde" {% if request.args.get('periodo_dia') == 'tarde' %}selected{% endif %}>Tarde</option>
+                                    <option value="noite" {% if request.args.get('periodo_dia') == 'noite' %}selected{% endif %}>Noite</option>
+                                </select>
+                            </div>
 
-                        <div class="filtro-item">
-                            <label for="bairro">Bairro:</label>
-                            <select name="bairro" id="bairro">
-                                <option value="">Todos</option>
-                                {% for b in bairros %}
-                                    <option value="{{ b }}" {% if request.args.get('bairro') == b %}selected{% endif %}>{{ b }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                            <div class="filtro-item">
+                                <label for="bairro">Bairro:</label>
+                                <select name="bairro" id="bairro">
+                                    <option value="">Todos</option>
+                                    {% for b in bairros %}
+                                        <option value="{{ b }}" {% if request.args.get('bairro') == b %}selected{% endif %}>{{ b }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
-                        <div class="filtro-item">
-                            <label for="categoria">Estilo:</label>
-                            <select name="categoria" id="categoria">
-                                <option value="">Todos</option>
-                                {% for c in estilos %}
-                                    <option value="{{ c }}" {% if request.args.get('categoria') == c %}selected{% endif %}>{{ c }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                            <div class="filtro-item">
+                                <label for="categoria">Estilo:</label>
+                                <select name="categoria" id="categoria">
+                                    <option value="">Todos</option>
+                                    {% for c in estilos %}
+                                        <option value="{{ c }}" {% if request.args.get('categoria') == c %}selected{% endif %}>{{ c }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
-                        <div class="filtro-item filtro-busca">
-                            <label for="q">Buscar:</label>
-                            <input type="text" id="q" name="q" placeholder="Nome..." value="{{ request.args.get('q', '') }}">
+                            <div class="filtro-item filtro-busca">
+                                <label for="q">Buscar:</label>
+                                <input type="text" id="q" name="q" placeholder="Nome..." value="{{ request.args.get('q', '') }}">
+                            </div>
                         </div>
 
                         <div class="filter-actions-row filter-footer">
@@ -182,9 +183,9 @@
                             <div class="expand-content">
                                 <div class="card-actions">
                                     {% if evento.lat and evento.lon %}
-                                    <a href="http://googleusercontent.com/maps.google.com/?q={{ evento.lat }},{{ evento.lon }}" target="_blank" class="directions-btn" onclick="event.stopPropagation();">
+                                    <button class="directions-btn" onclick="getDirections({{ evento.lat }}, {{ evento.lon }}, event)">
                                         🚗 Como Chegar
-                                    </a>
+                                    </button>
                                     {% endif %}
                                     
                                     <button class="fav-btn" title="Salvar em Meus Blocos" onclick="toggleFavorite('{{ evento.id }}', event)">
@@ -237,6 +238,29 @@
         ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng', 'center_lat', 'center_lng', 'zoom'].forEach(id => {
             document.getElementById(id).value = '';
         });
+    }
+
+    // --- NEW: DIRECTIONS LOGIC ---
+    function getDirections(destLat, destLon, event) {
+        if(event) event.stopPropagation();
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    // Open Map with Start and End points
+                    window.open(`https://www.google.com/maps/dir/${userLat},${userLng}/${destLat},${destLon}`, '_blank');
+                },
+                (error) => {
+                    console.warn("Location access denied or failed", error);
+                    // Fallback: Just open destination (Google will figure out "from")
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`, '_blank');
+                }
+            );
+        } else {
+            window.open(`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`, '_blank');
+        }
     }
 
     function toggleCard(card) {
@@ -462,14 +486,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
                         if (evento.id) window.markersMap[evento.id] = { marker: marker, style: defaultStyle };
                         
-                        // FIXED: Javascript Template Literal here, NOT Jinja syntax
+                        // UPDATED: Popup HTML using getDirections function
+                        // Note: Using Template Literals (` `) here is CORRECT for JS.
                         const popupContent = `
                             <div style="font-family: 'Poppins', sans-serif;">
                                 <strong style="color: ${markerColor};">${evento.titulo}</strong><br>
                                 <span style="font-size:0.8em; background:#eee; padding:1px 4px; border-radius:3px; margin-right:5px;">${evento.tamanho == 3 ? "Grande" : "Pequeno"}</span>
                                 <span style="font-size:0.85em; color:#666;">${evento.data}</span><br>
                                 <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
-                                <a href="http://googleusercontent.com/maps.google.com/?q=${evento.lat},${evento.lon}" target="_blank" style="display:block; margin-top:8px; background:${markerColor}; color:white; text-align:center; padding:4px; border-radius:4px; text-decoration:none; font-size:0.8em;">🚗 Como Chegar</a>
+                                <button onclick="getDirections(${evento.lat}, ${evento.lon}, event)" style="display:block; width:100%; margin-top:8px; background:${markerColor}; color:white; border:none; padding:6px; border-radius:4px; font-size:0.85em; cursor:pointer;">
+                                    🚗 Como Chegar
+                                </button>
                             </div>
                         `;
                         marker.bindPopup(popupContent);

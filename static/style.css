@@ -1,3 +1,4 @@
+/* ... (Keep existing variables and resets) ... */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
@@ -282,22 +283,27 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 /* FILTERS MODAL & FORM */
 .filters-wrapper { background: var(--card-background); padding: 0.8em; border-radius: 12px; margin-bottom: 1em; border: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.filtros-container form { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: flex-end; }
-.filtro-item { flex: 1; min-width: 100px; }
+.filtros-container form { display: flex; flex-direction: column; gap: 0.5em; }
+
+/* New Grid for Standard Filters */
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.5em;
+}
+
+.filtro-item { width: 100%; }
 .filtro-item label { display: block; font-size: 0.7em; font-weight: 600; margin-bottom: 2px; }
 .filtro-item input, .filtro-item select { width: 100%; padding: 8px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--background-color); color: var(--text-primary); }
 
 /* QUICK FILTERS (Chips/Checkboxes) */
 .quick-filters {
     display: flex;
+    flex-wrap: wrap; /* Wrap on desktop */
     gap: 8px;
-    overflow-x: auto;
     padding-bottom: 10px;
-    margin-bottom: 15px;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
+    margin-bottom: 10px;
 }
-.quick-filters::-webkit-scrollbar { display: none; }
 
 .chip-checkbox { display: inline-block; cursor: pointer; }
 .chip-checkbox input { display: none; } /* Hide real checkbox */
@@ -326,6 +332,8 @@ input:checked + .slider:before { transform: translateX(16px); }
     margin: 10px -0.8em -0.8em -0.8em; /* Stretch to edges */
     border-top: 1px solid var(--border-color);
     border-radius: 0 0 12px 12px;
+    
+    /* Ensure it stays at bottom on desktop if needed, or flows naturally */
 }
 .filter-actions-row { display: flex; gap: 10px; align-items: center; width: auto; }
 
@@ -418,8 +426,9 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 
 .card-actions { display: flex; gap: 10px; align-items: stretch; }
 
+/* DIRECTIONS BUTTON (Updated for Button/Link compatibility) */
 .directions-btn {
-    flex: 1; /* Grow to fill space */
+    flex: 1; 
     text-align: center;
     background-color: var(--primary-accent);
     color: white;
@@ -431,6 +440,11 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
     transition: background-color 0.2s;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     display: flex; align-items: center; justify-content: center;
+    
+    /* Reset Button Defaults */
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
 }
 .directions-btn:hover { background-color: #c2185b; }
 
@@ -489,7 +503,8 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
     .modal-content { background-color: var(--card-background); margin: 10% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
     .close-modal-btn { background: none; border: none; font-size: 1.8rem; color: var(--text-secondary); cursor: pointer; }
-    .filtros-container form { flex-direction: column; align-items: stretch; }
+    .filtros-container form { flex-direction: column; gap: 0.5em; }
+    .filters-grid { display: flex; flex-direction: column; }
     .filter-actions-row { display: flex; gap: 10px; margin-top: 15px; }
     .btn-filtrar, .btn-limpar { flex: 1; justify-content: center; }
 }
