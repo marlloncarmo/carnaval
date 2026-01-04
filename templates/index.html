@@ -289,22 +289,16 @@
         window.location.href = '/';
     }
 
+    // UPDATED: User-provided structure (No Emojis)
     function shareBlock(id, title, date, event) {
-        // Impede que o clique propague para elementos pai (como abrir o card)
         event.stopPropagation();
-
-        // 1. Monta o link do bloco
+        
         const baseUrl = window.location.origin + window.location.pathname;
         const link = `${baseUrl}?highlight_id=${id}`;
-
-        // 2. Cria a mensagem em texto plano
-        // Usamos \n para pular linhas e emojis literais
-        const message = `Bora nesse bloco? 🎭\n\n*${title}*\n📅 ${date}\n\n📍 Veja aqui: ${link}`;
-
-        // 3. Gera a URL final codificando a mensagem inteira automaticamente
+        
+        const message = `Bora nesse bloco? \n\n*${title}*\n ${date}\n\n Veja aqui: ${link}`;
+        
         const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-
-        // 4. Abre o WhatsApp
         window.open(waUrl, '_blank');
     }
 
@@ -326,26 +320,31 @@
         }
     }
 
+    // UPDATED: Check for expanded class to stop unwanted map moves
     function toggleCard(card) {
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
+        
+        // Toggle the state
         card.classList.toggle('expanded');
         
+        // FIX: If the card was just closed (class removed), stop here.
+        // This prevents the map from moving when closing a card.
+        if (!card.classList.contains('expanded')) {
+            return;
+        }
+
         const id = card.dataset.id;
-        // Parse float so strict check works
         const lat = parseFloat(card.dataset.lat);
         const lon = parseFloat(card.dataset.lon);
 
-        // Check if map exists AND coordinates are valid numbers
         if (window.mapInstance && !isNaN(lat) && !isNaN(lon)) {
-            // Use flyTo for smooth animation and accurate centering
+            // Use flyTo for smooth animation
             window.mapInstance.flyTo([lat, lon], 16, { duration: 1.2 });
             
             if (window.markersMap[id]) {
                 const current = window.markersMap[id];
-                
-                // Pulse Animation
                 const markerElement = current.marker.getElement(); 
                 if (markerElement) {
                     markerElement.classList.remove('marker-active-pulse');
@@ -353,10 +352,9 @@
                     markerElement.classList.add('marker-active-pulse');
                     setTimeout(() => { markerElement.classList.remove('marker-active-pulse'); }, 1000);
                 }
-                
                 current.marker.bringToFront();
                 
-                // IMPORTANT: Open popup AFTER the move starts
+                // Open popup shortly after start
                 setTimeout(() => {
                     current.marker.openPopup();
                 }, 300);
@@ -508,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         window.mapInstance.addControl(new ResetViewControl());
 
-        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', className: 'map-tiles' });
+        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { className: 'map-tiles' });
         const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], className: 'satellite-tiles' });
 
         const savedStyle = document.getElementById('map_style').value;
