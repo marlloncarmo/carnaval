@@ -15,6 +15,7 @@
         </div>
 
         <div class="events-list-container">
+            
             <div class="filters-wrapper" id="filters-desktop-wrapper">
                 <div class="filtros-container">
                     <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}">
@@ -171,6 +172,15 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
 <script>
+    const statusColors = {
+        'em-andamento': '#27ae60', // Green
+        'em-breve': '#2196F3',     // Blue
+        'encerrando': '#d35400',   // Orange
+        'hoje': '#8e44ad',         // Purple
+        'encerrado': '#95a5a6',    // Gray
+        'futuro': '#E91E63'        // Default Pink
+    };
+
     function clearMapBounds() {
         ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng', 'center_lat', 'center_lng', 'zoom'].forEach(id => {
             document.getElementById(id).value = '';
@@ -313,7 +323,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         const newLatLng = [lat, lng];
 
                         if (!userMarker) {
-                            // UPDATED: Icon Size 40x40 to show pulse
                             const userIcon = L.divIcon({
                                 className: 'user-location-marker',
                                 html: '<div class="user-dot"></div><div class="user-pulse"></div>',
@@ -365,19 +374,25 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(eventos => {
                 eventos.forEach(evento => {
+                    // --- CHANGED: SKIP 'ENCERRADO' MARKERS ---
+                    if (evento.status === 'encerrado') return; 
+
                     if (evento.lat && evento.lon) {
                         let radiusSize = 6; 
                         let tamanhoLabel = "Pequeno";
                         if (evento.tamanho === 2) { radiusSize = 10; tamanhoLabel = "Médio"; }
                         if (evento.tamanho === 3) { radiusSize = 16; tamanhoLabel = "Grande"; }
 
+                        // Color Logic
+                        const markerColor = statusColors[evento.status] || '#E91E63';
+
                         const defaultStyle = {
                             radius: radiusSize,
-                            fillColor: "#E91E63",
+                            fillColor: markerColor,
                             color: "#fff",
                             weight: 1,
                             opacity: 1,
-                            fillOpacity: 0.6
+                            fillOpacity: 0.7
                         };
 
                         const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle)
@@ -389,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         const popupContent = `
                             <div style="font-family: 'Poppins', sans-serif;">
-                                <strong style="color: #E91E63;">${evento.titulo}</strong><br>
+                                <strong style="color: ${markerColor};">${evento.titulo}</strong><br>
                                 <span style="font-size:0.8em; background:#eee; padding:1px 4px; border-radius:3px; margin-right:5px;">${tamanhoLabel}</span>
                                 <span style="font-size:0.85em; color:#666;">${evento.data}</span><br>
                                 <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
@@ -432,15 +447,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (id && window.markersMap[id]) {
                     const current = window.markersMap[id];
-                    current.marker.setStyle({
-                        fillColor: "#E91E63",  
-                        color: "#FFFFFF",      
-                        weight: 5,             
-                        opacity: 1,
-                        fillOpacity: 1
-                    });
+                    
+                    // --- TRIGGER PULSE ANIMATION ON CLICK ---
+                    const markerElement = current.marker.getElement();
+                    if (markerElement) {
+                        markerElement.classList.remove('marker-active-pulse');
+                        void markerElement.offsetWidth; // Reflow
+                        markerElement.classList.add('marker-active-pulse');
+                        
+                        setTimeout(() => {
+                            markerElement.classList.remove('marker-active-pulse');
+                        }, 1000);
+                    }
+                    
                     current.marker.bringToFront();
-                    window.selectedMarker = id;
                 }
             }
         });
