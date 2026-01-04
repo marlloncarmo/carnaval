@@ -94,7 +94,7 @@ body {
 .header-actions { display: flex; align-items: center; gap: 12px; }
 
 /* HEADER BUTTONS */
-.whatsapp-btn, .support-btn {
+.contact-btn, .support-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -107,8 +107,9 @@ body {
     background: none;
 }
 
-.whatsapp-btn { color: #25D366; }
-.whatsapp-btn:hover { transform: scale(1.1); background-color: rgba(37, 211, 102, 0.1); }
+/* Estilo do novo botão de contato (Azul genérico ou Roxo) */
+.contact-btn { color: #2196F3; }
+.contact-btn:hover { transform: scale(1.1); background-color: rgba(33, 150, 243, 0.1); }
 
 .support-btn { color: #E91E63; }
 .support-btn:hover { transform: scale(1.1); background-color: rgba(233, 30, 99, 0.1); }
