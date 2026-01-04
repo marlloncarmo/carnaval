@@ -448,6 +448,10 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 }
 .directions-btn:hover { background-color: #c2185b; }
 
+.feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; }
+.feature-kids svg { color: #2ecc71; }
+.feature-pet svg { color: #e67e22; }
+
 .fav-btn {
     width: 44px; /* Fixed width matching height roughly */
     background: white;

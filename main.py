@@ -68,12 +68,14 @@ def get_lat_lon(address, neighborhood):
 
 def fetch_carnival_data():
     eventos = []
+    unique_styles = set()
+
     try:
         response = requests.get(SHEET_CSV_URL)
         response.encoding = 'utf-8'
         
         if response.status_code != 200:
-            return []
+            return [], []
 
         csv_file = io.StringIO(response.text)
         reader = csv.DictReader(csv_file)
@@ -82,10 +84,27 @@ def fetch_carnival_data():
             titulo = row.get("NOME DO BLOCO", "Bloco sem nome").strip()
             bairro = row.get("Bairro", "").strip()
             endereco = row.get("LOCAL DA CONCENTRAÇÃO", "").strip()
-            categoria = row.get("ESTILO MUSICAL", "Outros").strip()
-            descricao_orig = row.get("OBS", "").strip()
             
+            # --- MUSICAL STYLE LOGIC ---
+            raw_categoria = row.get("ESTILO MUSICAL", "Outros").strip()
+            
+            # 1. Display Version (Summarized)
+            if len(raw_categoria) > 25 or "," in raw_categoria or " e " in raw_categoria:
+                categoria_display = "Variado"
+            else:
+                categoria_display = raw_categoria
+
+            # 2. Extract Individual Styles for Dropdown
+            # Split by comma, slash, or " e "
+            parts = re.split(r'[;,/]\s*|\s+e\s+', raw_categoria)
+            for part in parts:
+                clean_part = part.strip().title()
+                if len(clean_part) > 1:
+                    unique_styles.add(clean_part)
+
+            descricao_orig = row.get("OBS", "").strip()
             desc_lower = descricao_orig.lower()
+            
             is_kids = False
             is_lgbt = False
             is_pet = False
@@ -141,7 +160,8 @@ def fetch_carnival_data():
                 "endereco": endereco,
                 "data": data_formatada,
                 "_dt_obj": dt_obj,
-                "categoria": categoria,
+                "categoria": raw_categoria,         # Full String for searching
+                "categoria_display": categoria_display, # Summarized for UI
                 "descricao": clean_desc,
                 "tamanho": tamanho_score,
                 "lat": lat,
@@ -155,7 +175,7 @@ def fetch_carnival_data():
     except Exception as e:
         print(f"Error processing CSV: {e}")
 
-    return events_status_logic(eventos)
+    return events_status_logic(eventos), sorted(list(unique_styles))
 
 def events_status_logic(eventos):
     now = datetime.now()
@@ -205,8 +225,6 @@ def filtrar_eventos(eventos_todos, args):
     filtro_bairro = args.get('bairro')
     filtro_estilo = args.get('categoria')
     filtro_status = args.get('status_filter')
-    
-    # 4. UPDATED: Get list for multiple checkboxes
     quick_filters = args.getlist('quick_filter') 
     
     busca = args.get('q', '').lower()
@@ -218,37 +236,26 @@ def filtrar_eventos(eventos_todos, args):
     eventos_filtrados = eventos_todos
     now = datetime.now()
 
-    # 1. Filter by Status Dropdown
     if filtro_status:
         if filtro_status == 'hoje':
             eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() == now.date()]
         else:
             eventos_filtrados = [e for e in eventos_filtrados if e['status'] == filtro_status]
 
-    # 2. UPDATED Quick Filters Logic (Multi-select)
     if quick_filters:
         target_dates = []
         target_sizes = []
-        
-        # Parse filters
-        if 'hoje' in quick_filters:
-            target_dates.append(now.date())
-        if 'amanha' in quick_filters:
-            target_dates.append(now.date() + timedelta(days=1))
-            
+        if 'hoje' in quick_filters: target_dates.append(now.date())
+        if 'amanha' in quick_filters: target_dates.append(now.date() + timedelta(days=1))
         if 'grande' in quick_filters: target_sizes.append(3)
         if 'medio' in quick_filters: target_sizes.append(2)
         if 'pequeno' in quick_filters: target_sizes.append(1)
         
-        # Apply Date Filter (OR logic between selected days)
         if target_dates:
             eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() in target_dates]
-            
-        # Apply Size Filter (OR logic between selected sizes)
         if target_sizes:
             eventos_filtrados = [e for e in eventos_filtrados if e['tamanho'] in target_sizes]
 
-    # Standard Filters
     if filtro_data:
         try:
             target = datetime.strptime(filtro_data, '%Y-%m-%d').date()
@@ -267,8 +274,9 @@ def filtrar_eventos(eventos_todos, args):
     if filtro_bairro:
         eventos_filtrados = [e for e in eventos_filtrados if e['local'] == filtro_bairro]
 
+    # UPDATED: Partial Match for Style
     if filtro_estilo:
-        eventos_filtrados = [e for e in eventos_filtrados if e['categoria'] == filtro_estilo]
+        eventos_filtrados = [e for e in eventos_filtrados if filtro_estilo.lower() in e['categoria'].lower()]
 
     if busca:
         eventos_filtrados = [e for e in eventos_filtrados if busca in e['titulo'].lower() or busca in e['endereco'].lower()]
@@ -293,22 +301,21 @@ def filtrar_eventos(eventos_todos, args):
 
 @app.route('/')
 def mostrar_eventos():
-    eventos_todos = fetch_carnival_data()
+    eventos_todos, estilos = fetch_carnival_data() # Unpack styles
     eventos_filtrados = filtrar_eventos(eventos_todos, request.args)
 
     bairros = sorted(list(set([e['local'] for e in eventos_todos if e['local']])))
-    estilos = sorted(list(set([e['categoria'] for e in eventos_todos if e['categoria']])))
-
+    
     return render_template('index.html', 
                            eventos=eventos_filtrados,
                            bairros=bairros,
-                           estilos=estilos,
+                           estilos=estilos, # Pass processed unique styles
                            total=len(eventos_filtrados),
                            google_maps_api_key=GOOGLE_MAPS_API_KEY)
 
 @app.route('/api/eventos')
 def api_eventos():
-    eventos_todos = fetch_carnival_data()
+    eventos_todos, _ = fetch_carnival_data()
     eventos_filtrados = filtrar_eventos(eventos_todos, request.args)
     geocoded = [e for e in eventos_filtrados if e['lat'] and e['lon']]
     for e in geocoded:
