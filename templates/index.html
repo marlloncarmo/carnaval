@@ -15,7 +15,6 @@
         </div>
 
         <div class="events-list-container">
-            
             <div class="filters-wrapper" id="filters-desktop-wrapper">
                 <div class="filtros-container">
                     <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}">
@@ -228,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.mapInstance.addControl(new ResetViewControl());
 
         const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap',
             className: 'map-tiles'
         });
 
@@ -284,6 +284,70 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('zoom').value = zoom;
                 
                 document.getElementById('filter-form').submit();
+            });
+        }
+
+        const locateBtn = document.getElementById('locate-btn');
+        let userMarker = null;
+        let watchId = null;
+        let isFollowing = false;
+
+        if (locateBtn) {
+            locateBtn.addEventListener('click', function() {
+                if (watchId !== null) {
+                    isFollowing = true;
+                    locateBtn.classList.add('active'); 
+                    if (userMarker) {
+                        window.mapInstance.setView(userMarker.getLatLng(), 17);
+                    }
+                    return;
+                }
+
+                if (navigator.geolocation) {
+                    locateBtn.classList.add('active'); 
+                    isFollowing = true;
+
+                    watchId = navigator.geolocation.watchPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const newLatLng = [lat, lng];
+
+                        if (!userMarker) {
+                            // UPDATED: Icon Size 40x40 to show pulse
+                            const userIcon = L.divIcon({
+                                className: 'user-location-marker',
+                                html: '<div class="user-dot"></div><div class="user-pulse"></div>',
+                                iconSize: [40, 40], 
+                                iconAnchor: [20, 20] 
+                            });
+                            userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
+                            userMarker.bindPopup("<b>Você está aqui</b>");
+                        } else {
+                            userMarker.setLatLng(newLatLng);
+                        }
+
+                        if (isFollowing) {
+                            window.mapInstance.setView(newLatLng, 17, { animate: true });
+                        }
+
+                    }, function(error) {
+                        alert("Não foi possível obter sua localização.");
+                        console.error("Geolocation error:", error);
+                        locateBtn.classList.remove('active');
+                    }, {
+                        enableHighAccuracy: true,
+                        maximumAge: 10000,
+                        timeout: 10000
+                    });
+
+                    window.mapInstance.on('dragstart', function() {
+                        isFollowing = false;
+                        locateBtn.classList.remove('active'); 
+                    });
+
+                } else {
+                    alert("Seu navegador não suporta geolocalização.");
+                }
             });
         }
 

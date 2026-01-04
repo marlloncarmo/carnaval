@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-/* ... (Previous styles) ... */
+/* ... (Previous Variables) ... */
 :root {
     --primary-accent: #E91E63;
     --background-color: #f4f6f8;
@@ -128,6 +128,7 @@ main { flex: 1; display: flex; flex-direction: column; height: 100%; min-height:
 
 .main-content-grid { display: grid; grid-template-columns: 35% 65%; gap: 1.5em; height: 100%; width: 100%; min-height: 0; }
 
+/* MAP */
 .map-container {
     height: 100%; width: 100%;
     border-radius: 12px; overflow: hidden;
@@ -151,6 +152,68 @@ body.dark-mode .map-control-switch { background-color: #333; }
 }
 .map-search-btn.visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
 
+/* --- LOCATE ME BUTTON --- */
+.map-locate-btn {
+    position: absolute; 
+    bottom: 10px; right: 10px; 
+    z-index: 1000;
+    width: 40px; height: 40px;
+    background-color: white; 
+    color: var(--text-primary);
+    border: none; border-radius: 8px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+.map-locate-btn:hover { background-color: #f0f0f0; color: var(--primary-accent); }
+
+/* Updated Active State to Pink */
+.map-locate-btn.active {
+    color: var(--primary-accent); 
+    background-color: rgba(233, 30, 99, 0.1);
+}
+
+body.dark-mode .map-locate-btn { background-color: #333; color: var(--text-primary); }
+body.dark-mode .map-locate-btn:hover { background-color: #444; color: var(--primary-accent); }
+body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--primary-accent); }
+
+/* --- GOOGLE MAPS STYLE USER MARKER (PINK) --- */
+.user-location-marker {
+    background: transparent;
+    border: none;
+}
+
+.user-dot {
+    width: 14px;
+    height: 14px;
+    background-color: var(--primary-accent); /* Pink Center */
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.user-pulse {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(233, 30, 99, 0.4); /* Pink Pulse */
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    animation: map-pulse 2s infinite;
+}
+
+@keyframes map-pulse {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
 .leaflet-control-reset a {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>');
     background-size: 16px 16px; background-position: center; background-repeat: no-repeat; cursor: pointer; background-color: white;
@@ -160,6 +223,7 @@ body.dark-mode .leaflet-control-reset a {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>');
 }
 
+/* Switch */
 .switch { position: relative; display: inline-block; width: 36px; height: 20px; margin: 0; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
@@ -247,117 +311,27 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 
 .card-desc { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-color); font-size: 0.75rem; color: var(--text-primary); line-height: 1.3; }
 
-/* --- MODAL STYLES --- */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 2000; 
-    left: 0; top: 0; 
-    width: 100%; height: 100%; 
-    background-color: rgba(0,0,0,0.5); 
-    backdrop-filter: blur(3px);
-}
+/* MODAL & SUPPORT */
+.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
 .modal.show { display: block; }
-
-.modal-content {
-    background-color: var(--card-background);
-    margin: 15% auto;
-    padding: 20px;
-    width: 90%; max-width: 400px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    position: relative;
-    text-align: center;
-}
-
-.close-modal {
-    position: absolute;
-    top: 10px; right: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--text-secondary);
-    cursor: pointer;
-}
+.modal-content { background-color: var(--card-background); margin: 15% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; text-align: center; }
+.close-modal { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; color: var(--text-secondary); cursor: pointer; }
 .close-modal:hover { color: var(--primary-accent); }
-
 .modal-body h3 { margin-top: 0; color: var(--primary-accent); }
 .modal-body p { font-size: 0.9em; color: var(--text-primary); }
-
-/* QR Code Container */
-.qr-container {
-    margin: 20px 0;
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: #fff; 
-    display: inline-block;
-}
+.qr-container { margin: 20px 0; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff; display: inline-block; }
 .pix-img { width: 100%; max-width: 200px; display: block; }
 
-/* COPY PIX BOX */
-.pix-copy-wrapper {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.pix-label {
-    font-size: 0.75em;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-    display: block;
-    font-weight: 600;
-}
-
-.pix-copy-box {
-    display: flex;
-    align-items: center;
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow: hidden;
-    height: 40px;
-}
-
-.pix-copy-box input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 0 10px;
-    font-size: 0.85em;
-    color: var(--text-primary);
-    font-family: 'Poppins', sans-serif;
-    outline: none;
-    width: 100%; 
-}
-
-.copy-btn {
-    background-color: var(--primary-accent);
-    color: white;
-    border: none;
-    height: 100%;
-    width: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
+/* COPY PIX */
+.pix-copy-wrapper { margin-bottom: 20px; text-align: left; }
+.pix-label { font-size: 0.75em; color: var(--text-secondary); margin-bottom: 4px; display: block; font-weight: 600; }
+.pix-copy-box { display: flex; align-items: center; background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; height: 40px; }
+.pix-copy-box input { flex: 1; background: transparent; border: none; padding: 0 10px; font-size: 0.85em; color: var(--text-primary); font-family: 'Poppins', sans-serif; outline: none; width: 100%; }
+.copy-btn { background-color: var(--primary-accent); color: white; border: none; height: 100%; width: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color 0.2s; }
 .copy-btn:hover { background-color: #d81b60; }
 .copy-btn.copied { background-color: #27ae60; }
 
-/* Nubank Button */
-.nubank-btn {
-    display: inline-block;
-    background-color: #820AD1;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9em;
-    margin-top: 10px;
-    transition: background-color 0.2s;
-}
+.nubank-btn { display: inline-block; background-color: #820AD1; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 0.9em; margin-top: 10px; transition: background-color 0.2s; }
 .nubank-btn:hover { background-color: #6D08AF; }
 
 .mobile-filter-btn { display: none; }
