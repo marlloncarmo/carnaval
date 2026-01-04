@@ -81,7 +81,7 @@ body {
 .title-icon { width: 20px; height: 20px; }
 
 .header-logo .site-subtitle {
-    font-size: 0.65em;
+    font-size: 0.75em;
     color: var(--text-secondary);
     margin-top: 2px;
     font-weight: 400;

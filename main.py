@@ -17,6 +17,15 @@ SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1s_Vm7BCW1ZYtCf79CKZ7clF
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 CACHE_FILE = 'latlon_cache.json'
 
+# --- 1. GLOBAL CACHE FOR DATA ---
+# Cache structure: {'data': [eventos], 'styles': [styles], 'timestamp': datetime}
+DATA_CACHE = {
+    'data': [],
+    'styles': [],
+    'timestamp': None
+}
+CACHE_DURATION_MINUTES = 30  # Refresh CSV every 5 minutes
+
 def load_cache():
     if os.path.exists(CACHE_FILE):
         try:
@@ -34,6 +43,14 @@ def save_cache(cache_data):
         print(f"Error saving cache: {e}")
 
 geo_cache = load_cache()
+
+# --- 2. BRASILIA TIME HELPER ---
+def get_brasilia_time():
+    """Returns the current naive datetime in Brasilia Time (UTC-3)."""
+    # Get UTC time (naive)
+    utc_now = datetime.utcnow()
+    # Subtract 3 hours to get Brasilia time
+    return utc_now - timedelta(hours=3)
 
 def get_lat_lon(address, neighborhood):
     global geo_cache
@@ -67,8 +84,19 @@ def get_lat_lon(address, neighborhood):
     return None, None
 
 def fetch_carnival_data():
+    global DATA_CACHE
+    
+    # Check if cache is valid
+    now_br = get_brasilia_time()
+    if DATA_CACHE['timestamp'] and (now_br - DATA_CACHE['timestamp']).total_seconds() < (CACHE_DURATION_MINUTES * 60):
+        # Recalculate status logic on cached data (time changes, data stays same)
+        return events_status_logic(DATA_CACHE['data']), DATA_CACHE['styles']
+
+    # If cache expired or empty, fetch from Google Sheets
     eventos = []
     unique_styles = set()
+    
+    dias_semana = {0: 'Seg', 1: 'Ter', 2: 'Qua', 3: 'Qui', 4: 'Sex', 5: 'Sáb', 6: 'Dom'}
 
     try:
         response = requests.get(SHEET_CSV_URL)
@@ -140,10 +168,12 @@ def fetch_carnival_data():
                     data_clean = data_raw.split(' ')[0]
                     if hora_raw:
                         dt_obj = datetime.strptime(f"{data_clean} {hora_raw}", '%d/%m/%Y %H:%M')
-                        data_formatada = dt_obj.strftime('%d/%m - %H:%M')
+                        dia_sem = dias_semana[dt_obj.weekday()]
+                        data_formatada = f"{dt_obj.strftime('%d/%m')} ({dia_sem}) - {dt_obj.strftime('%H:%M')}"
                     else:
                         dt_obj = datetime.strptime(data_clean, '%d/%m/%Y')
-                        data_formatada = dt_obj.strftime('%d/%m')
+                        dia_sem = dias_semana[dt_obj.weekday()]
+                        data_formatada = f"{dt_obj.strftime('%d/%m')} ({dia_sem})"
                 except:
                     data_formatada = f"{data_raw} {hora_raw}"
 
@@ -168,14 +198,24 @@ def fetch_carnival_data():
                 "is_pet": is_pet
             })
             
+        # Update Cache
+        DATA_CACHE['data'] = events_status_logic(eventos) # Store unsorted initially? No, logic sorts.
+        DATA_CACHE['styles'] = sorted(list(unique_styles))
+        DATA_CACHE['timestamp'] = now_br
+            
     except Exception as e:
         print(f"Error processing CSV: {e}")
 
-    return events_status_logic(eventos), sorted(list(unique_styles))
+    return DATA_CACHE['data'], DATA_CACHE['styles']
 
-def events_status_logic(eventos):
-    now = datetime.now()
-    # now = datetime(2025, 3, 3, 13, 0) # Testing
+def events_status_logic(eventos_raw):
+    # Create a shallow copy so we don't mutate the cached list permanently if we re-run logic
+    eventos = [e.copy() for e in eventos_raw]
+    
+    # 3. USE BRASILIA TIME HERE
+    now = get_brasilia_time()
+    
+    # now = datetime(2025, 3, 3, 13, 0) # Testing Override
 
     for e in eventos:
         if not e['_dt_obj']: 
@@ -229,7 +269,9 @@ def filtrar_eventos(eventos_todos, args):
         has_active_filters = True
 
     eventos_filtrados = eventos_todos
-    now = datetime.now()
+    
+    # 4. USE BRASILIA TIME FOR FILTERING
+    now = get_brasilia_time()
 
     if quick_filters:
         target_dates = []
@@ -308,7 +350,6 @@ def mostrar_eventos():
 
     bairros = sorted(list(set([e['local'] for e in eventos_todos if e['local']])))
     
-    # Disable caching for the main page
     response = make_response(render_template('index.html', 
                            eventos=eventos_filtrados,
                            bairros=bairros,
@@ -317,6 +358,7 @@ def mostrar_eventos():
                            has_filters=has_filters,
                            google_maps_api_key=GOOGLE_MAPS_API_KEY))
     
+    # 5. KEEP NO-CACHE FOR HTML (Ensures Status tags update on refresh)
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
@@ -329,6 +371,9 @@ def api_eventos():
     geocoded = [e for e in eventos_filtrados if e['lat'] and e['lon']]
     for e in geocoded:
         if '_dt_obj' in e: del e['_dt_obj']
+    
+    # We can allow the API to be cached briefly by the browser if desired, 
+    # but for real-time status consistency, keeping it fresh is safer.
     return jsonify(geocoded)
 
 @app.route('/manifest.json')

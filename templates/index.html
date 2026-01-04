@@ -25,58 +25,26 @@
                     <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}" autocomplete="off">
                         
                         <div class="quick-filters">
-                            <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Hoje</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Amanhã</span>
-                                </label>
-                            </div>
-                            <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="em-andamento" {% if 'em-andamento' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Em Andamento</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="em-breve" {% if 'em-breve' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Em Breve</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="encerrando" {% if 'encerrando' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Encerrando</span>
-                                </label>
-                            </div>
-                            <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Pequenos</span>
-                                </label>                    
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Médios</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Grandes</span>
-                                </label>
-                            </div>
-                            <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="manha" {% if 'manha' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Manhã</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="tarde" {% if 'tarde' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Tarde</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="noite" {% if 'noite' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Noite</span>
-                                </label>
-                            </div>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Hoje</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Amanhã</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Grandes</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Médios</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Pequenos</span>
+                            </label>
                         </div>
 
                         <input type="hidden" id="ne_lat" name="ne_lat" value="{{ request.args.get('ne_lat', '') }}">
@@ -92,6 +60,26 @@
                             <div class="filtro-item">
                                 <label for="data_filtro">Data:</label>
                                 <input type="text" id="data_filtro" name="data_filtro" value="{{ request.args.get('data_filtro', '') }}" placeholder="Selecione..." style="background-color: var(--background-color);">
+                            </div>
+                            
+                            <div class="filtro-item">
+                                <label for="status_filter">Status:</label>
+                                <select name="status_filter" id="status_filter">
+                                    <option value="">Todos</option>
+                                    <option value="em-andamento" {% if request.args.get('status_filter') == 'em-andamento' %}selected{% endif %}>Em Andamento 🟢</option>
+                                    <option value="em-breve" {% if request.args.get('status_filter') == 'em-breve' %}selected{% endif %}>Em Breve 🔵</option>
+                                    <option value="encerrado" {% if request.args.get('status_filter') == 'encerrado' %}selected{% endif %}>Encerrados ⚫</option>
+                                </select>
+                            </div>
+
+                            <div class="filtro-item">
+                                <label for="periodo_dia">Período:</label>
+                                <select name="periodo_dia" id="periodo_dia">
+                                    <option value="">Todos</option>
+                                    <option value="manha" {% if request.args.get('periodo_dia') == 'manha' %}selected{% endif %}>Manhã</option>
+                                    <option value="tarde" {% if request.args.get('periodo_dia') == 'tarde' %}selected{% endif %}>Tarde</option>
+                                    <option value="noite" {% if request.args.get('periodo_dia') == 'noite' %}selected{% endif %}>Noite</option>
+                                </select>
                             </div>
 
                             <div class="filtro-item">
@@ -238,6 +226,9 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
 <script>
+    // --- SERVER SIDE FILTER FLAG ---
+    // If True (from Python), we obey server results (fitBounds). 
+    // If False (clean load), we obey LocalStorage (restore view).
     const hasActiveFilters = {{ 'true' if has_filters else 'false' }};
 
     const ICONS = {
@@ -262,12 +253,14 @@
             'quick_filter', 'status_filter', 'data_filtro', 'periodo_dia', 'bairro', 'categoria', 'q'
         ];
         let changed = false;
+        
         paramsToRemove.forEach(param => {
             if (url.searchParams.has(param)) {
                 url.searchParams.delete(param);
                 changed = true;
             }
         });
+
         if (changed) {
             window.history.replaceState({}, '', url);
         }
@@ -285,14 +278,14 @@
                 (position) => {
                     const userLat = position.coords.latitude;
                     const userLng = position.coords.longitude;
-                    window.open(`https://www.google.com/maps/dir/${userLat},${userLng}/${destLat},${destLon}`, '_blank');
+                    window.open(`http://googleusercontent.com/maps.google.com/maps?saddr=${userLat},${userLng}&daddr=${destLat},${destLon}`, '_blank');
                 },
                 (error) => {
-                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`, '_blank');
+                    window.open(`http://googleusercontent.com/maps.google.com/maps?daddr=${destLat},${destLon}`, '_blank');
                 }
             );
         } else {
-            window.open(`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`, '_blank');
+            window.open(`http://googleusercontent.com/maps.google.com/maps?daddr=${destLat},${destLon}`, '_blank');
         }
     }
 
@@ -338,13 +331,12 @@
         applyFavoritesUI();
     }
 
-    // UPDATED: Counts visible cards and updates text
     function applyFavoritesUI() {
         const favs = getFavorites();
         const cards = document.querySelectorAll('.evento-card');
         const showOnly = document.getElementById('show-favorites-only').checked;
         
-        let visibleCount = 0;
+        let visibleCount = 0; // Counter for results
 
         cards.forEach(card => {
             const id = card.dataset.id;
@@ -361,17 +353,19 @@
                     visibleCount++;
                 }
             } else {
+                // If not filtering by favorites, all currently loaded cards are visible
                 card.style.display = 'flex';
                 visibleCount++;
             }
         });
 
-        // Update the Total Count Text
+        // Update Text
         const totalElement = document.querySelector('.total-count');
         if (totalElement) {
             totalElement.textContent = `${visibleCount} blocos encontrados.`;
         }
 
+        // Update Markers
         if (window.markersMap && window.markersFeatureGroup) {
             Object.keys(window.markersMap).forEach(id => {
                 const markerObj = window.markersMap[id];
@@ -398,7 +392,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    // Capture filters before cleaning (if any exist)
+    // Capture filters before cleaning (if any)
     const activeParams = new URLSearchParams(window.location.search);
     cleanUrlParams();
 
@@ -410,6 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const mapElement = document.getElementById('map');
     if (mapElement) {
+        // Priority 1: Check hidden form inputs (populated by Server if searched)
         const formLat = document.getElementById('center_lat').value;
         const formLng = document.getElementById('center_lng').value;
         const formZoom = document.getElementById('zoom').value;
@@ -418,12 +413,13 @@ document.addEventListener('DOMContentLoaded', function () {
         let initialZoom = 13;
         let isSavedState = false;
 
-        // Prioritize explicit search (Search Area)
+        // If form has coordinates, user clicked "Search" -> Use that exact location
         if (formLat && formLng && formZoom) {
             initialView = [parseFloat(formLat), parseFloat(formLng)];
             initialZoom = parseInt(formZoom);
             isSavedState = true;
         } 
+        // Priority 2: LocalStorage (User refreshed page) -> Restore last view
         else {
             const savedMapState = localStorage.getItem('mapState');
             if (savedMapState) {
@@ -432,6 +428,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (parsedState.lat && parsedState.lng && parsedState.zoom) {
                         initialView = [parsedState.lat, parsedState.lng];
                         initialZoom = parsedState.zoom;
+                        // Note: We don't set isSavedState=true here because we might still want to Auto-Fit bounds 
+                        // if the user filtered by "Today" but didn't specify a location.
+                        // However, usually if refreshing, we want steady view.
                     }
                 } catch(e) { console.error("Map state error", e); }
             }
@@ -469,12 +468,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         window.mapInstance.addControl(new ResetViewControl());
 
-        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', className: 'map-tiles' });
+        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { className: 'map-tiles' });
         const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], className: 'satellite-tiles' });
 
         const savedStyle = document.getElementById('map_style').value;
         const satToggle = document.getElementById('satellite-toggle');
         
+        // Prevent click propagation for Satellite Toggle
+        const satContainer = document.getElementById('satellite-toggle-container');
+        if (satContainer) {
+            L.DomEvent.disableClickPropagation(satContainer);
+            L.DomEvent.disableScrollPropagation(satContainer);
+        }
+
         if (savedStyle === 'satellite') { satelliteLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = true; } 
         else { gpsLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = false; }
 
@@ -541,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.markersFeatureGroup = L.featureGroup();
         window.markersMap = {};
         
+        // Pass original params to fetch, since window.location is now clean
         const apiParams = new URLSearchParams(activeParams);
         ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'].forEach(k => apiParams.delete(k));
         
@@ -594,6 +601,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.mapInstance.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [30, 30] });
                 }
                 
+                // This updates the count text and map markers immediately on load
                 applyFavoritesUI();
             })
             .catch(err => console.error(err));
