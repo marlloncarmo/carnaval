@@ -22,30 +22,31 @@
             <div class="filters-wrapper" id="filters-desktop-wrapper">
                 <div class="filtros-container">
                     
-                    <div class="quick-filters">
-                        <label class="chip-checkbox">
-                            <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                            <span>Hoje</span>
-                        </label>
-                        <label class="chip-checkbox">
-                            <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                            <span>Amanhã</span>
-                        </label>
-                        <label class="chip-checkbox">
-                            <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                            <span>Grandes</span>
-                        </label>
-                        <label class="chip-checkbox">
-                            <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                            <span>Médios</span>
-                        </label>
-                        <label class="chip-checkbox">
-                            <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                            <span>Pequenos</span>
-                        </label>
-                    </div>
-
                     <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}">
+                        
+                        <div class="quick-filters">
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Hoje</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Amanhã</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Grandes</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Médios</span>
+                            </label>
+                            <label class="chip-checkbox">
+                                <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                <span>Pequenos</span>
+                            </label>
+                        </div>
+
                         <input type="hidden" id="ne_lat" name="ne_lat" value="{{ request.args.get('ne_lat', '') }}">
                         <input type="hidden" id="ne_lng" name="ne_lng" value="{{ request.args.get('ne_lng', '') }}">
                         <input type="hidden" id="sw_lat" name="sw_lat" value="{{ request.args.get('sw_lat', '') }}">
@@ -65,7 +66,6 @@
                                 <label for="status_filter">Status:</label>
                                 <select name="status_filter" id="status_filter">
                                     <option value="">Todos</option>
-                                    <option value="hoje" {% if request.args.get('status_filter') == 'hoje' %}selected{% endif %}>Hoje (Tudo) 🟣</option>
                                     <option value="em-andamento" {% if request.args.get('status_filter') == 'em-andamento' %}selected{% endif %}>Em Andamento 🟢</option>
                                     <option value="em-breve" {% if request.args.get('status_filter') == 'em-breve' %}selected{% endif %}>Em Breve 🔵</option>
                                     <option value="encerrado" {% if request.args.get('status_filter') == 'encerrado' %}selected{% endif %}>Encerrados ⚫</option>
@@ -482,16 +482,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (evento.status === 'encerrado') return; 
                     if (evento.lat && evento.lon) {
                         let radiusSize = 6; 
-                        let tamanhoLabel = "Pequeno";
-                        if (evento.tamanho === 2) { radiusSize = 10; tamanhoLabel = "Médio"; }
-                        if (evento.tamanho === 3) { radiusSize = 16; tamanhoLabel = "Grande"; }
+                        if (evento.tamanho === 2) radiusSize = 10;
+                        if (evento.tamanho === 3) radiusSize = 16;
+
+                        let tamanhoLabel = 'Pequeno 👤';
+                        if (evento.tamanho === 2) tamanhoLabel = 'Médio 👥';
+                        if (evento.tamanho === 3) tamanhoLabel = 'Grande 👥👥👥';
+
                         const markerColor = statusColors[evento.status] || '#E91E63';
                         const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
                         const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
                         if (evento.id) window.markersMap[evento.id] = { marker: marker, style: defaultStyle };
                         
-                        // --- UPDATED POPUP CONTENT WITH ICONS & STYLE ---
-                        let iconsHtml = '<div style="display:flex; gap:4px;">'; 
+                        let iconsHtml = '<div style="display:flex; gap:4px; flex-shrink: 0;">'; 
                         if (evento.is_kids) iconsHtml += `<span class="feature-icon feature-kids">${ICONS.kids}</span>`;
                         if (evento.is_lgbt) iconsHtml += `<span class="feature-icon feature-lgbt">${ICONS.lgbt}</span>`;
                         if (evento.is_pet) iconsHtml += `<span class="feature-icon feature-pet">${ICONS.pet}</span>`;
@@ -500,18 +503,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const popupContent = `
                             <div style="font-family: 'Poppins', sans-serif;">
                                 <strong style="color: ${markerColor};">${evento.titulo}</strong><br>
-                                
                                 <span style="font-size:0.8em; background:#eee; padding:1px 4px; border-radius:3px; margin-right:5px;">${tamanhoLabel}</span>
                                 <span style="font-size:0.8em; color:#666; background:#f0f0f0; padding:1px 4px; border-radius:3px;">${evento.categoria_display}</span><br>
                                 <span style="font-size:0.85em; color:#666;">${evento.data}</span><br>
                                 <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
-                                
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;">
-                                    
                                     <button onclick="getDirections(${evento.lat}, ${evento.lon}, event)" class="directions-btn" style="margin-top: 0; flex: 1;">
                                         🚗 Como Chegar
                                     </button>
-
                                     ${iconsHtml}
                                 </div>
                             </div>
