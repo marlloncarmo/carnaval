@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import requests
 import csv
@@ -85,7 +85,6 @@ def fetch_carnival_data():
             categoria = row.get("ESTILO MUSICAL", "Outros").strip()
             descricao_orig = row.get("OBS", "").strip()
             
-            # --- FEATURE PARSING & CLEANUP ---
             desc_lower = descricao_orig.lower()
             
             is_kids = False
@@ -94,19 +93,16 @@ def fetch_carnival_data():
 
             clean_desc = descricao_orig
             
-            # 1. KIDS
             if "infantil" in desc_lower or "criança" in desc_lower or "baby" in desc_lower or "👶" in descricao_orig:
                 is_kids = True
                 clean_desc = re.sub(r'(?i)(bloco)?\s*infantil|criança|baby|👶', '', clean_desc)
 
-            # 2. LGBT
             if "lgbt" in desc_lower or "gay" in desc_lower or "diversidade" in desc_lower or "🏳" in descricao_orig:
                 is_lgbt = True
                 clean_desc = re.sub(r'(?i)lgbt\w*|gay|diversidade', '', clean_desc)
                 clean_desc = clean_desc.replace('🏳️‍🌈', '').replace('🏳‍🌈', '') 
                 clean_desc = re.sub(r'[\U0001F3F3\uFE0F\u200D\U0001F308]', '', clean_desc)
 
-            # 3. PET
             if "pet" in desc_lower or "cachorro" in desc_lower or "animal" in desc_lower or "🐶" in descricao_orig or "🐕" in descricao_orig:
                 is_pet = True
                 clean_desc = re.sub(r'(?i)pet|cachorro|animal|🐶|🐕', '', clean_desc)
@@ -165,9 +161,7 @@ def fetch_carnival_data():
 
 def events_status_logic(eventos):
     now = datetime.now()
-    
-    # FOR TESTING (Uncomment to test specific date/time)
-    # now = datetime(2025, 3, 3, 13, 0) 
+    # now = datetime(2025, 3, 3, 13, 0) # Testing
 
     for e in eventos:
         if not e['_dt_obj']: 
@@ -177,56 +171,33 @@ def events_status_logic(eventos):
             continue
             
         dt = e['_dt_obj']
-        
-        # Diff in hours: 
-        # Negative = Event already started
-        # Positive = Event in future
         diff = (dt - now).total_seconds() / 3600
         
-        # --- NEW LOGIC & SORTING WEIGHTS ---
-        # Weight 0: Em Breve / Em Andamento (Top)
-        # Weight 1: Encerrando
-        # Weight 2: Hoje
-        # Weight 3: Futuro (Standard)
-        # Weight 4: Encerrado (Bottom)
-
-        # 1. Em Breve (< 2 hours to start)
         if 0 < diff <= 2:
             e['status'] = 'em-breve'
             e['status_label'] = 'Em Breve'
             e['sort_weight'] = 0
-            
-        # 2. Em Andamento (Started up to 3 hours ago)
         elif -3 <= diff <= 0:
             e['status'] = 'em-andamento'
             e['status_label'] = 'Em Andamento'
             e['sort_weight'] = 0
-            
-        # 3. Encerrando (Started 3 to 5 hours ago)
         elif -5 <= diff < -3:
             e['status'] = 'encerrando'
             e['status_label'] = 'Encerrando'
             e['sort_weight'] = 1
-            
-        # 4. Encerrado (Started more than 5 hours ago)
         elif diff < -5:
             e['status'] = 'encerrado'
             e['status_label'] = 'Encerrado'
             e['sort_weight'] = 4
-            
-        # 5. Hoje (Same day, but not in specific windows above)
         elif dt.date() == now.date():
             e['status'] = 'hoje'
             e['status_label'] = 'Hoje'
             e['sort_weight'] = 2
-            
-        # 6. Futuro
         else:
             e['status'] = 'futuro'
             e['status_label'] = ''
             e['sort_weight'] = 3
             
-    # Sort first by Weight (Status Priority), then by Date
     eventos.sort(key=lambda x: (x['sort_weight'], x['_dt_obj'] if x['_dt_obj'] else datetime.max))
     return eventos
 
@@ -235,6 +206,7 @@ def filtrar_eventos(eventos_todos, args):
     filtro_periodo = args.get('periodo_dia')
     filtro_bairro = args.get('bairro')
     filtro_estilo = args.get('categoria')
+    filtro_status = args.get('status_filter') # NEW
     busca = args.get('q', '').lower()
     
     ne_lat = args.get('ne_lat')
@@ -243,6 +215,10 @@ def filtrar_eventos(eventos_todos, args):
     sw_lng = args.get('sw_lng')
 
     eventos_filtrados = eventos_todos
+
+    # 1. Filter by Status
+    if filtro_status:
+        eventos_filtrados = [e for e in eventos_filtrados if e['status'] == filtro_status]
 
     if filtro_data:
         try:
@@ -305,12 +281,19 @@ def mostrar_eventos():
 def api_eventos():
     eventos_todos = fetch_carnival_data()
     eventos_filtrados = filtrar_eventos(eventos_todos, request.args)
-    
     geocoded = [e for e in eventos_filtrados if e['lat'] and e['lon']]
     for e in geocoded:
         if '_dt_obj' in e: del e['_dt_obj']
-    
     return jsonify(geocoded)
+
+# --- PWA ROUTES ---
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_from_directory('static', 'manifest.json', mimetype='application/manifest+json')
+
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory('static', 'sw.js', mimetype='application/javascript')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

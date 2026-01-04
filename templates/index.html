@@ -5,6 +5,10 @@
 {% block head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E91E63">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/carnaval-mask-icon.png') }}">
 {% endblock %}
 
 {% block content %}
@@ -23,24 +27,34 @@
                         <input type="hidden" id="ne_lng" name="ne_lng" value="{{ request.args.get('ne_lng', '') }}">
                         <input type="hidden" id="sw_lat" name="sw_lat" value="{{ request.args.get('sw_lat', '') }}">
                         <input type="hidden" id="sw_lng" name="sw_lng" value="{{ request.args.get('sw_lng', '') }}">
-                        
                         <input type="hidden" id="center_lat" name="center_lat" value="{{ request.args.get('center_lat', '') }}">
                         <input type="hidden" id="center_lng" name="center_lng" value="{{ request.args.get('center_lng', '') }}">
                         <input type="hidden" id="zoom" name="zoom" value="{{ request.args.get('zoom', '') }}">
                         <input type="hidden" id="map_style" name="map_style" value="{{ request.args.get('map_style', 'gps') }}">
 
                         <div class="filtro-item">
-                            <label for="data_filtro">Data (Dia/Mês):</label>
+                            <label for="data_filtro">Data:</label>
                             <input type="text" id="data_filtro" name="data_filtro" value="{{ request.args.get('data_filtro', '') }}" placeholder="Selecione..." style="background-color: var(--background-color);">
                         </div>
                         
                         <div class="filtro-item">
+                            <label for="status_filter">Status:</label>
+                            <select name="status_filter" id="status_filter">
+                                <option value="">Todos</option>
+                                <option value="em-andamento" {% if request.args.get('status_filter') == 'em-andamento' %}selected{% endif %}>Em Andamento 🟢</option>
+                                <option value="em-breve" {% if request.args.get('status_filter') == 'em-breve' %}selected{% endif %}>Em Breve 🔵</option>
+                                <option value="hoje" {% if request.args.get('status_filter') == 'hoje' %}selected{% endif %}>Hoje 🟣</option>
+                                <option value="encerrado" {% if request.args.get('status_filter') == 'encerrado' %}selected{% endif %}>Encerrados ⚫</option>
+                            </select>
+                        </div>
+
+                        <div class="filtro-item">
                             <label for="periodo_dia">Período:</label>
                             <select name="periodo_dia" id="periodo_dia">
                                 <option value="">Todos</option>
-                                <option value="manha" {% if request.args.get('periodo_dia') == 'manha' %}selected{% endif %}>Manhã (05h-12h)</option>
-                                <option value="tarde" {% if request.args.get('periodo_dia') == 'tarde' %}selected{% endif %}>Tarde (12h-18h)</option>
-                                <option value="noite" {% if request.args.get('periodo_dia') == 'noite' %}selected{% endif %}>Noite (18h+)</option>
+                                <option value="manha" {% if request.args.get('periodo_dia') == 'manha' %}selected{% endif %}>Manhã</option>
+                                <option value="tarde" {% if request.args.get('periodo_dia') == 'tarde' %}selected{% endif %}>Tarde</option>
+                                <option value="noite" {% if request.args.get('periodo_dia') == 'noite' %}selected{% endif %}>Noite</option>
                             </select>
                         </div>
 
@@ -69,6 +83,11 @@
                             <input type="text" id="q" name="q" placeholder="Nome..." value="{{ request.args.get('q', '') }}">
                         </div>
 
+                        <div class="filtro-item checkbox-item" style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <input type="checkbox" id="show-favorites-only" style="width: auto; margin-right: 8px;">
+                            <label for="show-favorites-only" style="margin: 0; cursor: pointer; color: var(--primary-accent); font-weight: bold;">❤️ Meus Blocos</label>
+                        </div>
+
                         <div class="filter-actions-row">
                             <button type="submit" class="btn-filtrar">Filtrar</button>
                             <a href="{{ url_for('mostrar_eventos') }}" class="btn-limpar" onclick="clearMapBounds()">Limpar</a>
@@ -79,7 +98,7 @@
             
             <p class="total-count">{{ total }} blocos encontrados.</p>
 
-            <div class="eventos-grid">
+            <div class="eventos-grid" id="events-grid">
                 {% for evento in eventos %}
                     <div class="evento-card status-bg-{{ evento.status }}" 
                          data-id="{{ evento.id }}"
@@ -92,6 +111,10 @@
                             </div>
                         {% endif %}
 
+                        <button class="fav-btn" title="Salvar em Meus Blocos" onclick="toggleFavorite('{{ evento.id }}', event)">
+                            <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </button>
+
                         <div class="evento-info-compact">
                             <div class="card-header">
                                 <h2>{{ evento.titulo }}</h2>
@@ -99,19 +122,13 @@
                                     {% if evento.is_kids or evento.is_lgbt or evento.is_pet %}
                                     <div class="icons-row">
                                         {% if evento.is_kids %}
-                                        <span class="feature-icon feature-kids" title="Infantil - Baby Friendly">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19 13H17.91C17.64 10.09 15.33 7.78 12.41 7.54V6C12.41 3.69 13.95 1.78 16.1 1.22C16.7 1.06 17.07 0.43 16.91 -0.17C16.75 -0.77 16.12 -1.14 15.52 -0.98C12.59 0.04 10.37 2.22 10.04 5H9.96C6.66 5.37 4 8.27 4 11.75V15H6V18C6 19.66 7.34 21 9 21C10.66 21 12 19.66 12 18V15H15.5V18C15.5 19.66 16.84 21 18.5 21C20.16 21 21.5 19.66 21.5 18V16.29C23.05 15.38 24 13.62 24 11.75V11C24 10.45 23.55 10 23 10C22.45 10 22 10.45 22 11V11.75C22 12.85 21.1 13.75 20 13.75V13H19ZM9 18C8.45 18 8 17.55 8 17V15H10V17C10 17.55 9.55 18 9 18ZM18.5 18C17.95 18 17.5 17.55 17.5 17V16H19.5V17C19.5 17.55 19.05 18 18.5 18Z" transform="translate(0, 2)"/> </svg>
-                                        </span>
+                                        <span class="feature-icon feature-kids" title="Infantil"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19 13H17.91C17.64 10.09 15.33 7.78 12.41 7.54V6C12.41 3.69 13.95 1.78 16.1 1.22C16.7 1.06 17.07 0.43 16.91 -0.17C16.75 -0.77 16.12 -1.14 15.52 -0.98C12.59 0.04 10.37 2.22 10.04 5H9.96C6.66 5.37 4 8.27 4 11.75V15H6V18C6 19.66 7.34 21 9 21C10.66 21 12 19.66 12 18V15H15.5V18C15.5 19.66 16.84 21 18.5 21C20.16 21 21.5 19.66 21.5 18V16.29C23.05 15.38 24 13.62 24 11.75V11C24 10.45 23.55 10 23 10C22.45 10 22 10.45 22 11V11.75C22 12.85 21.1 13.75 20 13.75V13H19ZM9 18C8.45 18 8 17.55 8 17V15H10V17C10 17.55 9.55 18 9 18ZM18.5 18C17.95 18 17.5 17.55 17.5 17V16H19.5V17C19.5 17.55 19.05 18 18.5 18Z" transform="translate(0, 2)"/> </svg></span>
                                         {% endif %}
                                         {% if evento.is_lgbt %}
-                                        <span class="feature-icon feature-lgbt" title="LGBTQIA+">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32" stroke="none"><rect x="2" y="4" width="28" height="4" fill="#FF4B4B"/><rect x="2" y="8" width="28" height="4" fill="#FFB04B"/><rect x="2" y="12" width="28" height="4" fill="#FFEB3B"/><rect x="2" y="16" width="28" height="4" fill="#4CAF50"/><rect x="2" y="20" width="28" height="4" fill="#2196F3"/><rect x="2" y="24" width="28" height="4" fill="#9C27B0"/></svg>
-                                        </span>
+                                        <span class="feature-icon feature-lgbt" title="LGBTQIA+"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32" stroke="none"><rect x="2" y="4" width="28" height="4" fill="#FF4B4B"/><rect x="2" y="8" width="28" height="4" fill="#FFB04B"/><rect x="2" y="12" width="28" height="4" fill="#FFEB3B"/><rect x="2" y="16" width="28" height="4" fill="#4CAF50"/><rect x="2" y="20" width="28" height="4" fill="#2196F3"/><rect x="2" y="24" width="28" height="4" fill="#9C27B0"/></svg></span>
                                         {% endif %}
                                         {% if evento.is_pet %}
-                                        <span class="feature-icon feature-pet" title="Pet Friendly">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C10.5 2 9 3.5 9 5C9 6.5 10.5 8 12 8C13.5 8 15 6.5 15 5C15 3.5 13.5 2 12 2ZM5 5C3.5 5 2 6.5 2 8C2 9.5 3.5 11 5 11C6.5 11 8 9.5 8 8C8 6.5 6.5 5 5 5ZM19 5C17.5 5 16 6.5 16 8C16 9.5 17.5 11 19 11C20.5 11 22 9.5 22 8C22 6.5 20.5 5 19 5ZM4 13.5C4 16.5 6 22 12 22C18 22 20 16.5 20 13.5C20 12 18 10 16 10C14.5 10 14 11 12 11C10 11 9.5 10 8 10C6 10 4 12 4 13.5Z"/></svg>
-                                        </span>
+                                        <span class="feature-icon feature-pet" title="Pet Friendly"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C10.5 2 9 3.5 9 5C9 6.5 10.5 8 12 8C13.5 8 15 6.5 15 5C15 3.5 13.5 2 12 2ZM5 5C3.5 5 2 6.5 2 8C2 9.5 3.5 11 5 11C6.5 11 8 9.5 8 8C8 6.5 6.5 5 5 5ZM19 5C17.5 5 16 6.5 16 8C16 9.5 17.5 11 19 11C20.5 11 22 9.5 22 8C22 6.5 20.5 5 19 5ZM4 13.5C4 16.5 6 22 12 22C18 22 20 16.5 20 13.5C20 12 18 10 16 10C14.5 10 14 11 12 11C10 11 9.5 10 8 10C6 10 4 12 4 13.5Z"/></svg></span>
                                         {% endif %}
                                     </div>
                                     {% endif %}
@@ -139,6 +156,12 @@
                             <div class="card-desc">
                                 <p>{{ evento.descricao }}</p>
                             </div>
+                            {% endif %}
+
+                            {% if evento.lat and evento.lon %}
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ evento.lat }},{{ evento.lon }}" target="_blank" class="directions-btn" onclick="event.stopPropagation();">
+                                🚗 Como Chegar
+                            </a>
                             {% endif %}
                         </div>
                     </div>
@@ -172,18 +195,70 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
 <script>
+    // --- SERVICE WORKER REGISTRATION (PWA) ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('SW Registered!', reg.scope))
+                .catch(err => console.log('SW Registration failed:', err));
+        });
+    }
+
     const statusColors = {
-        'em-andamento': '#27ae60', // Green
-        'em-breve': '#2196F3',     // Blue
-        'encerrando': '#d35400',   // Orange
-        'hoje': '#8e44ad',         // Purple
-        'encerrado': '#95a5a6',    // Gray
-        'futuro': '#E91E63'        // Default Pink
+        'em-andamento': '#27ae60',
+        'em-breve': '#2196F3',
+        'encerrando': '#d35400',
+        'hoje': '#8e44ad',
+        'encerrado': '#95a5a6',
+        'futuro': '#E91E63'
     };
 
     function clearMapBounds() {
         ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng', 'center_lat', 'center_lng', 'zoom'].forEach(id => {
             document.getElementById(id).value = '';
+        });
+    }
+
+    // --- FAVORITES LOGIC ---
+    function getFavorites() {
+        return JSON.parse(localStorage.getItem('my_blocos') || '[]');
+    }
+
+    function toggleFavorite(id, event) {
+        event.stopPropagation(); // Prevent card click logic
+        let favs = getFavorites();
+        if (favs.includes(id)) {
+            favs = favs.filter(fid => fid !== id);
+        } else {
+            favs.push(id);
+        }
+        localStorage.setItem('my_blocos', JSON.stringify(favs));
+        applyFavoritesUI();
+    }
+
+    function applyFavoritesUI() {
+        const favs = getFavorites();
+        const cards = document.querySelectorAll('.evento-card');
+        const showOnly = document.getElementById('show-favorites-only').checked;
+
+        cards.forEach(card => {
+            const id = card.dataset.id;
+            const isFav = favs.includes(id);
+            
+            // Toggle Icon Class
+            if (isFav) {
+                card.classList.add('is-favorite');
+            } else {
+                card.classList.remove('is-favorite');
+            }
+
+            // Filter View
+            if (showOnly) {
+                if (isFav) card.style.display = 'flex';
+                else card.style.display = 'none';
+            } else {
+                card.style.display = 'flex';
+            }
         });
     }
 
@@ -197,6 +272,14 @@ document.addEventListener('DOMContentLoaded', function () {
         disableMobile: "true" 
     });
 
+    // Init Favorites Toggle
+    const favToggle = document.getElementById('show-favorites-only');
+    if(favToggle) {
+        favToggle.addEventListener('change', applyFavoritesUI);
+    }
+    applyFavoritesUI(); // Run once on load
+
+    // ... (Map logic - same as before) ...
     const mapElement = document.getElementById('map');
     if (mapElement) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -237,6 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.mapInstance.addControl(new ResetViewControl());
 
         const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap',
             className: 'map-tiles'
         });
 
@@ -373,7 +457,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(eventos => {
                 eventos.forEach(evento => {
-                    // --- CHANGED: SKIP 'ENCERRADO' MARKERS ---
                     if (evento.status === 'encerrado') return; 
 
                     if (evento.lat && evento.lon) {
@@ -382,7 +465,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (evento.tamanho === 2) { radiusSize = 10; tamanhoLabel = "Médio"; }
                         if (evento.tamanho === 3) { radiusSize = 16; tamanhoLabel = "Grande"; }
 
-                        // Color Logic
                         const markerColor = statusColors[evento.status] || '#E91E63';
 
                         const defaultStyle = {
@@ -446,12 +528,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (id && window.markersMap[id]) {
                     const current = window.markersMap[id];
+                    const markerElement = current.marker.getElement(); 
                     
-                    // --- TRIGGER PULSE ANIMATION ON CLICK ---
-                    const markerElement = current.marker.getElement();
                     if (markerElement) {
                         markerElement.classList.remove('marker-active-pulse');
-                        void markerElement.offsetWidth; // Reflow
+                        void markerElement.offsetWidth; 
                         markerElement.classList.add('marker-active-pulse');
                         
                         setTimeout(() => {
