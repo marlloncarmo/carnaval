@@ -17,13 +17,11 @@
     <!-- Vercel Web Analytics -->
     <script type="module">
         import { inject } from 'https://cdn.jsdelivr.net/npm/@vercel/analytics/+esm';
+        import { injectSpeedInsights } from 'https://cdn.jsdelivr.net/npm/@vercel/speed-insights/+esm';
+
         inject();
+        injectSpeedInsights();
     </script>
-    <!-- Fallback for analytics tracking via Vercel Insights -->
-    <script>
-        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/insights/script.js"></script>
 
     {% block head %}{% endblock %}
 </head>
