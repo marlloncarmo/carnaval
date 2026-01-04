@@ -107,12 +107,12 @@ body {
     background: none;
 }
 
-/* Estilo do novo botão de contato (Azul genérico ou Roxo) */
 .contact-btn { color: #2196F3; }
 .contact-btn:hover { transform: scale(1.1); background-color: rgba(33, 150, 243, 0.1); }
 
 .support-btn { color: #E91E63; }
 .support-btn:hover { transform: scale(1.1); background-color: rgba(233, 30, 99, 0.1); }
+
 
 /* THEME SWITCH */
 .theme-switch { position: relative; display: flex; align-items: center; justify-content: space-between; width: 50px; height: 26px; background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: 30px; cursor: pointer; padding: 0 4px; overflow: hidden; }
@@ -131,7 +131,15 @@ body.dark-mode .switch-thumb { transform: translateX(24px); }
 .container { width: 100%; height: 100%; max-width: 1600px; margin: 0 auto; padding: 1em; display: flex; flex-direction: column; }
 main { flex: 1; display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
 
-.main-content-grid { display: grid; grid-template-columns: 35% 65%; gap: 1.5em; height: 100%; width: 100%; min-height: 0; }
+/* CORREÇÃO DO GRID PARA NÃO CORTAR NO DESKTOP */
+.main-content-grid { 
+    display: grid; 
+    grid-template-columns: 35% 1fr; /* MUDANÇA: 1fr ocupa o espaço restante sem estourar */
+    gap: 1.5em; 
+    height: 100%; 
+    width: 100%; 
+    min-height: 0; 
+}
 
 /* MAP */
 .map-container {
@@ -250,9 +258,18 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 /* LIST */
 .events-list-container {
-    height: 100%; overflow-y: auto;
-    padding-right: 8px; padding-bottom: 4em;
-    display: flex; flex-direction: column; min-height: 0;
+    height: 100%; 
+    overflow-y: auto;
+    padding-right: 8px; 
+    padding-bottom: 4em;
+    display: flex; 
+    flex-direction: column; 
+    min-height: 0;
+    
+    /* CORREÇÃO BUG DESKTOP + MOBILE */
+    overflow-x: hidden; 
+    position: relative;
+    min-width: 0; /* Importante para o Grid 1fr funcionar */
 }
 .events-list-container::-webkit-scrollbar { width: 8px; }
 .events-list-container::-webkit-scrollbar-track { background: transparent; }
@@ -283,7 +300,22 @@ input:checked + .slider:before { transform: translateX(16px); }
 .fav-toggle-wrapper label { cursor: pointer; }
 
 /* FILTERS MODAL & FORM */
-.filters-wrapper { background: var(--card-background); padding: 0.8em; border-radius: 12px; margin-bottom: 1em; border: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.filters-wrapper { 
+    background: var(--card-background); 
+    padding: 0.8em; 
+    border-radius: 12px; 
+    margin-bottom: 1em; 
+    border: 1px solid var(--border-color); 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    
+    /* CORREÇÃO BUG DESKTOP */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box; 
+}
 .filtros-container form { display: flex; flex-direction: column; gap: 0.5em; }
 
 /* New Grid for Standard Filters */
@@ -347,8 +379,6 @@ input:checked + .slider:before { transform: translateX(16px); }
     margin: 10px -0.8em -0.8em -0.8em; /* Stretch to edges */
     border-top: 1px solid var(--border-color);
     border-radius: 0 0 12px 12px;
-    
-    /* Ensure it stays at bottom on desktop if needed, or flows naturally */
 }
 .filter-actions-row { display: flex; gap: 10px; align-items: center; width: auto; }
 
@@ -543,6 +573,7 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
         padding: 0.8em; 
         height: auto; 
         padding-bottom: 120px; /* Space for the floating button */
+        overflow-x: hidden;
     }
 
     .filters-wrapper { display: none; }
@@ -564,8 +595,10 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
         border: none;
         border-radius: 50px;
         box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+        
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 0.85rem; /* Ajustado */
+        
         z-index: 1000;
         transition: transform 0.2s, box-shadow 0.2s;
     }
