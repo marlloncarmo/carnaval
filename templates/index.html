@@ -197,7 +197,7 @@
                                 <div class="card-actions">
                                     {% if evento.lat and evento.lon %}
                                     <button class="directions-btn" onclick="getDirections({{ evento.lat }}, {{ evento.lon }}, event)">
-                                        🚗 Como Chegar
+                                        🚗 Como Chegar 🚶
                                     </button>
                                     {% endif %}
                                     
@@ -521,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;">
                                     <button onclick="getDirections(${evento.lat}, ${evento.lon}, event)" class="directions-btn" style="margin-top: 0; flex: 1;">
-                                        🚗 Como Chegar
+                                        🚗 Como Chegar 🚶
                                     </button>
                                     ${iconsHtml}
                                 </div>

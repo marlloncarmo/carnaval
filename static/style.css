@@ -503,8 +503,8 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .copy-btn:hover { background-color: #d81b60; }
 .copy-btn.copied { background-color: #27ae60; }
 
-.nubank-btn { display: inline-block; background-color: #820AD1; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 0.9em; margin-top: 10px; transition: background-color 0.2s; }
-.nubank-btn:hover { background-color: #6D08AF; }
+.nubank-btn { display: inline-block; background-color: var(--primary-accent); color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 0.9em; margin-top: 10px; transition: background-color 0.2s; }
+.nubank-btn:hover { background-color: #d81b60; }
 
 .mobile-filter-btn { display: none; }
 .mobile-filter-modal { display: none; }
