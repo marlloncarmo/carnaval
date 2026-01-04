@@ -371,6 +371,25 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 .btn-limpar:hover { background-color: #95a5a6; }
 
+/* SHARE BUTTON */
+.share-btn {
+    width: 44px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #25D366; /* WhatsApp Green */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.share-btn:hover {
+    background-color: #25D366;
+    color: white;
+    border-color: #25D366;
+}
+
 /* CARDS */
 .eventos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8em; }
 .evento-card { 
