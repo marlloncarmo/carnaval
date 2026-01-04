@@ -5,7 +5,7 @@ import csv
 import io
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -86,11 +86,9 @@ def fetch_carnival_data():
             descricao_orig = row.get("OBS", "").strip()
             
             desc_lower = descricao_orig.lower()
-            
             is_kids = False
             is_lgbt = False
             is_pet = False
-
             clean_desc = descricao_orig
             
             if "infantil" in desc_lower or "criança" in desc_lower or "baby" in desc_lower or "👶" in descricao_orig:
@@ -206,20 +204,51 @@ def filtrar_eventos(eventos_todos, args):
     filtro_periodo = args.get('periodo_dia')
     filtro_bairro = args.get('bairro')
     filtro_estilo = args.get('categoria')
-    filtro_status = args.get('status_filter') # NEW
-    busca = args.get('q', '').lower()
+    filtro_status = args.get('status_filter')
     
+    # 4. UPDATED: Get list for multiple checkboxes
+    quick_filters = args.getlist('quick_filter') 
+    
+    busca = args.get('q', '').lower()
     ne_lat = args.get('ne_lat')
     ne_lng = args.get('ne_lng')
     sw_lat = args.get('sw_lat')
     sw_lng = args.get('sw_lng')
 
     eventos_filtrados = eventos_todos
+    now = datetime.now()
 
-    # 1. Filter by Status
+    # 1. Filter by Status Dropdown
     if filtro_status:
-        eventos_filtrados = [e for e in eventos_filtrados if e['status'] == filtro_status]
+        if filtro_status == 'hoje':
+            eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() == now.date()]
+        else:
+            eventos_filtrados = [e for e in eventos_filtrados if e['status'] == filtro_status]
 
+    # 2. UPDATED Quick Filters Logic (Multi-select)
+    if quick_filters:
+        target_dates = []
+        target_sizes = []
+        
+        # Parse filters
+        if 'hoje' in quick_filters:
+            target_dates.append(now.date())
+        if 'amanha' in quick_filters:
+            target_dates.append(now.date() + timedelta(days=1))
+            
+        if 'grande' in quick_filters: target_sizes.append(3)
+        if 'medio' in quick_filters: target_sizes.append(2)
+        if 'pequeno' in quick_filters: target_sizes.append(1)
+        
+        # Apply Date Filter (OR logic between selected days)
+        if target_dates:
+            eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() in target_dates]
+            
+        # Apply Size Filter (OR logic between selected sizes)
+        if target_sizes:
+            eventos_filtrados = [e for e in eventos_filtrados if e['tamanho'] in target_sizes]
+
+    # Standard Filters
     if filtro_data:
         try:
             target = datetime.strptime(filtro_data, '%Y-%m-%d').date()
@@ -286,7 +315,6 @@ def api_eventos():
         if '_dt_obj' in e: del e['_dt_obj']
     return jsonify(geocoded)
 
-# --- PWA ROUTES ---
 @app.route('/manifest.json')
 def serve_manifest():
     return send_from_directory('static', 'manifest.json', mimetype='application/manifest+json')
