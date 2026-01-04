@@ -25,26 +25,44 @@
                     <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}">
                         
                         <div class="quick-filters">
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Hoje</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Amanhã</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Grandes</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Médios</span>
-                            </label>
-                            <label class="chip-checkbox">
-                                <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                <span>Pequenos</span>
-                            </label>
+                            <div class="filter-group">
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Hoje</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Amanhã</span>
+                                </label>
+                            </div>
+                            <div class="filter-group">
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Pequenos</span>
+                                </label>                    
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Médios</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Grandes</span>
+                                </label>
+                            </div>
+                            <div class="filter-group">
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="manha" {% if 'manha' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Manhã</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="tarde" {% if 'tarde' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Tarde</span>
+                                </label>
+                                <label class="chip-checkbox">
+                                    <input type="checkbox" name="quick_filter" value="noite" {% if 'noite' in request.args.getlist('quick_filter') %}checked{% endif %}>
+                                    <span>Noite</span>
+                                </label>
+                            </div>
                         </div>
 
                         <input type="hidden" id="ne_lat" name="ne_lat" value="{{ request.args.get('ne_lat', '') }}">
@@ -69,16 +87,6 @@
                                     <option value="em-andamento" {% if request.args.get('status_filter') == 'em-andamento' %}selected{% endif %}>Em Andamento 🟢</option>
                                     <option value="em-breve" {% if request.args.get('status_filter') == 'em-breve' %}selected{% endif %}>Em Breve 🔵</option>
                                     <option value="encerrado" {% if request.args.get('status_filter') == 'encerrado' %}selected{% endif %}>Encerrados ⚫</option>
-                                </select>
-                            </div>
-
-                            <div class="filtro-item">
-                                <label for="periodo_dia">Período:</label>
-                                <select name="periodo_dia" id="periodo_dia">
-                                    <option value="">Todos</option>
-                                    <option value="manha" {% if request.args.get('periodo_dia') == 'manha' %}selected{% endif %}>Manhã</option>
-                                    <option value="tarde" {% if request.args.get('periodo_dia') == 'tarde' %}selected{% endif %}>Tarde</option>
-                                    <option value="noite" {% if request.args.get('periodo_dia') == 'noite' %}selected{% endif %}>Noite</option>
                                 </select>
                             </div>
 

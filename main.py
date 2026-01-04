@@ -221,7 +221,6 @@ def events_status_logic(eventos):
 
 def filtrar_eventos(eventos_todos, args):
     filtro_data = args.get('data_filtro')
-    filtro_periodo = args.get('periodo_dia')
     filtro_bairro = args.get('bairro')
     filtro_estilo = args.get('categoria')
     filtro_status = args.get('status_filter')
@@ -245,31 +244,36 @@ def filtrar_eventos(eventos_todos, args):
     if quick_filters:
         target_dates = []
         target_sizes = []
+        target_periods = []
+
         if 'hoje' in quick_filters: target_dates.append(now.date())
         if 'amanha' in quick_filters: target_dates.append(now.date() + timedelta(days=1))
         if 'grande' in quick_filters: target_sizes.append(3)
         if 'medio' in quick_filters: target_sizes.append(2)
         if 'pequeno' in quick_filters: target_sizes.append(1)
+        if 'manha' in quick_filters: target_periods.append('manha')
+        if 'tarde' in quick_filters: target_periods.append('tarde')
+        if 'noite' in quick_filters: target_periods.append('noite')
         
         if target_dates:
             eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() in target_dates]
         if target_sizes:
             eventos_filtrados = [e for e in eventos_filtrados if e['tamanho'] in target_sizes]
+        if target_periods:
+            def check_period(dt):
+                h = dt.hour
+                matches = []
+                if 'manha' in target_periods: matches.append(5 <= h < 12)
+                if 'tarde' in target_periods: matches.append(12 <= h < 18)
+                if 'noite' in target_periods: matches.append(18 <= h or h < 5)
+                return any(matches)
+            eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and check_period(e['_dt_obj'])]
 
     if filtro_data:
         try:
             target = datetime.strptime(filtro_data, '%Y-%m-%d').date()
             eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and e['_dt_obj'].date() == target]
         except: pass
-
-    if filtro_periodo:
-        def check_p(dt):
-            h = dt.hour
-            if filtro_periodo == 'manha': return 5 <= h < 12
-            if filtro_periodo == 'tarde': return 12 <= h < 18
-            if filtro_periodo == 'noite': return 18 <= h or h < 5
-            return True
-        eventos_filtrados = [e for e in eventos_filtrados if e['_dt_obj'] and check_p(e['_dt_obj'])]
 
     if filtro_bairro:
         eventos_filtrados = [e for e in eventos_filtrados if e['local'] == filtro_bairro]
