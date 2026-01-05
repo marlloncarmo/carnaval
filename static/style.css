@@ -1,4 +1,4 @@
-/* ... (Mantenha as variáveis e resets do topo) ... */
+/* RESET & FONTS */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
@@ -418,6 +418,39 @@ body.dark-mode .desktop-map-ad {
 body.dark-mode .desktop-map-ad h3 { color: #f1c40f; }
 body.dark-mode .desktop-map-ad p { color: #ccc; }
 
+/* --- WELCOME MODAL ESTILOS --- */
+.welcome-content {
+    max-width: 380px;
+    text-align: center;
+    padding: 30px 25px;
+    border-radius: 20px;
+}
+
+.welcome-icon {
+    font-size: 3.5rem; /* Ícone maior */
+    margin-bottom: 10px;
+    animation: floating 3s ease-in-out infinite; /* Animação mais suave */
+}
+
+.welcome-content h3 {
+    color: var(--primary-accent);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.welcome-content p {
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* Animação Flutuante (Mais amigável que o bounce) */
+@keyframes floating {
+    0% { transform: translate(0,  0px); }
+    50% { transform: translate(0, 10px); }
+    100% { transform: translate(0, -0px); }
+}
+
 /* CONTROLE DE VISIBILIDADE DE ANÚNCIOS (RESPONSIVO) */
 
 /* Default (Desktop): Esconde ads da lista (in-feed), mostra ad do mapa */
@@ -443,9 +476,40 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
     .mobile-filter-btn:active { transform: translateX(-50%) scale(0.95); }
     .mobile-filter-btn svg { width: 20px; height: 20px; }
     .mobile-filter-btn::after { content: "Encontrar Blocos"; display: block; }
+    
     .mobile-filter-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
     .mobile-filter-modal.show { display: block; }
-    .modal-content { background-color: var(--card-background); margin: 0; position: absolute; bottom: 0; left: 0; width: 100%; max-width: 100%; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; max-height: 85vh; height: 85vh; padding: 0; box-shadow: 0 -5px 25px rgba(0,0,0,0.2); }
+
+    /* CORREÇÃO DO BUG: Aplica estilo "Bottom Sheet" APENAS para o filtro */
+    #mobile-filter-modal .modal-content { 
+        background-color: var(--card-background); 
+        margin: 0; 
+        position: absolute; bottom: 0; left: 0; 
+        width: 100%; max-width: 100%; 
+        border-radius: 20px 20px 0 0; 
+        display: flex; flex-direction: column; 
+        max-height: 85vh; height: 85vh; /* Altura fixa apenas aqui */
+        padding: 0; 
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.2); 
+    }
+
+    /* ESTILO PARA OS OUTROS MODALS NO MOBILE (Bem-vindo, Apoie, etc) */
+    .modal:not(#mobile-filter-modal) .modal-content {
+        background-color: var(--card-background);
+        width: 90%; 
+        max-width: 400px;
+        border-radius: 16px;
+        padding: 20px;
+        /* Centralizar na tela */
+        position: relative;
+        margin: 50% auto; /* Fallback */
+        top: 50%;
+        transform: translateY(-50%);
+        margin-top: 0;
+        height: auto; /* Altura automática baseada no conteúdo! */
+        display: block;
+    }
+
     .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
     .modal-header h2 { font-size: 1.1rem; margin: 0; }
     .close-modal-btn { background: none; border: none; font-size: 1.8rem; color: var(--text-secondary); cursor: pointer; }

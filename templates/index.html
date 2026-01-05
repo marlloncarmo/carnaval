@@ -284,6 +284,22 @@
             </div>
         </div>
 
+        <div id="welcome-modal" class="modal" style="z-index: 3000;">
+            <div class="modal-content welcome-content">
+                <div class="welcome-icon">🎭</div> 
+                
+                <h3>Dados em Apresentação</h3>
+                <p>
+                    Os blocos exibidos atualmente são <strong>fictícios</strong> para fins de <strong>apresentação</strong> da plataforma.
+                    <br><br>
+                    Assim que a programação oficial do <strong>Carnaval de BH 2026</strong> for divulgada, atualizaremos o mapa com os dados reais imediatamente! 🎉
+                </p>
+                <button id="close-welcome-btn" class="directions-btn" style="width: 100%; margin-top: 15px; border:none;">
+                    Entendido!
+                </button>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
 
@@ -354,26 +370,24 @@
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
         
-        // URL base correta do Google Maps
-        const baseUrl = "https://www.google.com/maps/dir/?api=1";
-        const destParam = `&destination=${destLat},${destLon}`;
+        // URL base correta do Google Maps (Versão Universal)
+        const baseUrl = "https://www.google.com/maps/dir/?api=1"; // Essa URL redireciona corretamente
+        // CORREÇÃO: Usar a URL direta do maps para garantir compatibilidade
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`;
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const userLat = position.coords.latitude;
                     const userLng = position.coords.longitude;
-                    // Abre com Origem (Usuário) -> Destino (Bloco)
-                    window.open(`${baseUrl}&origin=${userLat},${userLng}${destParam}`, '_blank');
+                    window.open(`${mapsUrl}&origin=${userLat},${userLng}`, '_blank');
                 },
                 (error) => {
-                    // Se der erro no GPS ou usuário negar, abre só com o destino (o Google Maps calcula a rota dele)
-                    window.open(`${baseUrl}${destParam}`, '_blank');
+                    window.open(mapsUrl, '_blank');
                 }
             );
         } else {
-            // Se o navegador não suportar GPS
-            window.open(`${baseUrl}${destParam}`, '_blank');
+            window.open(mapsUrl, '_blank');
         }
     }
 
@@ -383,18 +397,22 @@
         const container = document.querySelector('.events-list-container');
 
         if (card) {
+            // Reseta todos para ordem 0
             document.querySelectorAll('.evento-card').forEach(c => {
                 c.style.order = '0'; 
                 c.classList.remove('expanded');
                 c.classList.remove('highlighted');
             });
             
+            // Joga SOMENTE este para o topo (-1)
             card.style.order = '-1';
             
+            // Expande e destaca
             card.classList.add('expanded');
             card.classList.add('highlighted');
             setTimeout(() => card.classList.remove('highlighted'), 2000); 
 
+            // Rola a lista para o topo
             if (container) {
                 container.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -403,10 +421,12 @@
 
     // --- LÓGICA DE CLIQUE NA LISTA (Não muda ordem) ---
     function toggleCard(card) {
+        // Fecha outros cards
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
         
+        // Alterna o estado do atual
         card.classList.toggle('expanded');
         
         if (!card.classList.contains('expanded')) {
@@ -480,7 +500,7 @@
             let shouldShow = true;
 
             if (isAd) {
-                // Se estiver vendo "Meus Blocos", escondemos os anúncios
+                // Se estiver vendo "Meus Blocos", escondemos os anúncios da lista
                 if (showOnly) shouldShow = false;
             } else {
                 const id = card.dataset.id;
@@ -534,6 +554,30 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     
+    // --- LÓGICA DO POPUP DE BOAS-VINDAS ---
+    const welcomeModal = document.getElementById('welcome-modal');
+    const closeWelcomeBtn = document.getElementById('close-welcome-btn');
+    
+    // Verifica se o usuário já viu o aviso
+    const hasSeenWelcome = localStorage.getItem('seen_welcome_msg_v1');
+
+    if (!hasSeenWelcome && welcomeModal) {
+        // Se não viu, mostra o modal com um pequeno delay
+        setTimeout(() => {
+            welcomeModal.classList.add('show');
+        }, 500);
+    }
+
+    if (closeWelcomeBtn && welcomeModal) {
+        closeWelcomeBtn.addEventListener('click', () => {
+            // Fecha o modal
+            welcomeModal.classList.remove('show');
+            // Salva no navegador que ele já viu
+            localStorage.setItem('seen_welcome_msg_v1', 'true');
+        });
+    }
+    // --------------------------------------
+
     const activeParams = new URLSearchParams(window.location.search);
     const highlightId = activeParams.get('highlight_id');
 
