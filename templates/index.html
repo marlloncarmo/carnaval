@@ -235,6 +235,20 @@
                             </div>
                         </div>
                     </div>
+
+                    {% if loop.index > 0 and loop.index % 5 == 0 %}
+                    <div class="evento-card ad-card">
+                        <div class="ad-label">Publicidade</div>
+                        <div class="ad-content">
+                            <h3>Sua Marca Aqui! 🚀</h3>
+                            <p>Destaque seu negócio para milhares de foliões durante o Carnaval de BH.</p>
+                            <a href="https://biolink.info/marllonca" target="_blank" class="directions-btn" style="background-color: #f1c40f; color: #333; border: none;">
+                                Anunciar Agora
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
                 {% else %}
                     <p style="grid-column: 1/-1; text-align: center; margin-top: 2em; color: var(--text-secondary);">
                         Nenhum bloco encontrado nesta área/filtro.
@@ -348,22 +362,18 @@
         const container = document.querySelector('.events-list-container');
 
         if (card) {
-            // Reseta todos para ordem 0
             document.querySelectorAll('.evento-card').forEach(c => {
                 c.style.order = '0'; 
                 c.classList.remove('expanded');
                 c.classList.remove('highlighted');
             });
             
-            // Joga SOMENTE este para o topo (-1)
             card.style.order = '-1';
             
-            // Expande e destaca
             card.classList.add('expanded');
             card.classList.add('highlighted');
             setTimeout(() => card.classList.remove('highlighted'), 2000); 
 
-            // Rola a lista para o topo
             if (container) {
                 container.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -372,17 +382,12 @@
 
     // --- LÓGICA DE CLIQUE NA LISTA (Não muda ordem) ---
     function toggleCard(card) {
-        // Fecha outros cards
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
         
-        // Alterna o estado do atual (apenas expande/colhe)
         card.classList.toggle('expanded');
         
-        // NOTA: Removemos a lógica de style.order daqui.
-        // Clicar na lista NÃO altera a posição do card.
-
         if (!card.classList.contains('expanded')) {
              return;
         }
@@ -413,7 +418,6 @@
                 }
                 current.marker.bringToFront();
                 
-                // Abre o popup, mas isso não afeta a ordem da lista
                 setTimeout(() => {
                     current.marker.openPopup();
                 }, 300);
@@ -437,6 +441,7 @@
         applyFavoritesUI();
     }
 
+    // --- ATUALIZAÇÃO DA LÓGICA DE CONTAGEM ---
     function applyFavoritesUI() {
         const favs = getFavorites();
         const cards = document.querySelectorAll('.evento-card');
@@ -445,21 +450,34 @@
         let visibleCount = 0;
 
         cards.forEach(card => {
-            const id = card.dataset.id;
-            const isFav = favs.includes(id);
+            // Verifica se é anúncio
+            const isAd = card.classList.contains('ad-card');
             
-            if (isFav) card.classList.add('is-favorite');
-            else card.classList.remove('is-favorite');
+            // Verifica se é bloco encerrado (para não contar)
+            const isEnded = card.classList.contains('status-bg-encerrado');
 
-            if (showOnly) {
-                if (!isFav) {
-                    card.style.display = 'none';
-                } else {
-                    card.style.display = 'flex';
-                    visibleCount++;
-                }
+            let shouldShow = true;
+
+            if (isAd) {
+                // Se estiver vendo "Meus Blocos", escondemos os anúncios
+                if (showOnly) shouldShow = false;
             } else {
-                card.style.display = 'flex';
+                const id = card.dataset.id;
+                const isFav = favs.includes(id);
+                
+                if (isFav) card.classList.add('is-favorite');
+                else card.classList.remove('is-favorite');
+
+                if (showOnly && !isFav) {
+                    shouldShow = false;
+                }
+            }
+
+            // Aplica visibilidade
+            card.style.display = shouldShow ? 'flex' : 'none';
+
+            // SÓ CONTA SE: Estiver visível + NÃO for anúncio + NÃO estiver encerrado
+            if (shouldShow && !isAd && !isEnded) {
                 visibleCount++;
             }
         });
@@ -469,6 +487,7 @@
             totalElement.textContent = `${visibleCount} blocos encontrados.`;
         }
 
+        // Lógica de Marcadores (Anúncios e Encerrados já não têm marcadores, então é seguro)
         if (window.markersMap && window.markersFeatureGroup) {
             Object.keys(window.markersMap).forEach(id => {
                 const markerObj = window.markersMap[id];
@@ -664,16 +683,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
                         const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
                         
-                        // LIGAÇÃO DO CLICK NO MAPA COM A LISTA
                         marker.on('click', () => {
                             selectCardFromMap(evento.id);
                         });
                         
-                        // --- NOVO: SE FECHAR O POPUP, O CARD VOLTA PRO LUGAR ORIGINAL ---
                         marker.on('popupclose', () => {
                             const card = document.querySelector(`.evento-card[data-id="${evento.id}"]`);
                             if (card) {
-                                card.style.order = '0'; // Reseta a ordem
+                                card.style.order = '0'; 
                             }
                         });
 
