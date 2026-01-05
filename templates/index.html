@@ -482,53 +482,65 @@
         applyFavoritesUI();
     }
 
-    // --- ATUALIZAÇÃO DA LÓGICA DE CONTAGEM ---
+    // --- NOVA LÓGICA DE FILTRAGEM COM ANÚNCIOS DINÂMICOS ---
     function applyFavoritesUI() {
         const favs = getFavorites();
-        const cards = document.querySelectorAll('.evento-card');
+        const cards = document.querySelectorAll('.evento-card'); // Pega blocos E anúncios
         const showOnly = document.getElementById('show-favorites-only').checked;
         
-        let visibleCount = 0;
+        let visibleBlockCount = 0; // Conta quantos blocos reais estão visíveis
+        let blocksSinceLastAd = 0; // Conta quantos blocos passamos desde o último anúncio
 
         cards.forEach(card => {
-            // Verifica se é anúncio
             const isAd = card.classList.contains('ad-card');
-            
-            // Verifica se é bloco encerrado (para não contar)
-            const isEnded = card.classList.contains('status-bg-encerrado');
-
-            let shouldShow = true;
+            const isEnded = card.classList.contains('status-bg-encerrado'); 
 
             if (isAd) {
-                // Se estiver vendo "Meus Blocos", escondemos os anúncios da lista
-                if (showOnly) shouldShow = false;
+                // SÓ mostra o anúncio se tiverem passado 5 ou mais blocos visíveis desde o último
+                // E também zera o contador se mostrar
+                if (blocksSinceLastAd >= 5) {
+                    card.style.display = 'flex';
+                    blocksSinceLastAd = 0; // Reseta a contagem
+                } else {
+                    card.style.display = 'none';
+                }
             } else {
+                // É um bloco normal
                 const id = card.dataset.id;
                 const isFav = favs.includes(id);
                 
+                // Aplica classe visual de favorito
                 if (isFav) card.classList.add('is-favorite');
                 else card.classList.remove('is-favorite');
 
+                // Lógica de visibilidade do BLOCO
+                let shouldShow = true;
                 if (showOnly && !isFav) {
                     shouldShow = false;
                 }
-            }
-
-            // Aplica visibilidade
-            card.style.display = shouldShow ? 'flex' : 'none';
-
-            // SÓ CONTA SE: Estiver visível + NÃO for anúncio + NÃO estiver encerrado
-            if (shouldShow && !isAd && !isEnded) {
-                visibleCount++;
+                
+                // Se o bloco estiver visível E não estiver encerrado (opcional, mantendo lógica anterior)
+                if (shouldShow && !isEnded) {
+                    card.style.display = 'flex';
+                    visibleBlockCount++;
+                    blocksSinceLastAd++; // Incrementa contador para liberar o próximo anúncio
+                } else if (shouldShow) {
+                     // Bloco visivel mas encerrado (conta visualmente, mas talvez não para ads? Vamos contar)
+                     card.style.display = 'flex';
+                     visibleBlockCount++;
+                     blocksSinceLastAd++;
+                } else {
+                    card.style.display = 'none';
+                }
             }
         });
 
         const totalElement = document.querySelector('.total-count');
         if (totalElement) {
-            totalElement.textContent = `${visibleCount} blocos encontrados.`;
+            totalElement.textContent = `${visibleBlockCount} blocos encontrados.`;
         }
 
-        // Lógica de Marcadores (Anúncios e Encerrados já não têm marcadores, então é seguro)
+        // Atualiza Marcadores do Mapa
         if (window.markersMap && window.markersFeatureGroup) {
             Object.keys(window.markersMap).forEach(id => {
                 const markerObj = window.markersMap[id];

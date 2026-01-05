@@ -258,10 +258,21 @@ input:checked + .slider:before { transform: translateX(16px); }
 .chip-checkbox { display: inline-block; cursor: pointer; }
 .chip-checkbox input { display: none; }
 .chip-checkbox span { background-color: var(--background-color); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 12px; border-radius: 20px; font-size: 0.8em; transition: all 0.2s; font-weight: 500; display: inline-block; }
-.chip-checkbox input:checked + span { background-color: var(--primary-accent); color: white; border-color: var(--primary-accent); }
+
+/* --- AJUSTE DE CORES DOS FILTROS SELECIONADOS --- */
+.chip-checkbox input:checked + span { 
+    background-color: rgba(233, 30, 99, 0.1); /* Fundo rosa bem clarinho */
+    color: var(--primary-accent); /* Texto rosa forte */
+    border-color: var(--primary-accent); 
+    font-weight: 700;
+}
 
 .chip-destaque { font-weight: 700; border-color: var(--primary-accent) !important; color: var(--primary-accent) !important; }
-.chip-checkbox input:checked + .chip-destaque { background-color: var(--primary-accent) !important; color: white !important; border-color: var(--primary-accent) !important; }
+.chip-checkbox input:checked + .chip-destaque { 
+    background-color: rgba(233, 30, 99, 0.15) !important; 
+    color: var(--primary-accent) !important; 
+    border-color: var(--primary-accent) !important; 
+}
 
 /* FILTER ACTIONS */
 .filter-footer { background-color: var(--background-color); padding: 15px; margin: 10px -0.8em -0.8em -0.8em; border-top: 1px solid var(--border-color); border-radius: 0 0 12px 12px; }
@@ -313,10 +324,13 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .date-wrapper { display: flex; align-items: center; gap: 5px; }
 .meta-row.address-row { gap: 5px; }
 .meta-row.address-row span { font-size: 0.75em; line-height: 1.2; }
-.card-desc { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-color); font-size: 0.75rem; color: var(--text-primary); line-height: 1.3; }
+
+/* --- REMOVIDA BORDA TRACEJADA DAQUI --- */
+.card-desc { margin-top: 6px; padding-top: 6px; border-top: none; font-size: 0.75rem; color: var(--text-primary); line-height: 1.3; }
 
 /* ACTIONS */
-.expand-content { display: none; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px; }
+/* --- REMOVIDA BORDA TRACEJADA DAQUI TAMBÉM --- */
+.expand-content { display: none; margin-top: 10px; border-top: none; padding-top: 10px; }
 .evento-card.expanded .expand-content { display: block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .card-actions { display: flex; gap: 10px; align-items: stretch; }
@@ -453,11 +467,11 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
 
 /* CONTROLE DE VISIBILIDADE DE ANÚNCIOS (RESPONSIVO) */
 
-/* Default (Desktop): Esconde ads da lista (in-feed), mostra ad do mapa */
-.ad-card.in-feed { display: none !important; }
+/* Default (Desktop e Geral): Oculta anúncios por padrão, mas SEM !IMPORTANT. O JS vai exibir quando necessário. */
+.ad-card.in-feed { display: none; }
 .desktop-map-ad { display: flex; }
 
-/* Mobile (< 768px): Esconde ad do mapa, mostra ads da lista */
+/* Mobile (< 768px): Esconde ad do mapa, e o JS cuida de mostrar os ads da lista */
 @media (max-width: 768px) {
     .container { padding: 0; }
     .main-content-grid { display: flex; flex-direction: column; gap: 0; }
@@ -467,8 +481,8 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
     /* ESCONDE ANÚNCIO DO MAPA NO MOBILE */
     .desktop-map-ad { display: none; }
     
-    /* MOSTRA ANÚNCIO DA LISTA NO MOBILE */
-    .ad-card.in-feed { display: flex !important; }
+    /* MOSTRA ANÚNCIO DA LISTA NO MOBILE (SEM !IMPORTANT PARA O JS FUNCIONAR) */
+    /* .ad-card.in-feed já tem display: none por padrão, o JS vai mudar para flex */
 
     .events-list-container { flex: 1 1 0; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0.8em; height: auto; padding-bottom: 120px; overflow-x: hidden; }
     .filters-wrapper { display: none; }
