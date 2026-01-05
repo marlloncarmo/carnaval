@@ -1,4 +1,4 @@
-/* ... (Keep existing variables and resets) ... */
+/* ... (Mantenha as variáveis e resets do topo) ... */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
@@ -130,7 +130,7 @@ body.dark-mode .switch-thumb { transform: translateX(24px); }
 .container { width: 100%; height: 100%; max-width: 1600px; margin: 0 auto; padding: 1em; display: flex; flex-direction: column; }
 main { flex: 1; display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
 
-/* GRID LAYOUT */
+/* GRID LAYOUT DESKTOP */
 .main-content-grid { 
     display: grid; 
     grid-template-columns: 35% 1fr; 
@@ -140,12 +140,25 @@ main { flex: 1; display: flex; flex-direction: column; height: 100%; min-height:
     min-height: 0; 
 }
 
+/* LEFT COLUMN (MAPA + ANUNCIO) */
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    height: 100%;
+    min-height: 0;
+}
+
 /* MAP */
 .map-container {
-    height: 100%; width: 100%;
-    border-radius: 12px; overflow: hidden;
+    flex: 1; /* Ocupa o espaço restante */
+    width: 100%;
+    border-radius: 12px; 
+    overflow: hidden;
     border: 1px solid var(--border-color);
-    position: relative; background: #e5e5e5;
+    position: relative; 
+    background: #e5e5e5;
+    min-height: 0;
 }
 #map { width: 100%; height: 100%; z-index: 1; }
 
@@ -241,13 +254,12 @@ input:checked + .slider:before { transform: translateX(16px); }
 .filter-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .filter-group:not(:last-child) { padding-right: 0; margin-right: 0; border-right: none; }
 
-/* CHIPS PADRÃO */
+/* CHIPS */
 .chip-checkbox { display: inline-block; cursor: pointer; }
 .chip-checkbox input { display: none; }
 .chip-checkbox span { background-color: var(--background-color); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 12px; border-radius: 20px; font-size: 0.8em; transition: all 0.2s; font-weight: 500; display: inline-block; }
 .chip-checkbox input:checked + span { background-color: var(--primary-accent); color: white; border-color: var(--primary-accent); }
 
-/* BOTÕES DE DESTAQUE */
 .chip-destaque { font-weight: 700; border-color: var(--primary-accent) !important; color: var(--primary-accent) !important; }
 .chip-checkbox input:checked + .chip-destaque { background-color: var(--primary-accent) !important; color: white !important; border-color: var(--primary-accent) !important; }
 
@@ -339,7 +351,7 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .mobile-filter-btn { display: none; }
 .mobile-filter-modal { display: none; }
 
-/* CARD DE PUBLICIDADE */
+/* --- CARD DE PUBLICIDADE (DESKTOP E MOBILE) --- */
 .ad-card {
     background: linear-gradient(135deg, #fff9c4 0%, #ffffff 100%);
     border: 1px solid #f1c40f;
@@ -350,7 +362,8 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
     justify-content: center;
     align-items: center;
     gap: 8px;
-    cursor: default; /* Remove pointer cursor from ads */
+    cursor: default;
+    border-radius: 8px; /* Arredondado igual aos cards */
 }
 .ad-card:hover { transform: none; border-color: #f1c40f; }
 
@@ -381,10 +394,49 @@ body.dark-mode .ad-card {
 body.dark-mode .ad-content h3 { color: #f1c40f; }
 body.dark-mode .ad-content p { color: #ccc; }
 
+/* ANÚNCIO DO MAPA (FIXO DESKTOP) */
+.desktop-map-ad {
+    background: var(--card-background);
+    padding: 10px;
+    border: 1px solid #f1c40f;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    background: linear-gradient(135deg, #fff9c4 0%, #ffffff 100%);
+}
+body.dark-mode .desktop-map-ad {
+    background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+}
+
+.desktop-map-ad .ad-text {
+    text-align: left;
+}
+.desktop-map-ad h3 { margin: 0; font-size: 1rem; color: #2c3e50; }
+.desktop-map-ad p { margin: 2px 0 0 0; font-size: 0.8em; color: #555; }
+body.dark-mode .desktop-map-ad h3 { color: #f1c40f; }
+body.dark-mode .desktop-map-ad p { color: #ccc; }
+
+/* CONTROLE DE VISIBILIDADE DE ANÚNCIOS (RESPONSIVO) */
+
+/* Default (Desktop): Esconde ads da lista (in-feed), mostra ad do mapa */
+.ad-card.in-feed { display: none !important; }
+.desktop-map-ad { display: flex; }
+
+/* Mobile (< 768px): Esconde ad do mapa, mostra ads da lista */
 @media (max-width: 768px) {
     .container { padding: 0; }
     .main-content-grid { display: flex; flex-direction: column; gap: 0; }
-    .map-container { flex: 0 0 35vh; width: 100%; border-radius: 0 0 12px 12px; z-index: 20; }
+    .left-column { flex: 0 0 35vh; gap: 0; } /* Remove gap no mobile */
+    .map-container { width: 100%; border-radius: 0 0 12px 12px; z-index: 20; height: 100%; }
+    
+    /* ESCONDE ANÚNCIO DO MAPA NO MOBILE */
+    .desktop-map-ad { display: none; }
+    
+    /* MOSTRA ANÚNCIO DA LISTA NO MOBILE */
+    .ad-card.in-feed { display: flex !important; }
+
     .events-list-container { flex: 1 1 0; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0.8em; height: auto; padding-bottom: 120px; overflow-x: hidden; }
     .filters-wrapper { display: none; }
     .mobile-filter-btn { display: flex; align-items: center; justify-content: center; gap: 8px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: auto; padding: 12px 24px; background-color: var(--primary-accent); color: white; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4); font-weight: 600; font-size: 0.85rem; z-index: 1000; transition: transform 0.2s, box-shadow 0.2s; }
