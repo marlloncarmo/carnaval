@@ -369,10 +369,6 @@
 
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
-        
-        // URL base correta do Google Maps (Versão Universal)
-        const baseUrl = "https://www.google.com/maps/dir/?api=1"; // Essa URL redireciona corretamente
-        // CORREÇÃO: Usar a URL direta do maps para garantir compatibilidade
         const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`;
 
         if (navigator.geolocation) {
@@ -391,42 +387,33 @@
         }
     }
 
-    // --- LÓGICA DE SELEÇÃO PELO MAPA (Move para o topo) ---
     function selectCardFromMap(id) {
         const card = document.querySelector(`.evento-card[data-id="${id}"]`);
         const container = document.querySelector('.events-list-container');
 
         if (card) {
-            // Reseta todos para ordem 0
             document.querySelectorAll('.evento-card').forEach(c => {
                 c.style.order = '0'; 
                 c.classList.remove('expanded');
                 c.classList.remove('highlighted');
             });
             
-            // Joga SOMENTE este para o topo (-1)
             card.style.order = '-1';
-            
-            // Expande e destaca
             card.classList.add('expanded');
             card.classList.add('highlighted');
             setTimeout(() => card.classList.remove('highlighted'), 2000); 
 
-            // Rola a lista para o topo
             if (container) {
                 container.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
     }
 
-    // --- LÓGICA DE CLIQUE NA LISTA (Não muda ordem) ---
     function toggleCard(card) {
-        // Fecha outros cards
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
         
-        // Alterna o estado do atual
         card.classList.toggle('expanded');
         
         if (!card.classList.contains('expanded')) {
@@ -438,10 +425,8 @@
         const lon = parseFloat(card.dataset.lon);
 
         if (window.mapInstance && !isNaN(lat) && !isNaN(lon)) {
-            
             const targetZoom = 16;
             const offsetPixels = -50; 
-
             const targetPoint = window.mapInstance.project([lat, lon], targetZoom);
             const newTargetPoint = targetPoint.add([0, offsetPixels]);
             const newLatLon = window.mapInstance.unproject(newTargetPoint, targetZoom);
@@ -458,10 +443,7 @@
                     setTimeout(() => { markerElement.classList.remove('marker-active-pulse'); }, 1000);
                 }
                 current.marker.bringToFront();
-                
-                setTimeout(() => {
-                    current.marker.openPopup();
-                }, 300);
+                setTimeout(() => { current.marker.openPopup(); }, 300);
             }
         }
     }
@@ -482,50 +464,40 @@
         applyFavoritesUI();
     }
 
-    // --- NOVA LÓGICA DE FILTRAGEM COM ANÚNCIOS DINÂMICOS ---
     function applyFavoritesUI() {
         const favs = getFavorites();
-        const cards = document.querySelectorAll('.evento-card'); // Pega blocos E anúncios
+        const cards = document.querySelectorAll('.evento-card');
         const showOnly = document.getElementById('show-favorites-only').checked;
         
-        let visibleBlockCount = 0; // Conta quantos blocos reais estão visíveis
-        let blocksSinceLastAd = 0; // Conta quantos blocos passamos desde o último anúncio
+        let visibleBlockCount = 0; 
+        let blocksSinceLastAd = 0; 
 
         cards.forEach(card => {
             const isAd = card.classList.contains('ad-card');
             const isEnded = card.classList.contains('status-bg-encerrado'); 
 
             if (isAd) {
-                // SÓ mostra o anúncio se tiverem passado 5 ou mais blocos visíveis desde o último
-                // E também zera o contador se mostrar
                 if (blocksSinceLastAd >= 5) {
                     card.style.display = 'flex';
-                    blocksSinceLastAd = 0; // Reseta a contagem
+                    blocksSinceLastAd = 0; 
                 } else {
                     card.style.display = 'none';
                 }
             } else {
-                // É um bloco normal
                 const id = card.dataset.id;
                 const isFav = favs.includes(id);
                 
-                // Aplica classe visual de favorito
                 if (isFav) card.classList.add('is-favorite');
                 else card.classList.remove('is-favorite');
 
-                // Lógica de visibilidade do BLOCO
                 let shouldShow = true;
-                if (showOnly && !isFav) {
-                    shouldShow = false;
-                }
+                if (showOnly && !isFav) shouldShow = false;
                 
-                // Se o bloco estiver visível E não estiver encerrado (opcional, mantendo lógica anterior)
                 if (shouldShow && !isEnded) {
                     card.style.display = 'flex';
                     visibleBlockCount++;
-                    blocksSinceLastAd++; // Incrementa contador para liberar o próximo anúncio
+                    blocksSinceLastAd++; 
                 } else if (shouldShow) {
-                     // Bloco visivel mas encerrado (conta visualmente, mas talvez não para ads? Vamos contar)
                      card.style.display = 'flex';
                      visibleBlockCount++;
                      blocksSinceLastAd++;
@@ -540,7 +512,6 @@
             totalElement.textContent = `${visibleBlockCount} blocos encontrados.`;
         }
 
-        // Atualiza Marcadores do Mapa
         if (window.markersMap && window.markersFeatureGroup) {
             Object.keys(window.markersMap).forEach(id => {
                 const markerObj = window.markersMap[id];
@@ -569,26 +540,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- LÓGICA DO POPUP DE BOAS-VINDAS ---
     const welcomeModal = document.getElementById('welcome-modal');
     const closeWelcomeBtn = document.getElementById('close-welcome-btn');
-    
-    // Verifica se o usuário já viu o aviso
     const hasSeenWelcome = localStorage.getItem('seen_welcome_msg_v1');
 
     if (!hasSeenWelcome && welcomeModal) {
-        // Se não viu, mostra o modal com um pequeno delay
-        setTimeout(() => {
-            welcomeModal.classList.add('show');
-        }, 500);
+        setTimeout(() => { welcomeModal.classList.add('show'); }, 500);
     }
 
     if (closeWelcomeBtn && welcomeModal) {
         closeWelcomeBtn.addEventListener('click', () => {
-            // Fecha o modal
             welcomeModal.classList.remove('show');
-            // Salva no navegador que ele já viu
             localStorage.setItem('seen_welcome_msg_v1', 'true');
         });
     }
-    // --------------------------------------
 
     const activeParams = new URLSearchParams(window.location.search);
     const highlightId = activeParams.get('highlight_id');
@@ -707,34 +670,57 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
+        // --- ATUALIZAÇÃO DO LOCATE BTN (CORRIGIDO PARA NÃO SEGUIR) ---
         const locateBtn = document.getElementById('locate-btn');
-        let userMarker = null; let watchId = null; let isFollowing = false;
+        let userMarker = null; 
+        let watchId = null; 
+        
         if (locateBtn) {
             locateBtn.addEventListener('click', function() {
-                if (watchId !== null) {
-                    isFollowing = true;
-                    locateBtn.classList.add('active'); 
-                    if (userMarker) window.mapInstance.setView(userMarker.getLatLng(), 17);
-                    return;
+                // 1. Feedback visual
+                locateBtn.classList.add('active');
+
+                // 2. Se o usuário clicar de novo e já tiver marcador, apenas recentraliza nele (sem reiniciar GPS)
+                if (userMarker) {
+                    window.mapInstance.setView(userMarker.getLatLng(), 17);
+                    return; 
                 }
+
+                // 3. Se não tem GPS ativo, inicia o rastreamento
                 if (navigator.geolocation) {
-                    locateBtn.classList.add('active'); 
-                    isFollowing = true;
-                    watchId = navigator.geolocation.watchPosition(function(position) {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        const newLatLng = [lat, lng];
-                        if (!userMarker) {
-                            const userIcon = L.divIcon({ className: 'user-location-marker', html: '<div class="user-dot"></div><div class="user-pulse"></div>', iconSize: [40, 40], iconAnchor: [20, 20] });
-                            userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
-                            userMarker.bindPopup("<b>Você está aqui</b>");
-                        } else { userMarker.setLatLng(newLatLng); }
-                        if (isFollowing) window.mapInstance.setView(newLatLng, 17, { animate: true });
-                    }, function(error) { alert("Erro GPS."); locateBtn.classList.remove('active'); }, { enableHighAccuracy: true });
-                    window.mapInstance.on('dragstart', function() { isFollowing = false; locateBtn.classList.remove('active'); });
+                    watchId = navigator.geolocation.watchPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            const newLatLng = [lat, lng];
+
+                            if (!userMarker) {
+                                // --- Lógica da PRIMEIRA VEZ ---
+                                // Cria o marcador
+                                const userIcon = L.divIcon({ className: 'user-location-marker', html: '<div class="user-dot"></div><div class="user-pulse"></div>', iconSize: [40, 40], iconAnchor: [20, 20] });
+                                userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
+                                userMarker.bindPopup("<b>Você está aqui</b>");
+                                
+                                // Centraliza o mapa APENAS nesta primeira vez
+                                window.mapInstance.setView(newLatLng, 17, { animate: true });
+                            } else {
+                                // --- Lógica das ATUALIZAÇÕES SEGUINTES ---
+                                // Apenas move a bolinha azul. NÃO chama map.setView()
+                                userMarker.setLatLng(newLatLng);
+                            }
+                        }, 
+                        function(error) { 
+                            alert("Erro ao obter localização ou permissão negada."); 
+                            locateBtn.classList.remove('active'); 
+                        }, 
+                        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                    );
+                } else {
+                    alert("Geolocalização não suportada.");
                 }
             });
         }
+        // -----------------------------------------------------------
 
         window.markersFeatureGroup = L.featureGroup();
         window.markersMap = {};
@@ -760,12 +746,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
                         const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
                         
-                        // LIGAÇÃO DO CLICK NO MAPA COM A LISTA
                         marker.on('click', () => {
                             selectCardFromMap(evento.id);
                         });
                         
-                        // --- SE FECHAR O POPUP, O CARD VOLTA PRO LUGAR ORIGINAL ---
                         marker.on('popupclose', () => {
                             const card = document.querySelector(`.evento-card[data-id="${evento.id}"]`);
                             if (card) {
