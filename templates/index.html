@@ -361,9 +361,23 @@
         const baseUrl = window.location.origin + window.location.pathname;
         const link = `${baseUrl}?highlight_id=${id}`;
         
-        const message = `Bora nesse bloco? \n\n*${title}*\n ${date}\n\n Veja aqui: ${link}`;
+        // Montando a mensagem linha por linha (array + join é mais limpo)
+        const lines = [
+            "🎭 *Olha esse bloco que eu achei!*",
+            "", // Linha em branco
+            `🎉 *${title}*`,
+            `📅 ${date}`,
+            "",
+            "👇 *Bora? Detalhes e localização aqui:*",
+            link
+        ];
+
+        // Junta as linhas com o caractere de nova linha
+        const message = lines.join("\n");
         
-        const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        // Codifica TUDO para garantir que emojis e acentos funcionem
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+        
         window.open(waUrl, '_blank');
     }
 
