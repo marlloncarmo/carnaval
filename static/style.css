@@ -316,7 +316,29 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
 .feature-kids svg { color: #2ecc71; }
 .feature-pet svg { color: #e67e22; }
-.tamanho-tag { font-size: 0.6em; font-weight: 700; background: var(--primary-accent); color: white; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+
+/* --- TAGS DE TAMANHO (PROPORCIONAIS) --- */
+.tamanho-tag { 
+    font-size: 0.6em; 
+    font-weight: 700; 
+    background: var(--primary-accent); 
+    color: white; 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    white-space: nowrap; 
+    
+    /* Configuração Flex para centralizar o texto dentro da largura fixa */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: width 0.3s ease;
+}
+
+/* Larguras progressivas para dar noção de volume */
+.tamanho-1 { width: 70px;  opacity: 0.8; }  /* Pequeno */
+.tamanho-2 { width: 95px;  opacity: 0.9; }  /* Médio */
+.tamanho-3 { width: 120px; opacity: 1; }    /* Grande */
+
 .categoria-tag { font-size: 0.6em; background: var(--border-color); padding: 1px 6px; border-radius: 4px; white-space: nowrap; color: var(--text-primary); border: 1px solid transparent; }
 .card-meta { font-size: 0.8em; color: var(--text-secondary); }
 .meta-row { display: flex; align-items: center; margin-bottom: 2px; }
@@ -407,7 +429,7 @@ body.dark-mode .ad-card {
 body.dark-mode .ad-content h3 { color: #f1c40f; }
 body.dark-mode .ad-content p { color: #ccc; }
 
-/* --- ANÚNCIO DO MAPA (FIXO DESKTOP - DOBRADO) --- */
+/* --- ANÚNCIO DO MAPA (FIXO DESKTOP - REDUZIDO) --- */
 .desktop-map-ad {
     background: linear-gradient(135deg, #fff9c4 0%, #ffffff 100%);
     border: 1px solid #f1c40f;
@@ -417,8 +439,8 @@ body.dark-mode .ad-content p { color: #ccc; }
     box-shadow: 0 4px 12px var(--shadow-color);
     text-align: center;
     
-    /* Mágica para dobrar tamanho e centralizar */
-    min-height: 200px;
+    /* Mágica para centralizar e manter tamanho bacana */
+    min-height: 250px; /* Reduzido de 500px para 250px */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -492,7 +514,7 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
 
 /* --- CONTROLE DE VISIBILIDADE (RESPONSIVO) --- */
 
-/* Default: Ads do Feed escondidos no CSS (JS controla via inline style). Ad do Mapa visível. */
+/* Default: Ads do Feed escondidos no CSS. Ad do Mapa visível. */
 .ad-card.in-feed { display: none; }
 .desktop-map-ad { display: flex; }
 
