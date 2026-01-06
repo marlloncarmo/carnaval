@@ -9,6 +9,10 @@ app.secret_key = 'carnaval_secret_key'
 
 load_dotenv()
 
+@app.context_processor
+def inject_ga():
+    return dict(ga_measurement_id=os.environ.get("GA_MEASUREMENT_ID"))
+
 # Recupera a chave apenas para passar para o template HTML (mapa frontend)
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 
