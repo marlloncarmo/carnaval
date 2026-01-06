@@ -296,16 +296,9 @@
         <div id="welcome-modal" class="modal" style="z-index: 3000;">
             <div class="modal-content welcome-content">
                 <div class="welcome-icon">🎭</div> 
-                
                 <h3>Dados em Apresentação</h3>
-                <p>
-                    Os blocos exibidos atualmente são <strong>fictícios</strong> para fins de <strong>apresentação</strong> da plataforma.
-                    <br><br>
-                    Assim que a programação oficial do <strong>Carnaval de BH 2026</strong> for divulgada, atualizaremos o mapa com os dados reais imediatamente! 🎉
-                </p>
-                <button id="close-welcome-btn" class="directions-btn" style="width: 100%; margin-top: 15px; border:none;">
-                    Entendido!
-                </button>
+                <p>Os blocos exibidos atualmente são <strong>fictícios</strong> para fins de <strong>apresentação</strong> da plataforma.<br><br>Assim que a programação oficial do <strong>Carnaval de BH 2026</strong> for divulgada, atualizaremos o mapa com os dados reais imediatamente! 🎉</p>
+                <button id="close-welcome-btn" class="directions-btn" style="width: 100%; margin-top: 15px; border:none;">Entendido!</button>
             </div>
         </div>
 
@@ -370,10 +363,9 @@
         const baseUrl = window.location.origin + window.location.pathname;
         const link = `${baseUrl}?highlight_id=${id}`;
         
-        // Montando a mensagem linha por linha (array + join é mais limpo)
         const lines = [
             "🎭 *Olha esse bloco que eu achei!*",
-            "", // Linha em branco
+            "",
             `🎉 *${title}*`,
             `📅 ${date}`,
             "",
@@ -381,13 +373,9 @@
             link
         ];
 
-        // Junta as linhas com o caractere de nova linha
         const message = lines.join("\n");
-        
-        // Codifica TUDO para garantir que emojis e acentos funcionem
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         
-        // TRACKING COMPARTILHAMENTO
         trackEvent('compartilhar_whatsapp', {
             'bloco_id': id,
             'bloco_nome': title
@@ -399,7 +387,6 @@
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
         
-        // TRACKING ROTA
         trackEvent('como_chegar', {
             'destino_lat': destLat,
             'destino_lon': destLon
@@ -442,6 +429,44 @@
             if (container) {
                 container.scrollTo({ top: 0, behavior: 'smooth' });
             }
+            
+            // Ativa o destaque no mapa
+            highlightMarker(id);
+        }
+    }
+
+    // --- NOVA FUNÇÃO DE HIGHLIGHT DO MARCADOR ---
+    function highlightMarker(id) {
+        if (!window.markersMap) return;
+
+        // 1. Reseta todos os marcadores para o estilo padrão
+        Object.values(window.markersMap).forEach(m => {
+            m.marker.setStyle(m.defaultStyle);
+            // Remove classe de animação se existir
+            const el = m.marker.getElement();
+            if(el) el.classList.remove('marker-selected-anim');
+        });
+
+        // 2. Aplica estilo de destaque ao selecionado
+        if (id && window.markersMap[id]) {
+            const current = window.markersMap[id];
+            
+            // Aumenta raio, opacidade total, borda branca grossa
+            current.marker.setStyle({
+                // radius: 15,
+                fillOpacity: 1,
+                color: '#fff',
+                weight: 3,
+                opacity: 1
+            });
+            
+            current.marker.bringToFront();
+
+            // Adiciona classe CSS para animação de pulso temporária
+            const el = current.marker.getElement();
+            if(el) {
+                el.classList.add('marker-selected-anim');
+            }
         }
     }
 
@@ -452,7 +477,9 @@
         
         card.classList.toggle('expanded');
         
+        // Se fechou, reseta o mapa (remove highlight)
         if (!card.classList.contains('expanded')) {
+             highlightMarker(null);
              return;
         }
 
@@ -461,28 +488,11 @@
         const lon = parseFloat(card.dataset.lon);
 
         if (window.mapInstance && !isNaN(lat) && !isNaN(lon)) {
-            const targetZoom = 16;
-            const offsetPixels = -50; 
-            const targetPoint = window.mapInstance.project([lat, lon], targetZoom);
-            const newTargetPoint = targetPoint.add([0, offsetPixels]);
-            const newLatLon = window.mapInstance.unproject(newTargetPoint, targetZoom);
-
-            window.mapInstance.flyTo(newLatLon, targetZoom, { duration: 1.2 });
+            // Centraliza exatamente no ponto (SEM OFFSET)
+            window.mapInstance.flyTo([lat, lon], 16, { duration: 1.2 });
             
-            if (window.markersMap[id]) {
-                const current = window.markersMap[id];
-                const markerElement = current.marker.getElement(); 
-                if (markerElement) {
-                    markerElement.classList.remove('marker-active-pulse');
-                    void markerElement.offsetWidth; 
-                    markerElement.classList.add('marker-active-pulse');
-                    setTimeout(() => { markerElement.classList.remove('marker-active-pulse'); }, 1000);
-                }
-                current.marker.bringToFront();
-                
-                // REMOVIDO: current.marker.openPopup();
-                // A ação de clique no card não abre mais o balãozinho no mapa
-            }
+            // Destaca o marcador
+            highlightMarker(id);
         }
     }
 
@@ -494,30 +504,20 @@
         event.stopPropagation(); 
         
         let favs = getFavorites();
-        
-        // Tenta pegar o nome do bloco para o relatório ficar legível
-        // Procura o card com esse ID e pega o texto do H2 (título)
         const card = document.querySelector(`.evento-card[data-id="${id}"]`);
         const blockName = card ? card.querySelector('h2').innerText : 'ID ' + id;
 
         if (favs.includes(id)) {
-            // REMOVER DOS FAVORITOS
             favs = favs.filter(fid => fid !== id);
-            
-            // Evento GA4: Remover
             trackEvent('favoritar_bloco', {
                 'acao': 'remover',
                 'bloco_id': id,
                 'bloco_nome': blockName
             });
-
         } else {
-            // ADICIONAR AOS FAVORITOS
             favs.push(id);
-            
-            // Evento GA4: Adicionar
             trackEvent('favoritar_bloco', {
-                'acao': 'adicionar', // Importante para você filtrar depois
+                'acao': 'adicionar',
                 'bloco_id': id,
                 'bloco_nome': blockName
             });
@@ -719,9 +719,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const searchBtn = document.getElementById('search-in-map-btn');
         if(searchBtn) {
             searchBtn.addEventListener('click', () => { 
-                // TRACKING BUSCA NO MAPA
                 trackEvent('mapa_buscar_area', {'origem': 'mapa_btn_flutuante'});
-
                 const bounds = window.mapInstance.getBounds();
                 const center = window.mapInstance.getCenter();
                 const zoom = window.mapInstance.getZoom();
@@ -736,26 +734,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // --- ATUALIZAÇÃO DO LOCATE BTN (CORRIGIDO PARA NÃO SEGUIR) ---
         const locateBtn = document.getElementById('locate-btn');
         let userMarker = null; 
         let watchId = null; 
         
         if (locateBtn) {
             locateBtn.addEventListener('click', function() {
-                // TRACKING LOCALIZAÇÃO
                 trackEvent('mapa_localizacao_click', {'origem': 'mapa_btn'});
-
-                // 1. Feedback visual
                 locateBtn.classList.add('active');
 
-                // 2. Se o usuário clicar de novo e já tiver marcador, apenas recentraliza nele (sem reiniciar GPS)
                 if (userMarker) {
                     window.mapInstance.setView(userMarker.getLatLng(), 17);
                     return; 
                 }
 
-                // 3. Se não tem GPS ativo, inicia o rastreamento
                 if (navigator.geolocation) {
                     watchId = navigator.geolocation.watchPosition(
                         function(position) {
@@ -764,17 +756,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             const newLatLng = [lat, lng];
 
                             if (!userMarker) {
-                                // --- Lógica da PRIMEIRA VEZ ---
-                                // Cria o marcador
                                 const userIcon = L.divIcon({ className: 'user-location-marker', html: '<div class="user-dot"></div><div class="user-pulse"></div>', iconSize: [40, 40], iconAnchor: [20, 20] });
                                 userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
-                                userMarker.bindPopup("<b>Você está aqui</b>");
-                                
-                                // Centraliza o mapa APENAS nesta primeira vez
                                 window.mapInstance.setView(newLatLng, 17, { animate: true });
                             } else {
-                                // --- Lógica das ATUALIZAÇÕES SEGUINTES ---
-                                // Apenas move a bolinha azul. NÃO chama map.setView()
                                 userMarker.setLatLng(newLatLng);
                             }
                         }, 
@@ -789,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        // ... (resto do código de marcadores)
+
         window.markersFeatureGroup = L.featureGroup();
         window.markersMap = {};
         
@@ -818,10 +803,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             selectCardFromMap(evento.id);
                         });
                         
-                        // REMOVIDO: marker.bindPopup(...) 
-                        // REMOVIDO: marker.on('popupclose'...)
-
-                        if (evento.id) window.markersMap[evento.id] = { marker: marker, style: defaultStyle };
+                        if (evento.id) window.markersMap[evento.id] = { marker: marker, defaultStyle: defaultStyle };
                     }
                 });
                 window.markersFeatureGroup.addTo(window.mapInstance);
