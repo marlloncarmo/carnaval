@@ -24,7 +24,9 @@
                     <h3>Sua Marca Aqui! 🚀</h3>
                     <p>Milhares de foliões acessam este mapa. Divulgue seu negócio.</p>
                 </div>
-                <a href="https://biolink.info/marllonca" target="_blank" class="directions-btn" style="background-color: #f1c40f; color: #333; border: none; padding: 8px 16px; flex: 0 0 auto;">
+                <a href="https://biolink.info/marllonca" target="_blank" class="directions-btn" 
+                   style="background-color: #f1c40f; color: #333; border: none; padding: 8px 16px; flex: 0 0 auto;"
+                   onclick="trackEvent('clique_anuncio', { 'origem': 'mapa_desktop', 'url_destino': this.href })">
                     Anunciar
                 </a>
             </div>
@@ -157,7 +159,7 @@
                         </div>
 
                         <div class="filter-actions-row filter-footer">
-                            <button type="submit" class="btn-filtrar">Filtrar</button>
+                            <button type="submit" class="btn-filtrar" onclick="trackEvent('filtrar_blocos', {'origem': 'filtros_gerais'})">Filtrar</button>
                             <button type="button" class="btn-limpar" onclick="resetApp()">Limpar</button>
                         </div>
                     </form>
@@ -379,11 +381,24 @@
         // Codifica TUDO para garantir que emojis e acentos funcionem
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         
+        // TRACKING COMPARTILHAMENTO
+        trackEvent('compartilhar_whatsapp', {
+            'bloco_id': id,
+            'bloco_nome': title
+        });
+        
         window.open(waUrl, '_blank');
     }
 
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
+        
+        // TRACKING ROTA
+        trackEvent('como_chegar', {
+            'destino_lat': destLat,
+            'destino_lon': destLon
+        });
+
         const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`;
 
         if (navigator.geolocation) {
@@ -671,6 +686,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const searchBtn = document.getElementById('search-in-map-btn');
         if(searchBtn) {
             searchBtn.addEventListener('click', () => { 
+                // TRACKING BUSCA NO MAPA
+                trackEvent('mapa_buscar_area', {'origem': 'mapa_btn_flutuante'});
+
                 const bounds = window.mapInstance.getBounds();
                 const center = window.mapInstance.getCenter();
                 const zoom = window.mapInstance.getZoom();
@@ -692,6 +710,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (locateBtn) {
             locateBtn.addEventListener('click', function() {
+                // TRACKING LOCALIZAÇÃO
+                trackEvent('mapa_localizacao_click', {'origem': 'mapa_btn'});
+
                 // 1. Feedback visual
                 locateBtn.classList.add('active');
 
@@ -735,7 +756,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        // -----------------------------------------------------------
 
         window.markersFeatureGroup = L.featureGroup();
         window.markersMap = {};
