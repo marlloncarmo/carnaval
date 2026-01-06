@@ -479,7 +479,9 @@
                     setTimeout(() => { markerElement.classList.remove('marker-active-pulse'); }, 1000);
                 }
                 current.marker.bringToFront();
-                setTimeout(() => { current.marker.openPopup(); }, 300);
+                
+                // REMOVIDO: current.marker.openPopup();
+                // A ação de clique no card não abre mais o balãozinho no mapa
             }
         }
     }
@@ -787,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-
+        // ... (resto do código de marcadores)
         window.markersFeatureGroup = L.featureGroup();
         window.markersMap = {};
         
@@ -816,37 +818,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             selectCardFromMap(evento.id);
                         });
                         
-                        marker.on('popupclose', () => {
-                            const card = document.querySelector(`.evento-card[data-id="${evento.id}"]`);
-                            if (card) {
-                                card.style.order = '0'; 
-                            }
-                        });
+                        // REMOVIDO: marker.bindPopup(...) 
+                        // REMOVIDO: marker.on('popupclose'...)
 
                         if (evento.id) window.markersMap[evento.id] = { marker: marker, style: defaultStyle };
-                        
-                        let iconsHtml = '<div style="display:flex; gap:4px; flex-shrink: 0;">'; 
-                        if (evento.is_kids) iconsHtml += `<span class="feature-icon feature-kids">${ICONS.kids}</span>`;
-                        if (evento.is_lgbt) iconsHtml += `<span class="feature-icon feature-lgbt">${ICONS.lgbt}</span>`;
-                        if (evento.is_pet) iconsHtml += `<span class="feature-icon feature-pet">${ICONS.pet}</span>`;
-                        iconsHtml += '</div>';
-
-                        const popupContent = `
-                            <div style="font-family: 'Poppins', sans-serif;">
-                                <strong style="color: ${markerColor};">${evento.titulo}</strong><br>
-                                <span style="font-size:0.8em; background:#eee; padding:1px 4px; border-radius:3px; margin-right:5px;">${tamanhoLabel}</span>
-                                <span style="font-size:0.8em; color:#666; background:#f0f0f0; padding:1px 4px; border-radius:3px;">${evento.categoria_display}</span><br>
-                                <span style="font-size:0.85em; color:#666;">${evento.data}</span><br>
-                                <div style="margin-top:4px; font-size:0.8em;">${evento.endereco}</div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px;">
-                                    <button onclick="getDirections(${evento.lat}, ${evento.lon}, event)" class="directions-btn" style="margin-top: 0; flex: 1;">
-                                        🚗 Como Chegar
-                                    </button>
-                                    ${iconsHtml}
-                                </div>
-                            </div>
-                        `;
-                        marker.bindPopup(popupContent);
                     }
                 });
                 window.markersFeatureGroup.addTo(window.mapInstance);

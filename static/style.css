@@ -207,7 +207,6 @@ body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--
 .user-pulse { width: 40px; height: 40px; background-color: rgba(233, 30, 99, 0.4); border-radius: 4px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg); z-index: 1; animation: map-pulse 2s infinite; }
 @keyframes map-pulse { 0% { transform: translate(-50%, -50%) rotate(45deg) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -50%) rotate(45deg) scale(1.5); opacity: 0; } }
 
-/* MARKER ANIMATION */
 @keyframes double-pulse { 0% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 25% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 50% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 75% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 100% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } }
 .marker-active-pulse { animation: double-pulse 1s ease-out; transform-origin: center; }
 
@@ -326,18 +325,14 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
     padding: 2px 6px; 
     border-radius: 4px; 
     white-space: nowrap; 
-    
-    /* Configuração Flex para centralizar o texto dentro da largura fixa */
     display: inline-flex;
     justify-content: center;
     align-items: center;
     transition: width 0.3s ease;
 }
-
-/* Larguras progressivas para dar noção de volume */
-.tamanho-1 { width: 70px;  opacity: 0.8; }  /* Pequeno */
-.tamanho-2 { width: 95px;  opacity: 0.9; }  /* Médio */
-.tamanho-3 { width: 120px; opacity: 1; }    /* Grande */
+.tamanho-1 { width: 70px;  opacity: 0.8; }
+.tamanho-2 { width: 95px;  opacity: 0.9; }
+.tamanho-3 { width: 120px; opacity: 1; }
 
 .categoria-tag { font-size: 0.6em; background: var(--border-color); padding: 1px 6px; border-radius: 4px; white-space: nowrap; color: var(--text-primary); border: 1px solid transparent; }
 .card-meta { font-size: 0.8em; color: var(--text-secondary); }
@@ -440,7 +435,7 @@ body.dark-mode .ad-content p { color: #ccc; }
     text-align: center;
     
     /* Mágica para centralizar e manter tamanho bacana */
-    min-height: 250px; /* Reduzido de 500px para 250px */
+    min-height: 250px; 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -514,25 +509,19 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
 
 /* --- CONTROLE DE VISIBILIDADE (RESPONSIVO) --- */
 
-/* Default: Ads do Feed escondidos no CSS. Ad do Mapa visível. */
 .ad-card.in-feed { display: none; }
 .desktop-map-ad { display: flex; }
 
 /* DESKTOP ( > 768px ) */
 @media (min-width: 769px) {
-    /* Força ocultar anúncios do feed no Desktop, ignorando o JS */
     .evento-card.ad-card.in-feed { display: none !important; }
-    
-    /* Garante que o anúncio do mapa apareça */
     .desktop-map-ad { display: flex !important; }
 }
 
 /* MOBILE ( <= 768px ) */
 @media (max-width: 768px) {
-    /* Esconde anúncio do mapa no Mobile */
     .desktop-map-ad { display: none !important; }
 
-    /* LAYOUT MOBILE */
     .container { padding: 0; }
     .main-content-grid { display: flex; flex-direction: column; gap: 0; }
     .left-column { flex: 0 0 35vh; gap: 0; }
