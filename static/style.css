@@ -329,7 +329,6 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .card-desc { margin-top: 6px; padding-top: 6px; border-top: none; font-size: 0.75rem; color: var(--text-primary); line-height: 1.3; }
 
 /* ACTIONS */
-/* --- REMOVIDA BORDA TRACEJADA DAQUI TAMBÉM --- */
 .expand-content { display: none; margin-top: 10px; border-top: none; padding-top: 10px; }
 .evento-card.expanded .expand-content { display: block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -365,7 +364,7 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .mobile-filter-btn { display: none; }
 .mobile-filter-modal { display: none; }
 
-/* --- CARD DE PUBLICIDADE (DESKTOP E MOBILE) --- */
+/* --- CARD DE PUBLICIDADE (FEED) --- */
 .ad-card {
     background: linear-gradient(135deg, #fff9c4 0%, #ffffff 100%);
     border: 1px solid #f1c40f;
@@ -377,7 +376,7 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
     align-items: center;
     gap: 8px;
     cursor: default;
-    border-radius: 8px; /* Arredondado igual aos cards */
+    border-radius: 8px;
 }
 .ad-card:hover { transform: none; border-color: #f1c40f; }
 
@@ -408,27 +407,54 @@ body.dark-mode .ad-card {
 body.dark-mode .ad-content h3 { color: #f1c40f; }
 body.dark-mode .ad-content p { color: #ccc; }
 
-/* ANÚNCIO DO MAPA (FIXO DESKTOP) */
+/* --- ANÚNCIO DO MAPA (FIXO DESKTOP - DOBRADO) --- */
 .desktop-map-ad {
-    background: var(--card-background);
-    padding: 10px;
+    background: linear-gradient(135deg, #fff9c4 0%, #ffffff 100%);
     border: 1px solid #f1c40f;
     border-radius: 12px;
+    padding: 24px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    text-align: center;
+    
+    /* Mágica para dobrar tamanho e centralizar */
+    min-height: 200px;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    background: linear-gradient(135deg, #fff9c4 0%, #ffffff 100%);
-}
-body.dark-mode .desktop-map-ad {
-    background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+    gap: 20px;
 }
 
 .desktop-map-ad .ad-text {
-    text-align: left;
+    text-align: center;
+    width: 100%;
 }
-.desktop-map-ad h3 { margin: 0; font-size: 1rem; color: #2c3e50; }
-.desktop-map-ad p { margin: 2px 0 0 0; font-size: 0.8em; color: #555; }
+
+.desktop-map-ad h3 { 
+    margin: 0 0 10px 0; 
+    font-size: 1.5rem; 
+    color: #2c3e50; 
+}
+
+.desktop-map-ad p { 
+    margin: 0; 
+    font-size: 1rem; 
+    color: #555; 
+    line-height: 1.5;
+}
+
+.desktop-map-ad .directions-btn {
+    width: auto;
+    min-width: 200px;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+}
+
+body.dark-mode .desktop-map-ad {
+    background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+    border-color: #f1c40f;
+}
 body.dark-mode .desktop-map-ad h3 { color: #f1c40f; }
 body.dark-mode .desktop-map-ad p { color: #ccc; }
 
@@ -441,9 +467,9 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
 }
 
 .welcome-icon {
-    font-size: 3.5rem; /* Ícone maior */
+    font-size: 3.5rem;
     margin-bottom: 10px;
-    animation: floating 3s ease-in-out infinite; /* Animação mais suave */
+    animation: floating 3s ease-in-out infinite;
 }
 
 .welcome-content h3 {
@@ -458,32 +484,38 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
     font-size: 0.95rem;
 }
 
-/* Animação Flutuante (Mais amigável que o bounce) */
 @keyframes floating {
     0% { transform: translate(0,  0px); }
     50% { transform: translate(0, 10px); }
     100% { transform: translate(0, -0px); }
 }
 
-/* CONTROLE DE VISIBILIDADE DE ANÚNCIOS (RESPONSIVO) */
+/* --- CONTROLE DE VISIBILIDADE (RESPONSIVO) --- */
 
-/* Default (Desktop e Geral): Oculta anúncios por padrão, mas SEM !IMPORTANT. O JS vai exibir quando necessário. */
+/* Default: Ads do Feed escondidos no CSS (JS controla via inline style). Ad do Mapa visível. */
 .ad-card.in-feed { display: none; }
 .desktop-map-ad { display: flex; }
 
-/* Mobile (< 768px): Esconde ad do mapa, e o JS cuida de mostrar os ads da lista */
+/* DESKTOP ( > 768px ) */
+@media (min-width: 769px) {
+    /* Força ocultar anúncios do feed no Desktop, ignorando o JS */
+    .evento-card.ad-card.in-feed { display: none !important; }
+    
+    /* Garante que o anúncio do mapa apareça */
+    .desktop-map-ad { display: flex !important; }
+}
+
+/* MOBILE ( <= 768px ) */
 @media (max-width: 768px) {
+    /* Esconde anúncio do mapa no Mobile */
+    .desktop-map-ad { display: none !important; }
+
+    /* LAYOUT MOBILE */
     .container { padding: 0; }
     .main-content-grid { display: flex; flex-direction: column; gap: 0; }
-    .left-column { flex: 0 0 35vh; gap: 0; } /* Remove gap no mobile */
+    .left-column { flex: 0 0 35vh; gap: 0; }
     .map-container { width: 100%; border-radius: 0 0 12px 12px; z-index: 20; height: 100%; }
     
-    /* ESCONDE ANÚNCIO DO MAPA NO MOBILE */
-    .desktop-map-ad { display: none; }
-    
-    /* MOSTRA ANÚNCIO DA LISTA NO MOBILE (SEM !IMPORTANT PARA O JS FUNCIONAR) */
-    /* .ad-card.in-feed já tem display: none por padrão, o JS vai mudar para flex */
-
     .events-list-container { flex: 1 1 0; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0.8em; height: auto; padding-bottom: 120px; overflow-x: hidden; }
     .filters-wrapper { display: none; }
     .mobile-filter-btn { display: flex; align-items: center; justify-content: center; gap: 8px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: auto; padding: 12px 24px; background-color: var(--primary-accent); color: white; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4); font-weight: 600; font-size: 0.85rem; z-index: 1000; transition: transform 0.2s, box-shadow 0.2s; }
@@ -494,7 +526,6 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
     .mobile-filter-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
     .mobile-filter-modal.show { display: block; }
 
-    /* CORREÇÃO DO BUG: Aplica estilo "Bottom Sheet" APENAS para o filtro */
     #mobile-filter-modal .modal-content { 
         background-color: var(--card-background); 
         margin: 0; 
@@ -502,25 +533,23 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
         width: 100%; max-width: 100%; 
         border-radius: 20px 20px 0 0; 
         display: flex; flex-direction: column; 
-        max-height: 85vh; height: 85vh; /* Altura fixa apenas aqui */
+        max-height: 85vh; height: 85vh;
         padding: 0; 
         box-shadow: 0 -5px 25px rgba(0,0,0,0.2); 
     }
 
-    /* ESTILO PARA OS OUTROS MODALS NO MOBILE (Bem-vindo, Apoie, etc) */
     .modal:not(#mobile-filter-modal) .modal-content {
         background-color: var(--card-background);
         width: 90%; 
         max-width: 400px;
         border-radius: 16px;
         padding: 20px;
-        /* Centralizar na tela */
         position: relative;
-        margin: 50% auto; /* Fallback */
+        margin: 50% auto;
         top: 50%;
         transform: translateY(-50%);
         margin-top: 0;
-        height: auto; /* Altura automática baseada no conteúdo! */
+        height: auto;
         display: block;
     }
 
