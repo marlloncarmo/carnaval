@@ -388,7 +388,6 @@
         const baseUrl = window.location.origin + window.location.pathname;
         const link = `${baseUrl}?highlight_id=${id}`;
         
-        // Montando a mensagem linha por linha (array + join é mais limpo)
         const lines = [
             "🎭 *Olha esse bloco que eu achei!*",
             "", // Linha em branco
@@ -414,7 +413,7 @@
         window.open(waUrl, '_blank');
     }
 
-    // --- NOVA FUNÇÃO PARA COMPARTILHAR LISTA DE FAVORITOS ---
+    // --- FUNÇÃO PARA COMPARTILHAR LISTA DE FAVORITOS (LIMPA) ---
     function shareAllFavorites() {
         const favs = getFavorites();
         if (favs.length === 0) {
@@ -425,22 +424,18 @@
         let msg = "🎭 *Minha Lista de Blocos - Carnaval BH 2026*\n\n";
         let hasItems = false;
         
-        // Pega todos os cards do DOM (que já estão ordenados por data)
+        // Pega todos os cards do DOM (que já estão ordenados)
         const allCards = document.querySelectorAll('.evento-card');
         
         allCards.forEach(card => {
             const id = card.dataset.id;
             
-            // Verifica se este card é favorito
             if (favs.includes(id)) {
-                // Tenta pegar os dados direto do HTML do card
                 const title = card.querySelector('h2').innerText;
                 const rawDate = card.querySelector('.date-wrapper strong').innerText;
                 
-                // Link curto
-                const link = window.location.origin + "/?highlight_id=" + id;
-                
-                msg += `🎉 *${title}*\n📅 ${rawDate}\n${link}\n\n`;
+                // Sem link individual, conforme pedido
+                msg += `🎉 *${title}*\n📅 ${rawDate}\n\n`;
                 hasItems = true;
             }
         });
@@ -506,15 +501,12 @@
             card.classList.remove('highlighted'); 
             void card.offsetWidth; 
             card.classList.add('highlighted');
-            // --- CORREÇÃO AQUI ---
             setTimeout(() => card.classList.remove('highlighted'), 4000); 
-            // ---------------------
 
             if (container) {
                 container.scrollTo({ top: 0, behavior: 'smooth' });
             }
             
-            // Ativa o destaque no mapa
             highlightMarker(id);
         }
     }
@@ -572,7 +564,6 @@
                 card.classList.remove('highlighted');
             }, 4000);
         }
-        // ---------------------------------------------------------------
         
         // Se fechou, reseta o mapa (remove highlight)
         if (!card.classList.contains('expanded')) {
@@ -636,7 +627,6 @@
 
         // Lógica de visibilidade do botão de compartilhar
         if (shareBtn) {
-            // Mostra se checkbox marcado E tem favoritos
             if (showOnly && favs.length > 0) {
                 shareBtn.style.display = 'flex';
             } else {
