@@ -468,7 +468,7 @@ body.dark-mode .ad-content p { color: #ccc; }
     text-align: center;
     
     /* Mágica para centralizar e manter tamanho bacana */
-    min-height: 250px; 
+    min-height: 200px; 
     display: flex;
     flex-direction: column;
     justify-content: center;
