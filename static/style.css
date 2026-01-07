@@ -469,8 +469,8 @@ input:checked + .slider:before { transform: translateX(16px); }
     align-items: center;
     transition: width 0.3s ease;
 }
-.tamanho-1 { width: 70px;  opacity: 0.8; }
-.tamanho-2 { width: 95px;  opacity: 0.9; }
+.tamanho-1 { width: 70px;  opacity: 1; }
+.tamanho-2 { width: 95px;  opacity: 1; }
 .tamanho-3 { width: 120px; opacity: 1; }
 
 .categoria-tag { font-size: 0.6em; background: var(--border-color); padding: 1px 6px; border-radius: 4px; white-space: nowrap; color: var(--text-primary); border: 1px solid transparent; }

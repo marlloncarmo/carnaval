@@ -423,6 +423,7 @@
 
         let msg = "🎭 *Minha Lista de Blocos - Carnaval BH 2026*\n\n";
         let hasItems = false;
+        let lastDay = ""; // Para controle de cabeçalho de data
         
         // Pega todos os cards do DOM (que já estão ordenados)
         const allCards = document.querySelectorAll('.evento-card');
@@ -432,10 +433,34 @@
             
             if (favs.includes(id)) {
                 const title = card.querySelector('h2').innerText;
-                const rawDate = card.querySelector('.date-wrapper strong').innerText;
+                const rawDateText = card.querySelector('.date-wrapper strong').innerText;
                 
-                // Sem link individual, conforme pedido
-                msg += `🎉 *${title}*\n📅 ${rawDate}\n\n`;
+                // Separa Data e Hora
+                // Exemplo esperado: "14/02 (Sáb) - 14:00" ou "14/02 (Sáb)"
+                let datePart = rawDateText;
+                let timePart = "";
+
+                if (rawDateText.includes('-')) {
+                    const parts = rawDateText.split('-');
+                    datePart = parts[0].trim(); // "14/02 (Sáb)"
+                    timePart = parts[1].trim(); // "14:00"
+                }
+
+                // Verifica se mudou o dia para adicionar cabeçalho e divisória
+                if (datePart !== lastDay) {
+                    if (hasItems) {
+                        msg += "----------------------------------\n\n";
+                    }
+                    msg += `🗓️ *${datePart}*\n\n`;
+                    lastDay = datePart;
+                }
+                
+                // Monta o item do bloco
+                msg += `🎉 *${title}*\n`;
+                if (timePart) {
+                    msg += `⏰ ${timePart}\n\n`;
+                }
+                
                 hasItems = true;
             }
         });
@@ -449,8 +474,9 @@
         
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
         
-        trackEvent('compartilhar_favoritos', {
-            'quantidade': favs.length
+        // NOVO EVENTO
+        trackEvent('compartilhar_lista', {
+            'quantidade_blocos': favs.length
         });
         
         window.open(waUrl, '_blank');
