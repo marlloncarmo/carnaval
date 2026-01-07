@@ -207,7 +207,7 @@ body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--
 .user-pulse { width: 40px; height: 40px; background-color: rgba(233, 30, 99, 0.4); border-radius: 4px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg); z-index: 1; animation: map-pulse 2s infinite; }
 @keyframes map-pulse { 0% { transform: translate(-50%, -50%) rotate(45deg) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -50%) rotate(45deg) scale(1.5); opacity: 0; } }
 
-/* MARKER ANIMATION (ORIGINAL, APENAS NA CRIAÇÃO) */
+/* MARKER ANIMATION (ORIGINAL) */
 @keyframes double-pulse { 0% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 25% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 50% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 75% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 100% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } }
 .marker-active-pulse { animation: double-pulse 1s ease-out; transform-origin: center; }
 
@@ -218,7 +218,7 @@ body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--
     100% { stroke-width: 3; stroke-opacity: 1; opacity: 1; }
 }
 .marker-selected-anim {
-    animation: blink-marker 1s ease-in-out 4; /* Pisca 4 vezes (4 segundos total) */
+    animation: blink-marker 1s ease-in-out 4; /* Pisca 4 vezes */
     transform-origin: center;
 }
 
@@ -230,7 +230,7 @@ body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--
 }
 
 .evento-card.highlighted {
-    animation: card-flash 1s ease-in-out 4; /* 4 ciclos de 1s = 4 segundos */
+    animation: card-flash 1s ease-in-out 4; /* 4 ciclos de 1s */
     border-color: var(--primary-accent);
     z-index: 5;
 }
@@ -266,13 +266,119 @@ input:checked + .slider:before { transform: translateX(16px); }
 .events-list-container::-webkit-scrollbar-track { background: transparent; }
 .events-list-container::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
 
-/* RESULTS HEADER */
-.results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8em; }
-.total-count { margin: 0; font-size: 0.85em; color: var(--text-secondary); }
+/* --- RESULTS HEADER (RESPONSIVO E COMPACTO) --- */
+.results-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 0.8em; 
+    flex-wrap: wrap; 
+    gap: 8px;
+}
 
-.fav-toggle-wrapper { display: flex; align-items: center; gap: 6px; font-size: 0.85em; font-weight: 600; color: var(--primary-accent); }
-.fav-toggle-wrapper input { width: 16px; height: 16px; accent-color: var(--primary-accent); cursor: pointer; }
-.fav-toggle-wrapper label { cursor: pointer; }
+.total-count { 
+    margin: 0; 
+    font-size: 0.75em; 
+    color: var(--text-secondary); 
+    white-space: nowrap;
+    flex-grow: 1; /* Ocupa o espaço para empurrar o resto para a direita */
+}
+
+/* --- CLUSTER: Botão + Toggle Unidos --- */
+.fav-cluster {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--card-background);
+    padding: 3px 3px 3px 8px; /* Padding ajustado */
+    border-radius: 30px;
+    /* border: 1px solid var(--border-color); (Opcional, removido para ficar mais limpo) */
+}
+
+/* --- BOTÃO DE COMPARTILHAR (Ícone Circular) --- */
+.share-favs-btn {
+    display: none; /* JS controla */
+    align-items: center;
+    justify-content: center;
+    background-color: #25D366; /* Verde WhatsApp */
+    color: white;
+    border: none;
+    width: 28px;  /* Tamanho pequeno e fixo */
+    height: 28px; 
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    transition: transform 0.2s, background-color 0.2s;
+    text-decoration: none;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.share-favs-btn:hover {
+    background-color: #128C7E;
+    transform: scale(1.1);
+}
+
+.share-favs-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    margin-right: 1px; /* Ajuste visual */
+}
+
+/* --- TOGGLE DE FAVORITOS (Estilo Botão com SVG) --- */
+.fav-toggle-wrapper { 
+    display: flex; 
+    align-items: center; 
+    cursor: pointer;
+    user-select: none;
+}
+
+.fav-toggle-wrapper input { display: none; }
+
+.fav-toggle-wrapper label { 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+}
+
+.fav-toggle-wrapper label svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2;
+    transition: all 0.2s;
+}
+
+.fav-toggle-wrapper label:hover {
+    background-color: #eee;
+}
+
+/* Estado Ativo */
+.fav-toggle-wrapper input:checked + label {
+    color: var(--primary-accent);
+    background-color: rgba(233, 30, 99, 0.08);
+    border-color: var(--primary-accent);
+}
+
+.fav-toggle-wrapper input:checked + label svg {
+    fill: var(--primary-accent);
+    stroke: var(--primary-accent);
+}
 
 /* FILTERS WRAPPER */
 .filters-wrapper { background: var(--card-background); padding: 0.8em; border-radius: 12px; margin-bottom: 1em; border: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05); width: 100%; max-width: 100%; box-sizing: border-box; }
@@ -468,7 +574,7 @@ body.dark-mode .ad-content p { color: #ccc; }
     text-align: center;
     
     /* Mágica para centralizar e manter tamanho bacana */
-    min-height: 200px; 
+    min-height: 250px; 
     display: flex;
     flex-direction: column;
     justify-content: center;

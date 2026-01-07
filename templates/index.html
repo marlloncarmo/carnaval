@@ -168,9 +168,27 @@
             
             <div class="results-header">
                 <p class="total-count">{{ total }} blocos encontrados.</p>
-                <div class="fav-toggle-wrapper">
-                    <input type="checkbox" id="show-favorites-only">
-                    <label for="show-favorites-only">❤️ Meus Blocos</label>
+                
+                <div class="fav-cluster">
+                    <button id="share-favs-btn" class="share-favs-btn" onclick="shareAllFavorites()" title="Enviar lista no WhatsApp">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+
+                    <div class="fav-toggle-wrapper">
+                        <input type="checkbox" id="show-favorites-only">
+                        <label for="show-favorites-only" title="Mostrar apenas favoritos">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            Meus Blocos
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -396,6 +414,53 @@
         window.open(waUrl, '_blank');
     }
 
+    // --- NOVA FUNÇÃO PARA COMPARTILHAR LISTA DE FAVORITOS ---
+    function shareAllFavorites() {
+        const favs = getFavorites();
+        if (favs.length === 0) {
+            alert("Você não tem nenhum bloco favoritado.");
+            return;
+        }
+
+        let msg = "🎭 *Minha Lista de Blocos - Carnaval BH 2026*\n\n";
+        let hasItems = false;
+        
+        // Pega todos os cards do DOM (que já estão ordenados por data)
+        const allCards = document.querySelectorAll('.evento-card');
+        
+        allCards.forEach(card => {
+            const id = card.dataset.id;
+            
+            // Verifica se este card é favorito
+            if (favs.includes(id)) {
+                // Tenta pegar os dados direto do HTML do card
+                const title = card.querySelector('h2').innerText;
+                const rawDate = card.querySelector('.date-wrapper strong').innerText;
+                
+                // Link curto
+                const link = window.location.origin + "/?highlight_id=" + id;
+                
+                msg += `🎉 *${title}*\n📅 ${rawDate}\n${link}\n\n`;
+                hasItems = true;
+            }
+        });
+
+        if (!hasItems) {
+            alert("Nenhum bloco favorito encontrado na visualização atual.");
+            return;
+        }
+
+        msg += "👇 *Monte sua lista também em:*\n" + window.location.origin;
+        
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        
+        trackEvent('compartilhar_favoritos', {
+            'quantidade': favs.length
+        });
+        
+        window.open(waUrl, '_blank');
+    }
+
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
         
@@ -436,10 +501,14 @@
             
             card.style.order = '-1';
             card.classList.add('expanded');
+            
+            // Highlight sincronizado com o mapa (4 segundos)
             card.classList.remove('highlighted'); 
             void card.offsetWidth; 
             card.classList.add('highlighted');
+            // --- CORREÇÃO AQUI ---
             setTimeout(() => card.classList.remove('highlighted'), 4000); 
+            // ---------------------
 
             if (container) {
                 container.scrollTo({ top: 0, behavior: 'smooth' });
@@ -492,16 +561,20 @@
         
         card.classList.toggle('expanded');
         
+        // --- ADIÇÃO: Dispara a animação de highlight ao clicar no card ---
         if (card.classList.contains('expanded')) {
-            card.classList.remove('highlighted'); 
-            void card.offsetWidth; 
+            card.classList.remove('highlighted'); // Reset
+            void card.offsetWidth; // Force Reflow
             card.classList.add('highlighted');
             
+            // Remove a classe depois da animação (4 segundos)
             setTimeout(() => {
                 card.classList.remove('highlighted');
             }, 4000);
         }
+        // ---------------------------------------------------------------
         
+        // Se fechou, reseta o mapa (remove highlight)
         if (!card.classList.contains('expanded')) {
              highlightMarker(null);
              return;
@@ -556,9 +629,20 @@
         const favs = getFavorites();
         const cards = document.querySelectorAll('.evento-card');
         const showOnly = document.getElementById('show-favorites-only').checked;
+        const shareBtn = document.getElementById('share-favs-btn');
         
         let visibleBlockCount = 0; 
         let blocksSinceLastAd = 0; 
+
+        // Lógica de visibilidade do botão de compartilhar
+        if (shareBtn) {
+            // Mostra se checkbox marcado E tem favoritos
+            if (showOnly && favs.length > 0) {
+                shareBtn.style.display = 'flex';
+            } else {
+                shareBtn.style.display = 'none';
+            }
+        }
 
         cards.forEach(card => {
             const isAd = card.classList.contains('ad-card');
