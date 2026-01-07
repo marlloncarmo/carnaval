@@ -413,7 +413,7 @@
         window.open(waUrl, '_blank');
     }
 
-    // --- FUNÇÃO PARA COMPARTILHAR LISTA DE FAVORITOS (LIMPA) ---
+    // --- NOVA FUNÇÃO PARA COMPARTILHAR LISTA DE FAVORITOS (LIMPA) ---
     function shareAllFavorites() {
         const favs = getFavorites();
         if (favs.length === 0) {
@@ -488,6 +488,10 @@
         const container = document.querySelector('.events-list-container');
 
         if (card) {
+            // NOVO EVENTO: CLIQUE NO MAPA
+            const title = card.querySelector('h2').innerText;
+            trackEvent('interacao_mapa_clique', { 'bloco_nome': title });
+
             document.querySelectorAll('.evento-card').forEach(c => {
                 c.style.order = '0'; 
                 c.classList.remove('expanded');
@@ -555,6 +559,10 @@
         
         // --- ADIÇÃO: Dispara a animação de highlight ao clicar no card ---
         if (card.classList.contains('expanded')) {
+            // NOVO EVENTO: CLIQUE NA LISTA
+            const title = card.querySelector('h2').innerText;
+            trackEvent('interacao_lista_expandir', { 'bloco_nome': title });
+
             card.classList.remove('highlighted'); // Reset
             void card.offsetWidth; // Force Reflow
             card.classList.add('highlighted');
@@ -627,6 +635,7 @@
 
         // Lógica de visibilidade do botão de compartilhar
         if (shareBtn) {
+            // Mostra se checkbox marcado E tem favoritos
             if (showOnly && favs.length > 0) {
                 shareBtn.style.display = 'flex';
             } else {
@@ -712,6 +721,8 @@ document.addEventListener('DOMContentLoaded', function () {
         closeWelcomeBtn.addEventListener('click', () => {
             welcomeModal.classList.remove('show');
             localStorage.setItem('seen_welcome_msg_v1', 'true');
+            // EVENTO: FECHAR TUTORIAL
+            trackEvent('fechar_tutorial', {'origem': 'modal_boas_vindas'});
         });
     }
 
@@ -723,7 +734,15 @@ document.addEventListener('DOMContentLoaded', function () {
     flatpickr("#data_filtro", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m", locale: "pt", disableMobile: "true" });
 
     const favToggle = document.getElementById('show-favorites-only');
-    if(favToggle) { favToggle.addEventListener('change', applyFavoritesUI); }
+    if(favToggle) { 
+        favToggle.addEventListener('change', function() {
+            applyFavoritesUI();
+            // NOVO EVENTO: TOGGLE FAVORITOS
+            trackEvent('filtrar_meus_blocos', {
+                'acao': this.checked ? 'ativar' : 'desativar'
+            });
+        }); 
+    }
     applyFavoritesUI();
 
     const mapElement = document.getElementById('map');
