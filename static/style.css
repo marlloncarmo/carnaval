@@ -211,34 +211,34 @@ body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--
 @keyframes double-pulse { 0% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 25% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 50% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 75% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 100% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } }
 .marker-active-pulse { animation: double-pulse 1s ease-out; transform-origin: center; }
 
-/* ANIMAÇÃO DE DESTAQUE DO MARCADOR SELECIONADO */
+/* ANIMAÇÃO DE DESTAQUE DO MARCADOR SELECIONADO (4 SEGUNDOS) */
 @keyframes blink-marker {
     0% { stroke-width: 3; stroke-opacity: 1; opacity: 1; }
     50% { stroke-width: 10; stroke-opacity: 0.6; opacity: 0.8; }
     100% { stroke-width: 3; stroke-opacity: 1; opacity: 1; }
 }
 .marker-selected-anim {
-    animation: blink-marker 1s ease-in-out 4; /* Pisca 4 vezes (4 segundos) */
+    animation: blink-marker 1s ease-in-out 4; /* Pisca 4 vezes (4 segundos total) */
     transform-origin: center;
 }
 
-/* --- ANIMAÇÃO DE DESTAQUE DO CARD SELECIONADO --- */
+/* --- ANIMAÇÃO DE DESTAQUE DO CARD SELECIONADO (4 SEGUNDOS) --- */
 @keyframes card-flash {
-    0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.4); }
-    70% { box-shadow: 0 0 0 8px rgba(233, 30, 99, 0); } /* Efeito de onda saindo */
+    0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); }
+    50% { box-shadow: 0 0 15px 4px rgba(233, 30, 99, 0.3); } /* Brilho rosa suave no meio */
     100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); }
 }
 
 .evento-card.highlighted {
-    animation: card-flash 1s ease-out;
+    animation: card-flash 1s ease-in-out 4; /* 4 ciclos de 1s = 4 segundos */
     border-color: var(--primary-accent);
+    z-index: 5;
 }
 
 /* ESTADO EXPANDIDO (FIXO) */
 .evento-card.expanded {
     border-color: var(--primary-accent);
     background-color: rgba(233, 30, 99, 0.03); /* Fundo rosa bem suave */
-    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.15); /* Sombra suave rosa */
 }
 
 body.dark-mode .evento-card.expanded {
@@ -345,7 +345,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .card-header h2 { font-size: 1rem; margin: 0; color: var(--primary-accent); line-height: 1.2; padding-right: 10px; flex: 1; }
 .header-tags { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .icons-row { display: flex; gap: 4px; }
-.feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
+.feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; }
 .feature-kids svg { color: #2ecc71; }
 .feature-pet svg { color: #e67e22; }
 

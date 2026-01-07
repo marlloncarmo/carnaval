@@ -436,8 +436,10 @@
             
             card.style.order = '-1';
             card.classList.add('expanded');
+            card.classList.remove('highlighted'); 
+            void card.offsetWidth; 
             card.classList.add('highlighted');
-            setTimeout(() => card.classList.remove('highlighted'), 2000); 
+            setTimeout(() => card.classList.remove('highlighted'), 4000); 
 
             if (container) {
                 container.scrollTo({ top: 0, behavior: 'smooth' });
@@ -484,28 +486,22 @@
     }
 
     function toggleCard(card) {
-        // Fecha outros cards
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
         
-        // Alterna o estado do atual
         card.classList.toggle('expanded');
         
-        // --- ADIÇÃO: Dispara a animação de highlight ao clicar no card ---
         if (card.classList.contains('expanded')) {
-            card.classList.remove('highlighted'); // Reset para garantir que a animação rode
-            void card.offsetWidth; // Força reflow (truque para reiniciar animação CSS)
+            card.classList.remove('highlighted'); 
+            void card.offsetWidth; 
             card.classList.add('highlighted');
             
-            // Remove a classe depois da animação para poder rodar de novo se clicar
             setTimeout(() => {
                 card.classList.remove('highlighted');
-            }, 1000);
+            }, 4000);
         }
-        // ---------------------------------------------------------------
         
-        // Se fechou, reseta o mapa (remove highlight)
         if (!card.classList.contains('expanded')) {
              highlightMarker(null);
              return;
@@ -532,17 +528,11 @@
         event.stopPropagation(); 
         
         let favs = getFavorites();
-        
-        // Tenta pegar o nome do bloco para o relatório ficar legível
-        // Procura o card com esse ID e pega o texto do H2 (título)
         const card = document.querySelector(`.evento-card[data-id="${id}"]`);
         const blockName = card ? card.querySelector('h2').innerText : 'ID ' + id;
 
         if (favs.includes(id)) {
-            // REMOVER DOS FAVORITOS
             favs = favs.filter(fid => fid !== id);
-            
-            // Evento GA4: Remover
             trackEvent('favoritar_bloco', {
                 'acao': 'remover',
                 'bloco_id': id,
@@ -550,12 +540,9 @@
             });
 
         } else {
-            // ADICIONAR AOS FAVORITOS
             favs.push(id);
-            
-            // Evento GA4: Adicionar
             trackEvent('favoritar_bloco', {
-                'acao': 'adicionar', // Importante para você filtrar depois
+                'acao': 'adicionar',
                 'bloco_id': id,
                 'bloco_nome': blockName
             });
