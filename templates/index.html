@@ -296,9 +296,16 @@
         <div id="welcome-modal" class="modal" style="z-index: 3000;">
             <div class="modal-content welcome-content">
                 <div class="welcome-icon">🎭</div> 
+                
                 <h3>Dados em Apresentação</h3>
-                <p>Os blocos exibidos atualmente são <strong>fictícios</strong> para fins de <strong>apresentação</strong> da plataforma.<br><br>Assim que a programação oficial do <strong>Carnaval de BH 2026</strong> for divulgada, atualizaremos o mapa com os dados reais imediatamente! 🎉</p>
-                <button id="close-welcome-btn" class="directions-btn" style="width: 100%; margin-top: 15px; border:none;">Entendido!</button>
+                <p>
+                    Os blocos exibidos atualmente são <strong>fictícios</strong> para fins de <strong>apresentação</strong> da plataforma.
+                    <br><br>
+                    Assim que a programação oficial do <strong>Carnaval de BH 2026</strong> for divulgada, atualizaremos o mapa com os dados reais imediatamente! 🎉
+                </p>
+                <button id="close-welcome-btn" class="directions-btn" style="width: 100%; margin-top: 15px; border:none;">
+                    Entendido!
+                </button>
             </div>
         </div>
 
@@ -363,9 +370,10 @@
         const baseUrl = window.location.origin + window.location.pathname;
         const link = `${baseUrl}?highlight_id=${id}`;
         
+        // Montando a mensagem linha por linha (array + join é mais limpo)
         const lines = [
             "🎭 *Olha esse bloco que eu achei!*",
-            "",
+            "", // Linha em branco
             `🎉 *${title}*`,
             `📅 ${date}`,
             "",
@@ -373,9 +381,13 @@
             link
         ];
 
+        // Junta as linhas com o caractere de nova linha
         const message = lines.join("\n");
+        
+        // Codifica TUDO para garantir que emojis e acentos funcionem
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         
+        // TRACKING COMPARTILHAMENTO
         trackEvent('compartilhar_whatsapp', {
             'bloco_id': id,
             'bloco_nome': title
@@ -387,6 +399,7 @@
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
         
+        // TRACKING ROTA
         trackEvent('como_chegar', {
             'destino_lat': destLat,
             'destino_lon': destLon
@@ -471,11 +484,26 @@
     }
 
     function toggleCard(card) {
+        // Fecha outros cards
         document.querySelectorAll('.evento-card.expanded').forEach(c => {
             if (c !== card) c.classList.remove('expanded');
         });
         
+        // Alterna o estado do atual
         card.classList.toggle('expanded');
+        
+        // --- ADIÇÃO: Dispara a animação de highlight ao clicar no card ---
+        if (card.classList.contains('expanded')) {
+            card.classList.remove('highlighted'); // Reset para garantir que a animação rode
+            void card.offsetWidth; // Força reflow (truque para reiniciar animação CSS)
+            card.classList.add('highlighted');
+            
+            // Remove a classe depois da animação para poder rodar de novo se clicar
+            setTimeout(() => {
+                card.classList.remove('highlighted');
+            }, 1000);
+        }
+        // ---------------------------------------------------------------
         
         // Se fechou, reseta o mapa (remove highlight)
         if (!card.classList.contains('expanded')) {
@@ -504,20 +532,30 @@
         event.stopPropagation(); 
         
         let favs = getFavorites();
+        
+        // Tenta pegar o nome do bloco para o relatório ficar legível
+        // Procura o card com esse ID e pega o texto do H2 (título)
         const card = document.querySelector(`.evento-card[data-id="${id}"]`);
         const blockName = card ? card.querySelector('h2').innerText : 'ID ' + id;
 
         if (favs.includes(id)) {
+            // REMOVER DOS FAVORITOS
             favs = favs.filter(fid => fid !== id);
+            
+            // Evento GA4: Remover
             trackEvent('favoritar_bloco', {
                 'acao': 'remover',
                 'bloco_id': id,
                 'bloco_nome': blockName
             });
+
         } else {
+            // ADICIONAR AOS FAVORITOS
             favs.push(id);
+            
+            // Evento GA4: Adicionar
             trackEvent('favoritar_bloco', {
-                'acao': 'adicionar',
+                'acao': 'adicionar', // Importante para você filtrar depois
                 'bloco_id': id,
                 'bloco_nome': blockName
             });

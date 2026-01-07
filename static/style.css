@@ -211,7 +211,7 @@ body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--
 @keyframes double-pulse { 0% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 25% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 50% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } 75% { r: 14; stroke-width: 10; stroke-opacity: 0.5; fill-opacity: 0.9; } 100% { r: 6; stroke-width: 1; stroke-opacity: 1; fill-opacity: 0.6; } }
 .marker-active-pulse { animation: double-pulse 1s ease-out; transform-origin: center; }
 
-/* NOVA ANIMAÇÃO DE DESTAQUE DO MARCADOR SELECIONADO */
+/* ANIMAÇÃO DE DESTAQUE DO MARCADOR SELECIONADO */
 @keyframes blink-marker {
     0% { stroke-width: 3; stroke-opacity: 1; opacity: 1; }
     50% { stroke-width: 10; stroke-opacity: 0.6; opacity: 0.8; }
@@ -220,6 +220,29 @@ body.dark-mode .map-locate-btn.active { background-color: #1a202c; color: var(--
 .marker-selected-anim {
     animation: blink-marker 1s ease-in-out 4; /* Pisca 4 vezes (4 segundos) */
     transform-origin: center;
+}
+
+/* --- ANIMAÇÃO DE DESTAQUE DO CARD SELECIONADO --- */
+@keyframes card-flash {
+    0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(233, 30, 99, 0); } /* Efeito de onda saindo */
+    100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); }
+}
+
+.evento-card.highlighted {
+    animation: card-flash 1s ease-out;
+    border-color: var(--primary-accent);
+}
+
+/* ESTADO EXPANDIDO (FIXO) */
+.evento-card.expanded {
+    border-color: var(--primary-accent);
+    background-color: rgba(233, 30, 99, 0.03); /* Fundo rosa bem suave */
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.15); /* Sombra suave rosa */
+}
+
+body.dark-mode .evento-card.expanded {
+    background-color: rgba(233, 30, 99, 0.1);
 }
 
 .leaflet-control-reset a { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>'); background-size: 16px 16px; background-position: center; background-repeat: no-repeat; cursor: pointer; background-color: white; }
@@ -300,8 +323,6 @@ input:checked + .slider:before { transform: translateX(16px); }
 .eventos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8em; }
 .evento-card { background: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8em; position: relative; transition: transform 0.2s; box-shadow: 0 2px 4px var(--shadow-color); display: flex; flex-direction: column; cursor: pointer; overflow: hidden; }
 .evento-card:hover { transform: translateY(-3px); border-color: var(--primary-accent); }
-.evento-card.highlighted { border: 2px solid var(--primary-accent); background-color: rgba(233, 30, 99, 0.04); transform: scale(1.01); }
-body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.15); }
 
 /* STATUS */
 .status-bg-em-andamento { background-color: rgba(39, 174, 96, 0.08); border-color: rgba(39, 174, 96, 0.4); }
@@ -324,7 +345,7 @@ body.dark-mode .evento-card.highlighted { background-color: rgba(233, 30, 99, 0.
 .card-header h2 { font-size: 1rem; margin: 0; color: var(--primary-accent); line-height: 1.2; padding-right: 10px; flex: 1; }
 .header-tags { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .icons-row { display: flex; gap: 4px; }
-.feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; }
+.feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
 .feature-kids svg { color: #2ecc71; }
 .feature-pet svg { color: #e67e22; }
 
