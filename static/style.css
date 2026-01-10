@@ -266,6 +266,37 @@ input:checked + .slider:before { transform: translateX(16px); }
 .events-list-container::-webkit-scrollbar-track { background: transparent; }
 .events-list-container::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
 
+/* --- INFO BANNER (AVISO PBH) --- */
+.info-banner {
+    background-color: #fff3cd; /* Amarelo suave */
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.info-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.info-text strong {
+    font-weight: 700;
+}
+
+/* Dark Mode para o Banner */
+body.dark-mode .info-banner {
+    background-color: #2c3e50; /* Azul escuro/Cinza */
+    border-color: #4a5568;
+    color: #ffeb3b; /* Texto amarelo para destaque */
+}
+
 /* --- RESULTS HEADER (RESPONSIVO E COMPACTO) --- */
 .results-header { 
     display: flex; 
