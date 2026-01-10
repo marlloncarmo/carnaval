@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnaval-bh-v9';
+const CACHE_NAME = 'carnaval-bh-v10';
 const URLS_TO_CACHE = [
     '/',
     '/static/style.css',
