@@ -86,32 +86,42 @@ def events_status_logic(eventos_raw):
     return eventos
 
 def fetch_carnival_data():
-    # Tenta carregar o arquivo local gerado pelo script
-    if not os.path.exists(DATA_FILE):
-        return [], []
+    todos_eventos = []
+    estilos_set = set()
 
-    try:
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            conteudo = json.load(f)
+    # 1. Carrega Oficiais (se existir)
+    if os.path.exists('eventos.json'):
+        try:
+            with open('eventos.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                todos_eventos.extend(data.get('eventos', []))
+                # Coleta estilos apenas dos oficiais por enquanto
+                for est in data.get('estilos', []):
+                    estilos_set.add(est)
+        except Exception as e:
+            print(f"Erro ao ler eventos.json: {e}")
+
+    # 2. Carrega Ensaios (se existir)
+    if os.path.exists('ensaios.json'):
+        try:
+            with open('ensaios.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                # Adiciona os ensaios à lista principal
+                todos_eventos.extend(data.get('eventos', []))
+        except Exception as e:
+            print(f"Erro ao ler ensaios.json: {e}")
+
+    # Reconverte data ISO para objeto datetime (necessário para a ordenação e status)
+    for e in todos_eventos:
+        if e.get('dt_iso'):
+            e['_dt_obj'] = datetime.fromisoformat(e['dt_iso'])
+        else:
+            e['_dt_obj'] = None
             
-        eventos_raw = conteudo.get('eventos', [])
-        estilos = conteudo.get('estilos', [])
-        
-        # Reconverte a string ISO de data para objeto datetime real
-        for e in eventos_raw:
-            if e.get('dt_iso'):
-                e['_dt_obj'] = datetime.fromisoformat(e['dt_iso'])
-            else:
-                e['_dt_obj'] = None
-                
-        # Calcula o status (Ao Vivo, Encerrado) baseado na hora ATUAL
-        eventos_com_status = events_status_logic(eventos_raw)
-        
-        return eventos_com_status, estilos
-        
-    except Exception as e:
-        print(f"Erro ao ler JSON local: {e}")
-        return [], []
+    # Calcula status (Ao Vivo, Encerrado) e ordena
+    eventos_com_status = events_status_logic(todos_eventos)
+    
+    return eventos_com_status, sorted(list(estilos_set))
 
 def filtrar_eventos(eventos_todos, args):
     has_active_filters = False
@@ -211,11 +221,13 @@ def mostrar_eventos():
 
     bairros = sorted(list(set([e['local'] for e in eventos_todos if e['local']])))
     
+    total_ativos = len([e for e in eventos_filtrados if e.get('status') != 'encerrado'])
+
     response = make_response(render_template('index.html', 
                            eventos=eventos_filtrados,
                            bairros=bairros,
                            estilos=estilos,
-                           total=len(eventos_filtrados),
+                           total=total_ativos,
                            has_filters=has_filters,
                            google_maps_api_key=GOOGLE_MAPS_API_KEY))
     

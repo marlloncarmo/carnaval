@@ -40,80 +40,30 @@
                     <form id="filter-form" method="GET" action="{{ url_for('mostrar_eventos') }}" autocomplete="off">
                         
                         <div class="quick-filters">
-                            
                             <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="sab_oficial" {% if 'sab_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span class="chip-destaque">Sáb 14</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="dom_oficial" {% if 'dom_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span class="chip-destaque">Dom 15</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="seg_oficial" {% if 'seg_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span class="chip-destaque">Seg 16</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="ter_oficial" {% if 'ter_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span class="chip-destaque">Ter 17</span>
-                                </label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="sab_oficial" {% if 'sab_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}><span class="chip-destaque">Sáb 14</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="dom_oficial" {% if 'dom_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}><span class="chip-destaque">Dom 15</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="seg_oficial" {% if 'seg_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}><span class="chip-destaque">Seg 16</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="ter_oficial" {% if 'ter_oficial' in request.args.getlist('quick_filter') %}checked{% endif %}><span class="chip-destaque">Ter 17</span></label>
                             </div>
-
                             <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Hoje</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Amanhã</span>
-                                </label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="hoje" {% if 'hoje' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Hoje</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="amanha" {% if 'amanha' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Amanhã</span></label>
                             </div>
-
                             <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="em-andamento" {% if 'em-andamento' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Em Andamento</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="em-breve" {% if 'em-breve' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Em Breve</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="encerrando" {% if 'encerrando' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Encerrando</span>
-                                </label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="em-andamento" {% if 'em-andamento' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Em Andamento</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="em-breve" {% if 'em-breve' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Em Breve</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="encerrando" {% if 'encerrando' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Encerrando</span></label>
                             </div>
-
                             <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Pequenos</span>
-                                </label>                    
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Médios</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Grandes</span>
-                                </label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="pequeno" {% if 'pequeno' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Pequenos</span></label>                    
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="medio" {% if 'medio' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Médios</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="grande" {% if 'grande' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Grandes</span></label>
                             </div>
-
                             <div class="filter-group">
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="manha" {% if 'manha' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Manhã</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="tarde" {% if 'tarde' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Tarde</span>
-                                </label>
-                                <label class="chip-checkbox">
-                                    <input type="checkbox" name="quick_filter" value="noite" {% if 'noite' in request.args.getlist('quick_filter') %}checked{% endif %}>
-                                    <span>Noite</span>
-                                </label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="manha" {% if 'manha' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Manhã</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="tarde" {% if 'tarde' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Tarde</span></label>
+                                <label class="chip-checkbox"><input type="checkbox" name="quick_filter" value="noite" {% if 'noite' in request.args.getlist('quick_filter') %}checked{% endif %}><span>Noite</span></label>
                             </div>
                         </div>
 
@@ -131,7 +81,6 @@
                                 <label for="data_filtro">Data:</label>
                                 <input type="text" id="data_filtro" name="data_filtro" value="{{ request.args.get('data_filtro', '') }}" placeholder="Selecione..." style="background-color: var(--background-color);">
                             </div>
-
                             <div class="filtro-item">
                                 <label for="bairro">Bairro:</label>
                                 <select name="bairro" id="bairro">
@@ -141,7 +90,6 @@
                                     {% endfor %}
                                 </select>
                             </div>
-
                             <div class="filtro-item">
                                 <label for="categoria">Estilo:</label>
                                 <select name="categoria" id="categoria">
@@ -151,7 +99,6 @@
                                     {% endfor %}
                                 </select>
                             </div>
-
                             <div class="filtro-item filtro-busca">
                                 <label for="q">Buscar:</label>
                                 <input type="text" id="q" name="q" placeholder="Nome..." value="{{ request.args.get('q', '') }}">
@@ -223,9 +170,14 @@
                                         {% endif %}
                                     </div>
                                     {% endif %}
-                                    <span class="tamanho-tag tamanho-{{ evento.tamanho }}">
-                                        {% if evento.tamanho == 3 %}Grande 👥👥👥{% elif evento.tamanho == 2 %}Médio 👥👥{% else %}Pequeno 👥{% endif %}
-                                    </span>
+
+                                    {% if evento.is_ensaio %}
+                                        <span class="categoria-tag tag-ensaio">✨ Ensaio</span>
+                                    {% else %}
+                                        <span class="tamanho-tag tamanho-{{ evento.tamanho }}">
+                                            {% if evento.tamanho == 3 %}Grande 👥👥👥{% elif evento.tamanho == 2 %}Médio 👥👥{% else %}Pequeno 👥{% endif %}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             
@@ -235,7 +187,10 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                         <strong>{{ evento.data }}</strong>
                                     </div>
-                                    <span class="categoria-tag">{{ evento.categoria_display }}</span>
+                                    
+                                    {% if not evento.is_ensaio %}
+                                        <span class="categoria-tag">{{ evento.categoria_display }}</span>
+                                    {% endif %}
                                 </div>
                                 <div class="meta-row address-row">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -243,9 +198,11 @@
                                 </div>
                             </div>
 
-                            {% if evento.descricao|length > 1 %}
+                            {% if evento.link_ingresso %}
                             <div class="card-desc">
-                                <p>{{ evento.descricao }}</p>
+                                <a href="{{ evento.link_ingresso }}" target="_blank" class="btn-ingresso" onclick="trackEvent('clique_ingresso', {'bloco': '{{ evento.titulo }}', 'origem': 'card'})">
+                                    🎟️ Retirar Ingressos
+                                </a>
                             </div>
                             {% endif %}
 
@@ -315,14 +272,16 @@
             <div class="modal-content welcome-content">
                 <div class="welcome-icon">🎭</div> 
                 
-                <h3>Dados em Apresentação</h3>
+                <h3>O Carnaval tá chegando!</h3>
                 <p>
-                    Os blocos exibidos atualmente são <strong>fictícios</strong> para fins de <strong>apresentação</strong> da plataforma.
+                    Estamos em ritmo de aquecimento! 🔥
                     <br><br>
-                    Assim que a programação oficial do <strong>Carnaval de BH 2026</strong> for divulgada, atualizaremos o mapa com os dados reais imediatamente! 🎉
+                    Por enquanto, exibimos os <strong>Ensaios</strong> e alguns blocos de <strong>Pré-Carnaval</strong> já confirmados.
+                    <br><br>
+                    Assim que a programação oficial completa for divulgada pela PBH, atualizaremos o mapa automaticamente. Divirta-se!
                 </p>
                 <button id="close-welcome-btn" class="directions-btn" style="width: 100%; margin-top: 15px; border:none;">
-                    Entendido!
+                    Bora pro bloco!
                 </button>
             </div>
         </div>
@@ -390,7 +349,7 @@
         
         const lines = [
             "🎭 *Olha esse bloco que eu achei!*",
-            "", // Linha em branco
+            "",
             `🎉 *${title}*`,
             `📅 ${date}`,
             "",
@@ -398,13 +357,9 @@
             link
         ];
 
-        // Junta as linhas com o caractere de nova linha
         const message = lines.join("\n");
-        
-        // Codifica TUDO para garantir que emojis e acentos funcionem
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         
-        // TRACKING COMPARTILHAMENTO
         trackEvent('compartilhar_whatsapp', {
             'bloco_id': id,
             'bloco_nome': title
@@ -413,7 +368,6 @@
         window.open(waUrl, '_blank');
     }
 
-    // --- NOVA FUNÇÃO PARA COMPARTILHAR LISTA DE FAVORITOS (LIMPA) ---
     function shareAllFavorites() {
         const favs = getFavorites();
         if (favs.length === 0) {
@@ -423,9 +377,8 @@
 
         let msg = "🎭 *Minha Lista de Blocos - Carnaval BH 2026*\n\n";
         let hasItems = false;
-        let lastDay = ""; // Para controle de cabeçalho de data
+        let lastDay = "";
         
-        // Pega todos os cards do DOM (que já estão ordenados)
         const allCards = document.querySelectorAll('.evento-card');
         
         allCards.forEach(card => {
@@ -435,18 +388,15 @@
                 const title = card.querySelector('h2').innerText;
                 const rawDateText = card.querySelector('.date-wrapper strong').innerText;
                 
-                // Separa Data e Hora
-                // Exemplo esperado: "14/02 (Sáb) - 14:00" ou "14/02 (Sáb)"
                 let datePart = rawDateText;
                 let timePart = "";
 
                 if (rawDateText.includes('-')) {
                     const parts = rawDateText.split('-');
-                    datePart = parts[0].trim(); // "14/02 (Sáb)"
-                    timePart = parts[1].trim(); // "14:00"
+                    datePart = parts[0].trim();
+                    timePart = parts[1].trim();
                 }
 
-                // Verifica se mudou o dia para adicionar cabeçalho e divisória
                 if (datePart !== lastDay) {
                     if (hasItems) {
                         msg += "----------------------------------\n\n";
@@ -455,10 +405,11 @@
                     lastDay = datePart;
                 }
                 
-                // Monta o item do bloco
                 msg += `🎉 *${title}*\n`;
                 if (timePart) {
                     msg += `⏰ ${timePart}\n\n`;
+                } else {
+                    msg += `\n`;
                 }
                 
                 hasItems = true;
@@ -474,9 +425,8 @@
         
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
         
-        // NOVO EVENTO
         trackEvent('compartilhar_lista', {
-            'quantidade_blocos': favs.length
+            'quantidade': favs.length
         });
         
         window.open(waUrl, '_blank');
@@ -485,7 +435,6 @@
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
         
-        // TRACKING ROTA
         trackEvent('como_chegar', {
             'destino_lat': destLat,
             'destino_lon': destLon
@@ -514,7 +463,6 @@
         const container = document.querySelector('.events-list-container');
 
         if (card) {
-            // NOVO EVENTO: CLIQUE NO MAPA
             const title = card.querySelector('h2').innerText;
             trackEvent('interacao_mapa_clique', { 'bloco_nome': title });
 
@@ -527,7 +475,6 @@
             card.style.order = '-1';
             card.classList.add('expanded');
             
-            // Highlight sincronizado com o mapa (4 segundos)
             card.classList.remove('highlighted'); 
             void card.offsetWidth; 
             card.classList.add('highlighted');
@@ -541,25 +488,19 @@
         }
     }
 
-    // --- NOVA FUNÇÃO DE HIGHLIGHT DO MARCADOR ---
     function highlightMarker(id) {
         if (!window.markersMap) return;
 
-        // 1. Reseta todos os marcadores para o estilo padrão
         Object.values(window.markersMap).forEach(m => {
             m.marker.setStyle(m.defaultStyle);
-            // Remove classe de animação se existir
             const el = m.marker.getElement();
             if(el) el.classList.remove('marker-selected-anim');
         });
 
-        // 2. Aplica estilo de destaque ao selecionado
         if (id && window.markersMap[id]) {
             const current = window.markersMap[id];
             
-            // Aumenta raio, opacidade total, borda branca grossa
             current.marker.setStyle({
-                // radius: 15,
                 fillOpacity: 1,
                 color: '#fff',
                 weight: 3,
@@ -568,7 +509,6 @@
             
             current.marker.bringToFront();
 
-            // Adiciona classe CSS para animação de pulso temporária
             const el = current.marker.getElement();
             if(el) {
                 el.classList.add('marker-selected-anim');
@@ -583,23 +523,19 @@
         
         card.classList.toggle('expanded');
         
-        // --- ADIÇÃO: Dispara a animação de highlight ao clicar no card ---
         if (card.classList.contains('expanded')) {
-            // NOVO EVENTO: CLIQUE NA LISTA
             const title = card.querySelector('h2').innerText;
             trackEvent('interacao_lista_expandir', { 'bloco_nome': title });
 
-            card.classList.remove('highlighted'); // Reset
-            void card.offsetWidth; // Force Reflow
+            card.classList.remove('highlighted'); 
+            void card.offsetWidth; 
             card.classList.add('highlighted');
             
-            // Remove a classe depois da animação (4 segundos)
             setTimeout(() => {
                 card.classList.remove('highlighted');
             }, 4000);
         }
         
-        // Se fechou, reseta o mapa (remove highlight)
         if (!card.classList.contains('expanded')) {
              highlightMarker(null);
              return;
@@ -610,10 +546,7 @@
         const lon = parseFloat(card.dataset.lon);
 
         if (window.mapInstance && !isNaN(lat) && !isNaN(lon)) {
-            // Centraliza exatamente no ponto (SEM OFFSET)
             window.mapInstance.flyTo([lat, lon], 16, { duration: 1.2 });
-            
-            // Destaca o marcador
             highlightMarker(id);
         }
     }
@@ -659,20 +592,13 @@
         let visibleBlockCount = 0; 
         let blocksSinceLastAd = 0; 
 
-        // Lógica de visibilidade do botão de compartilhar
         if (shareBtn) {
-            // Mostra se checkbox marcado E tem favoritos
-            if (showOnly && favs.length > 0) {
-                shareBtn.style.display = 'flex';
-            } else {
-                shareBtn.style.display = 'none';
-            }
+            shareBtn.style.display = (showOnly && favs.length > 0) ? 'flex' : 'none';
         }
 
         cards.forEach(card => {
             const isAd = card.classList.contains('ad-card');
-            const isEnded = card.classList.contains('status-bg-encerrado'); 
-
+            
             if (isAd) {
                 if (blocksSinceLastAd >= 5) {
                     card.style.display = 'flex';
@@ -683,21 +609,24 @@
             } else {
                 const id = card.dataset.id;
                 const isFav = favs.includes(id);
+                const isEnded = card.classList.contains('status-bg-encerrado'); 
                 
+                // Gerencia classe visual de favorito
                 if (isFav) card.classList.add('is-favorite');
                 else card.classList.remove('is-favorite');
 
+                // Decide se deve mostrar o card
                 let shouldShow = true;
                 if (showOnly && !isFav) shouldShow = false;
                 
-                if (shouldShow && !isEnded) {
+                if (shouldShow) {
                     card.style.display = 'flex';
-                    visibleBlockCount++;
-                    blocksSinceLastAd++; 
-                } else if (shouldShow) {
-                     card.style.display = 'flex';
-                     visibleBlockCount++;
-                     blocksSinceLastAd++;
+                    blocksSinceLastAd++;
+                    
+                    // NOVA LÓGICA: Só incrementa o contador se NÃO estiver encerrado
+                    if (!isEnded) {
+                        visibleBlockCount++; 
+                    }
                 } else {
                     card.style.display = 'none';
                 }
@@ -708,7 +637,8 @@
         if (totalElement) {
             totalElement.textContent = `${visibleBlockCount} blocos encontrados.`;
         }
-
+        
+        // Atualiza os marcadores do mapa conforme visibilidade
         if (window.markersMap && window.markersFeatureGroup) {
             Object.keys(window.markersMap).forEach(id => {
                 const markerObj = window.markersMap[id];
@@ -734,7 +664,6 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    // --- LÓGICA DO POPUP DE BOAS-VINDAS ---
     const welcomeModal = document.getElementById('welcome-modal');
     const closeWelcomeBtn = document.getElementById('close-welcome-btn');
     const hasSeenWelcome = localStorage.getItem('seen_welcome_msg_v1');
@@ -747,7 +676,6 @@ document.addEventListener('DOMContentLoaded', function () {
         closeWelcomeBtn.addEventListener('click', () => {
             welcomeModal.classList.remove('show');
             localStorage.setItem('seen_welcome_msg_v1', 'true');
-            // EVENTO: FECHAR TUTORIAL
             trackEvent('fechar_tutorial', {'origem': 'modal_boas_vindas'});
         });
     }
@@ -763,13 +691,21 @@ document.addEventListener('DOMContentLoaded', function () {
     if(favToggle) { 
         favToggle.addEventListener('change', function() {
             applyFavoritesUI();
-            // NOVO EVENTO: TOGGLE FAVORITOS
             trackEvent('filtrar_meus_blocos', {
                 'acao': this.checked ? 'ativar' : 'desativar'
             });
         }); 
     }
     applyFavoritesUI();
+
+    const quickFilters = document.querySelectorAll('input[name="quick_filter"]');
+    quickFilters.forEach(qf => {
+        qf.addEventListener('change', function() {
+            if(this.checked) {
+                trackEvent('clique_filtro_rapido', {'filtro': this.value});
+            }
+        });
+    });
 
     const mapElement = document.getElementById('map');
     if (mapElement) {

@@ -402,5 +402,397 @@
     "Rua José Coutinho, 160, Centro - Savassi": {
         "lat": -19.919168,
         "lon": -43.9386558
+    },
+    "Quadra da Escola de Samba Cidade Jardim (R. do Mercado, 47, Conjunto Santa Maria)": {
+        "lat": -19.9526989,
+        "lon": -43.9592275
+    },
+    "Praça da Comunidade, Dom Cabral": {
+        "lat": -19.9232175,
+        "lon": -43.9988336
+    },
+    "A Casa (R. Padre Marinho, 30, Santa Efigênia)": {
+        "lat": -19.9260483,
+        "lon": -43.9202403
+    },
+    "The Mexican (Av. Silviano Brandão, 1891, Sagrada Familia)": {
+        "lat": -19.9113491,
+        "lon": -43.91980299999999
+    },
+    "Parque do Brejinho, Indaía": {
+        "lat": -19.8670312,
+        "lon": -43.9540112
+    },
+    "Praça da Liberdade": {
+        "lat": -19.9329185,
+        "lon": -43.938381
+    },
+    "Viaduto Santa Tereza, Centro": {
+        "lat": -19.9200743,
+        "lon": -43.934761
+    },
+    "Underground Pub (Av. Itaú, 540, Dom Cabral)": {
+        "lat": -19.919067,
+        "lon": -43.9944808
+    },
+    "Autêntica (R. Álvares Maciel, 312, Santa Efigênia)": {
+        "lat": -19.9242728,
+        "lon": -43.92250060000001
+    },
+    "Bar e Espetaria Upa (R. Dourada, 2509, Alto dos Pinheiros)": {
+        "lat": -19.9278272,
+        "lon": -44.0061247
+    },
+    "Mister Rock (Av. Teresa Cristina, 295, Prado)": {
+        "lat": -19.9192305,
+        "lon": -43.95952070000001
+    },
+    "ABESC (R. Michel Echenique, 322, Horto)": {
+        "lat": -19.8878859,
+        "lon": -43.9145852
+    },
+    "Praça Duque de Caxias, Santa Tereza": {
+        "lat": -19.9164193,
+        "lon": -43.917815
+    },
+    "CEFET Campus I (Av. Amazonas, 5253, Nova Suíça)": {
+        "lat": -19.9327936,
+        "lon": -43.9848113
+    },
+    "Praça Nossa Senhora da Paz, Planalto": {
+        "lat": -19.8302739,
+        "lon": -43.9568399
+    },
+    "Galpão 73 (R. Hilda de Carvalho Garzon, 73, Dona Clara)": {
+        "lat": -19.8613855,
+        "lon": -43.9394139
+    },
+    "Bar do Palé (R. Dr. Pedro Pinto, 292, Caiçara)": {
+        "lat": -19.9024212,
+        "lon": -43.9717204
+    },
+    "Ocupação MTD Pátria Livre (R. Pedro Lessa, 435, Santo André)": {
+        "lat": -19.9044346,
+        "lon": -43.9503109
+    },
+    "Recanto Buri (Av. Mario Werneck, 515, Buritis)": {
+        "lat": -19.9691507,
+        "lon": -43.9579025
+    },
+    "R. 4, nº 86, Conjunto Santa Maria": {
+        "lat": -19.9520582,
+        "lon": -43.9575726
+    },
+    "The Mexican (Av. Silviano Brandão, 1891, Sagrada Família)": {
+        "lat": -19.9113491,
+        "lon": -43.91980299999999
+    },
+    "Casa da Pedreira (R. Araribá, 285, São Cristóvão)": {
+        "lat": -19.9009809,
+        "lon": -43.9476241
+    },
+    "Praça do Boa Vista": {
+        "lat": -19.893593,
+        "lon": -43.9036442
+    },
+    "AMA Cultural (Av. dos Andradas 2808, Santa Efigênia)": {
+        "lat": -19.9210192,
+        "lon": -43.92338950000001
+    },
+    "Casa Bantu (R. Jequiriçá, 106, Concórdia)": {
+        "lat": -19.898255,
+        "lon": -43.93744
+    },
+    "Lagoa do Nado (R. Min. Hermenegildo de Barros, 904, Itapoa)": {
+        "lat": -19.8325162,
+        "lon": -43.9607941
+    },
+    "CENARAB (R. Desembargador Barcelos, 102, Calafate)": {
+        "lat": -19.9253643,
+        "lon": -43.97244999999999
+    },
+    "Complexo Esportivo Fê Faria (R. Onix, 85, São Joaquim)": {
+        "lat": -19.8816674,
+        "lon": -44.0319063
+    },
+    "R. Araribá, 285, Concórdia": {
+        "lat": -19.9009809,
+        "lon": -43.9476241
+    },
+    "Escola Estadual Cândido Portinari (R. Campina Verde, s/n, Salgado Filho)": {
+        "lat": -19.9453743,
+        "lon": -43.9831358
+    },
+    "Ama Cultural (Av. dos Andradas, 2808, Santa Efigênia)": {
+        "lat": -19.9210192,
+        "lon": -43.92338950000001
+    },
+    "R. Alvares Maciel, 312, Santa Efigênia": {
+        "lat": -19.9242728,
+        "lon": -43.92250060000001
+    },
+    "Av. Américo Vespúcio, 915, Aparecida": {
+        "lat": -19.8922664,
+        "lon": -43.9579549
+    },
+    "Bar do Tião (R. Agnelo Macedo, 290, Barreiro)": {
+        "lat": -19.9763353,
+        "lon": -44.0192323
+    },
+    "R. Oliem Bonfim Guimarães, 105, Nossa Senhora da Conceição": {
+        "lat": -19.9364325,
+        "lon": -43.9123686
+    },
+    "Bar du Beto (R. Deputado Bernardino Sena Figueiredo, 1011, Cidade Nova)": {
+        "lat": -19.8894595,
+        "lon": -43.92056669999999
+    },
+    "Arena (Av. Mem de Sá, 143, Santa Efigênia)": {
+        "lat": -19.9190631,
+        "lon": -43.9099385
+    },
+    "Av. Santa Matilde, 255, Dom Cabral": {
+        "lat": -19.923754,
+        "lon": -43.999979
+    },
+    "R. Carmo da Mata, 644, Vera Cruz": {
+        "lat": -19.9153053,
+        "lon": -43.8979164
+    },
+    "Viaduto Santa Tereza": {
+        "lat": -19.9200743,
+        "lon": -43.934761
+    },
+    "The Mexican (Av. Silviano Brandão, 1891, Horto)": {
+        "lat": -19.9113491,
+        "lon": -43.91980299999999
+    },
+    "Quintal Casa de Cultura (R. Padre Marinho, 30, Santa Efigênia)": {
+        "lat": -19.926072,
+        "lon": -43.920222
+    },
+    "A Autêntica (R. Álvares Maciel, 312, Santa Efigênia)": {
+        "lat": -19.9242728,
+        "lon": -43.92250060000001
+    },
+    "Bar Opção (R. Alabandina, 619, Caiçara)": {
+        "lat": -19.8925037,
+        "lon": -43.9691353
+    },
+    "Praça Carlos Marques, Calafate": {
+        "lat": -19.9235877,
+        "lon": -43.9686789
+    },
+    "Underground Black Club (Av. Itaú, 540, Dom Cabral)": {
+        "lat": -19.919067,
+        "lon": -43.9944808
+    },
+    "Praça Geraldo Torres, Padre Eustáquio": {
+        "lat": -19.9187822,
+        "lon": -43.9766604
+    },
+    "Mister Rock (Av. Tereza Cristina, 295, Prado)": {
+        "lat": -19.9192305,
+        "lon": -43.95952070000001
+    },
+    "Barzenho (R. Itapecerica, 865, Lagoinha)": {
+        "lat": -19.906693,
+        "lon": -43.9463819
+    },
+    "Espaço Du Forró (R. Peçanha, 533, Carlos Prates)": {
+        "lat": -19.9163176,
+        "lon": -43.9488495
+    },
+    "Pizzaria Mangabeiras (R. Iraí, 235, Luxemburgo)": {
+        "lat": -19.9473217,
+        "lon": -43.9494901
+    },
+    "Bar 30 (R. Gabro, 35, Saanta Tereza)": {
+        "lat": -19.9153639,
+        "lon": -43.9210577
+    },
+    "R. Mercúrio, 31, Bom Retiro": {
+        "lat": -19.910543,
+        "lon": -43.9826067
+    },
+    "Jângal (R. Outono, 523, Carmo)": {
+        "lat": -19.9426655,
+        "lon": -43.9293252
+    },
+    "CCPE (R. Jacutinga, 550, Padre Eustáquio)": {
+        "lat": -19.9148145,
+        "lon": -43.9887351
+    },
+    "Sede do Grupo Aruanda (R. Espírito Santo, 757, Centro)": {
+        "lat": -19.921225,
+        "lon": -43.9377
+    },
+    "R. Porto Alegre, 495, Carlos Prates": {
+        "lat": -19.9151353,
+        "lon": -43.961511
+    },
+    "Bar do Chico (R. Conselheiro Rocha, 1605, Santa Tereza)": {
+        "lat": -19.917587,
+        "lon": -43.919603
+    },
+    "Mercado da Lagoinha (R. Formiga, 140, Lagoinha)": {
+        "lat": -19.9048517,
+        "lon": -43.9451063
+    },
+    "Praça Comendador Negrão de Lima, Floresta": {
+        "lat": -19.9104437,
+        "lon": -43.930584
+    },
+    "Centro Cultural Salgado Filho (R. Ponte Nova, 22, Salgado Filho)": {
+        "lat": -19.9449409,
+        "lon": -43.985319
+    },
+    "Praça da Abadia, Esplanada": {
+        "lat": -19.9050527,
+        "lon": -43.9031293
+    },
+    "Casa da Pedreira (R. Araribá, 285, Concórdia)": {
+        "lat": -19.9009809,
+        "lon": -43.9476241
+    },
+    "Dimas Bar e Restaurante (R. Padre Eustáquio, 1010, Carlos Prates)": {
+        "lat": -19.91147,
+        "lon": -43.9629525
+    },
+    "Choperia Carcará (Av. Santa Matilde, 500, Dom Cabral)": {
+        "lat": -19.9250469,
+        "lon": -43.9985417
+    },
+    "R. Aloísio Aragão Villar, 370, Trevo": {
+        "lat": -19.8342766,
+        "lon": -44.0056465
+    },
+    "Praça Antônio André de Miranda, Nova Esperança": {
+        "lat": -19.8989739,
+        "lon": -43.9569737
+    },
+    "Parque do Brejinho, Indaiá": {
+        "lat": -19.8670312,
+        "lon": -43.9540112
+    },
+    "Praça dos Agricultores, Castelo": {
+        "lat": -19.8870532,
+        "lon": -44.0044175
+    },
+    "Mi Corazón (R. Sapucaí, 511, Floresta)": {
+        "lat": -19.9182581,
+        "lon": -43.9327107
+    },
+    "Praça do Planalto": {
+        "lat": -19.8325412,
+        "lon": -43.9433717
+    },
+    "Kilombo Souza (R. Teixeira Soares, 985, Santa Tereza)": {
+        "lat": -19.9136281,
+        "lon": -43.9167886
+    },
+    "Petico Di Buteco (Av. Serrana, 650, Serrano)": {
+        "lat": -19.8802889,
+        "lon": -44.01145229999999
+    },
+    "R. Sapucaí": {
+        "lat": -19.9163142,
+        "lon": -43.9323177
+    },
+    "Parque do Palácio (R. Prof. Djalma Guimarães, 161, Mangabeiras)": {
+        "lat": -19.955545,
+        "lon": -43.9118542
+    },
+    "Centro Cultural Venda Nova (R. José Ferreira dos Santos, 184, Jardim dos Comerciantes)": {
+        "lat": -19.7998129,
+        "lon": -43.9725871
+    },
+    "Praça da Estação": {
+        "lat": -19.9168158,
+        "lon": -43.933902
+    },
+    "Praça Capela Nova, Minas Brasil": {
+        "lat": -19.9160291,
+        "lon": -43.991477
+    },
+    "Quintal Longue Bar (Av. General Olimpio Mourão Filho, 411, Planalto)": {
+        "lat": -19.831768,
+        "lon": -43.9579661
+    },
+    "Escola Pituchinha (R. Marquês de Lavradio, 619, Alto dos Pinheiros)": {
+        "lat": -19.9291416,
+        "lon": -44.0027464
+    },
+    "BARzenho (R. Itapecerica, 865, Lagoinha)": {
+        "lat": -19.906693,
+        "lon": -43.9463819
+    },
+    "Guarapa's Bar (Av. Guarapari, 646, Santa Amélia)": {
+        "lat": -19.8402526,
+        "lon": -43.97751239999999
+    },
+    "Bendito Chopp (R. Campos Sales, 638, Calafate)": {
+        "lat": -19.9278208,
+        "lon": -43.9793802
+    },
+    "Casa da Família (R. das Garças, 83, Santo André)": {
+        "lat": -19.9027061,
+        "lon": -43.95300049999999
+    },
+    "R. Antônio Teixeira Dias, 2013, Santa Helena": {
+        "lat": -19.9887561,
+        "lon": -44.0143186
+    },
+    "Quintal Vegan (R. Pitangui, 175, Concórdia)": {
+        "lat": -19.9000911,
+        "lon": -43.9434739
+    },
+    "Distrital (R. Opala, 55, Cruzeiro)": {
+        "lat": -19.942297,
+        "lon": -43.9261397
+    },
+    "Portaria 1959 (Av. Amazonas, 1057, Centro)": {
+        "lat": -19.9223144,
+        "lon": -43.9440462
+    },
+    "AMA Cultural (Av. dos Andradas, 2808, Santa Efigênia)": {
+        "lat": -19.9210192,
+        "lon": -43.92338950000001
+    },
+    "Na Arena (Av. Mem de Sá, 143, Santa Efigênia)": {
+        "lat": -19.9190631,
+        "lon": -43.9099385
+    },
+    "Praça Arcângelo Maleta, Santa Lúcia": {
+        "lat": -19.9674586,
+        "lon": -43.9516284
+    },
+    "Em Canto Bar du Beto (R. Dep. Bernardino Sena Figueiredo, 1011, Cidade Nova)": {
+        "lat": -19.8895051,
+        "lon": -43.92055089999999
+    },
+    "Praça México, Concórdia": {
+        "lat": -19.9019007,
+        "lon": -43.9356207
+    },
+    "A divulgar": {
+        "lat": -19.919052,
+        "lon": -43.9386685
+    },
+    "Quintal do Chalé (Av. Professor Mário Werneck, 530, Estoril)": {
+        "lat": -19.968118,
+        "lon": -43.95747
+    },
+    "R. Conceição Pinto Ferreira, 240, Alto Caiçara": {
+        "lat": -19.8992203,
+        "lon": -43.974461
+    },
+    "Em breve": {
+        "lat": -19.8636337,
+        "lon": -43.9322303
+    },
+    "Casa da Família Santo André (R. das Garças, 83, Santo André)": {
+        "lat": -19.9027061,
+        "lon": -43.95300049999999
     }
 }
