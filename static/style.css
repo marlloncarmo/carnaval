@@ -277,7 +277,7 @@ input:checked + .slider:before { transform: translateX(16px); }
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     line-height: 1.4;
 }
 
@@ -777,4 +777,116 @@ body.dark-mode .desktop-map-ad p { color: #ccc; }
 }
 .btn-ingresso:hover {
     background-color: #34495e;
+}
+
+/* --- MODAL DE NAVEGAÇÃO (ESTILO APP MODERN + ÍCONES) --- */
+.nav-modal-content {
+    background: var(--card-background);
+    width: 90%;
+    max-width: 340px; /* Mais compacto */
+    padding: 25px;
+    border-radius: 24px; /* Mais arredondado */
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    position: relative;
+    margin: 15% auto; /* Centraliza verticalmente */
+}
+
+/* Título do Modal */
+.nav-modal-content h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* Grid dos botões */
+.nav-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Botões de Navegação */
+.nav-option-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinha ícone e texto */
+    gap: 20px; /* Espaço maior entre ícone e texto */
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+}
+
+.nav-option-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.nav-option-btn:active {
+    transform: scale(0.98);
+}
+
+/* Tamanho dos ícones dentro do botão */
+.nav-option-btn img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Botão Google Maps */
+.btn-google {
+    background-color: #f8f9fa;
+    color: #3c4043;
+    border: 1px solid #e8eaed;
+}
+
+/* Dark Mode para botão Google */
+body.dark-mode .btn-google {
+    background-color: #303134;
+    color: #e8eaed;
+    border-color: #5f6368;
+}
+
+/* Botão Waze */
+.btn-waze {
+    background-color: #33ccff; /* Azul Waze */
+    color: white;
+    box-shadow: 0 4px 12px rgba(51, 204, 255, 0.25);
+}
+.btn-waze:hover {
+    background-color: #00c3ff;
+    box-shadow: 0 6px 15px rgba(51, 204, 255, 0.35);
+}
+
+/* Botão Fechar (X) mais discreto */
+.nav-modal-content .close-modal-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+.nav-modal-content .close-modal-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+    color: var(--primary-accent);
 }

@@ -117,7 +117,7 @@
                 <div class="info-icon">🚧</div>
                 <div class="info-text">
                     <strong>Atenção:</strong> A lista oficial da PBH ainda não saiu. 
-                    Exibindo apenas <strong>Ensaios</strong> e <strong>Pré-Carnaval</strong> confirmados por enquanto!
+                    Exibindo apenas <strong>Ensaios</strong> confirmados por enquanto!
                 </div>
             </div>
 
@@ -294,6 +294,24 @@
             </div>
         </div>
 
+        <div id="nav-modal" class="modal" style="z-index: 4000;">
+            <div class="modal-content nav-modal-content">
+                <button onclick="closeNavModal()" class="close-modal-btn">×</button>
+                <h3>Como você quer ir? 🚗</h3>
+                
+                <div class="nav-options">
+                    <button class="nav-option-btn btn-google" onclick="openApp('google')">
+                        <img src="{{ url_for('static', filename='images/googlemaps-logo.png') }}" alt="Google Maps">
+                        Google Maps
+                    </button>
+                    <button class="nav-option-btn btn-waze" onclick="openApp('waze')">
+                        <img src="{{ url_for('static', filename='images/waze-logo.png') }}" alt="Waze">
+                        Waze
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
 
@@ -304,12 +322,7 @@
 <script>
     const hasActiveFilters = {{ 'true' if has_filters else 'false' }};
 
-    const ICONS = {
-        kids: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19 13H17.91C17.64 10.09 15.33 7.78 12.41 7.54V6C12.41 3.69 13.95 1.78 16.1 1.22C16.7 1.06 17.07 0.43 16.91 -0.17C16.75 -0.77 16.12 -1.14 15.52 -0.98C12.59 0.04 10.37 2.22 10.04 5H9.96C6.66 5.37 4 8.27 4 11.75V15H6V18C6 19.66 7.34 21 9 21C10.66 21 12 19.66 12 18V15H15.5V18C15.5 19.66 16.84 21 18.5 21C20.16 21 21.5 19.66 21.5 18V16.29C23.05 15.38 24 13.62 24 11.75V11C24 10.45 23.55 10 23 10C22.45 10 22 10.45 22 11V11.75C22 12.85 21.1 13.75 20 13.75V13H19ZM9 18C8.45 18 8 17.55 8 17V15H10V17C10 17.55 9.55 18 9 18ZM18.5 18C17.95 18 17.5 17.55 17.5 17V16H19.5V17C19.5 17.55 19.05 18 18.5 18Z" transform="translate(0, 2)"/> </svg>`,
-        lgbt: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" stroke="none"><rect x="2" y="4" width="28" height="4" fill="#FF4B4B"/><rect x="2" y="8" width="28" height="4" fill="#FFB04B"/><rect x="2" y="12" width="28" height="4" fill="#FFEB3B"/><rect x="2" y="16" width="28" height="4" fill="#4CAF50"/><rect x="2" y="20" width="28" height="4" fill="#2196F3"/><rect x="2" y="24" width="28" height="4" fill="#9C27B0"/></svg>`,
-        pet: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C10.5 2 9 3.5 9 5C9 6.5 10.5 8 12 8C13.5 8 15 6.5 15 5C15 3.5 13.5 2 12 2ZM5 5C3.5 5 2 6.5 2 8C2 9.5 3.5 11 5 11C6.5 11 8 9.5 8 8C8 6.5 6.5 5 5 5ZM19 5C17.5 5 16 6.5 16 8C16 9.5 17.5 11 19 11C20.5 11 22 9.5 22 8C22 6.5 20.5 5 19 5ZM4 13.5C4 16.5 6 22 12 22C18 22 20 16.5 20 13.5C20 12 18 10 16 10C14.5 10 14 11 12 11C10 11 9.5 10 8 10C6 10 4 12 4 13.5Z"/></svg>`
-    };
-
+    // --- CONFIGURAÇÃO E CACHE ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); });
     }
@@ -319,6 +332,7 @@
         'hoje': '#8e44ad', 'encerrado': '#95a5a6', 'futuro': '#E91E63'
     };
 
+    // --- FUNÇÕES UTILITÁRIAS ---
     function cleanUrlParams() {
         const url = new URL(window.location);
         const paramsToRemove = [
@@ -349,12 +363,12 @@
         window.location.href = '/';
     }
 
+    // --- COMPARTILHAMENTO ---
     function shareBlock(id, title, date, event) {
         event.stopPropagation();
         
         const baseUrl = window.location.origin + window.location.pathname;
         const link = `${baseUrl}?highlight_id=${id}`;
-        
         const lines = [
             "🎭 *Olha esse bloco que eu achei!*",
             "",
@@ -368,11 +382,7 @@
         const message = lines.join("\n");
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         
-        trackEvent('compartilhar_whatsapp', {
-            'bloco_id': id,
-            'bloco_nome': title
-        });
-        
+        trackEvent('compartilhar_whatsapp', { 'bloco_id': id, 'bloco_nome': title });
         window.open(waUrl, '_blank');
     }
 
@@ -391,14 +401,12 @@
         
         allCards.forEach(card => {
             const id = card.dataset.id;
-            
             if (favs.includes(id)) {
                 const title = card.querySelector('h2').innerText;
                 const rawDateText = card.querySelector('.date-wrapper strong').innerText;
                 
                 let datePart = rawDateText;
                 let timePart = "";
-
                 if (rawDateText.includes('-')) {
                     const parts = rawDateText.split('-');
                     datePart = parts[0].trim();
@@ -406,19 +414,14 @@
                 }
 
                 if (datePart !== lastDay) {
-                    if (hasItems) {
-                        msg += "----------------------------------\n\n";
-                    }
+                    if (hasItems) msg += "----------------------------------\n\n";
                     msg += `🗓️ *${datePart}*\n\n`;
                     lastDay = datePart;
                 }
                 
                 msg += `🎉 *${title}*\n`;
-                if (timePart) {
-                    msg += `⏰ ${timePart}\n\n`;
-                } else {
-                    msg += `\n`;
-                }
+                if (timePart) msg += `⏰ ${timePart}\n\n`;
+                else msg += `\n`;
                 
                 hasItems = true;
             }
@@ -430,41 +433,72 @@
         }
 
         msg += "👇 *Monte sua lista também em:*\n" + window.location.origin;
-        
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
         
-        trackEvent('compartilhar_lista', {
-            'quantidade': favs.length
-        });
-        
+        trackEvent('compartilhar_lista', { 'quantidade': favs.length });
         window.open(waUrl, '_blank');
     }
+
+    // --- LÓGICA DE NAVEGAÇÃO CORRIGIDA (GOOGLE & WAZE) ---
+    let currentDestLat = null;
+    let currentDestLon = null;
 
     function getDirections(destLat, destLon, event) {
         if(event) event.stopPropagation();
         
-        trackEvent('como_chegar', {
+        currentDestLat = destLat;
+        currentDestLon = destLon;
+        
+        const modal = document.getElementById('nav-modal');
+        if (modal) modal.classList.add('show');
+        
+        trackEvent('abrir_opcoes_rota', {
             'destino_lat': destLat,
             'destino_lon': destLon
         });
-
-        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`;
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const userLat = position.coords.latitude;
-                    const userLng = position.coords.longitude;
-                    window.open(`${mapsUrl}&origin=${userLat},${userLng}`, '_blank');
-                },
-                (error) => {
-                    window.open(mapsUrl, '_blank');
-                }
-            );
-        } else {
-            window.open(mapsUrl, '_blank');
-        }
     }
+
+    function closeNavModal() {
+        const modal = document.getElementById('nav-modal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    function openApp(app) {
+        let url = '';
+        const lat = parseFloat(currentDestLat);
+        const lon = parseFloat(currentDestLon);
+        
+        // Detecção simples de dispositivo móvel
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (app === 'google') {
+            // URL Universal Google Maps (Funciona perfeito Desktop e Mobile)
+            // 'dir' força direções, 'api=1' é obrigatório.
+            url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=driving`;
+        } 
+        else if (app === 'waze') {
+            if (isMobile) {
+                // Link para Mobile: Força a abertura do App com navegação iniciada
+                url = `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`;
+            } else {
+                // Link para Desktop: Abre a interface "Live Map" do Waze já com a caixa de destino
+                // Isso força a barra lateral a aparecer pedindo "Sua localização"
+                url = `https://www.waze.com/live-map/directions?to=ll.${lat}%2C${lon}`;
+            }
+        }
+
+        closeNavModal();
+        window.open(url, '_blank');
+        
+        trackEvent('como_chegar_click', { 'app': app, 'device': isMobile ? 'mobile' : 'desktop' });
+    }
+    
+    // Fechar modal ao clicar fora
+    window.addEventListener('click', (e) => {
+        const navModal = document.getElementById('nav-modal');
+        if (e.target === navModal) closeNavModal();
+    });
+    // -----------------------------------------------------
 
     function selectCardFromMap(id) {
         const card = document.querySelector(`.evento-card[data-id="${id}"]`);
@@ -572,19 +606,10 @@
 
         if (favs.includes(id)) {
             favs = favs.filter(fid => fid !== id);
-            trackEvent('favoritar_bloco', {
-                'acao': 'remover',
-                'bloco_id': id,
-                'bloco_nome': blockName
-            });
-
+            trackEvent('favoritar_bloco', { 'acao': 'remover', 'bloco_id': id, 'bloco_nome': blockName });
         } else {
             favs.push(id);
-            trackEvent('favoritar_bloco', {
-                'acao': 'adicionar',
-                'bloco_id': id,
-                'bloco_nome': blockName
-            });
+            trackEvent('favoritar_bloco', { 'acao': 'adicionar', 'bloco_id': id, 'bloco_nome': blockName });
         }
         
         localStorage.setItem('my_blocos', JSON.stringify(favs));
@@ -606,7 +631,6 @@
 
         cards.forEach(card => {
             const isAd = card.classList.contains('ad-card');
-            
             if (isAd) {
                 if (blocksSinceLastAd >= 5) {
                     card.style.display = 'flex';
@@ -619,22 +643,16 @@
                 const isFav = favs.includes(id);
                 const isEnded = card.classList.contains('status-bg-encerrado'); 
                 
-                // Gerencia classe visual de favorito
                 if (isFav) card.classList.add('is-favorite');
                 else card.classList.remove('is-favorite');
 
-                // Decide se deve mostrar o card
                 let shouldShow = true;
                 if (showOnly && !isFav) shouldShow = false;
                 
                 if (shouldShow) {
                     card.style.display = 'flex';
                     blocksSinceLastAd++;
-                    
-                    // NOVA LÓGICA: Só incrementa o contador se NÃO estiver encerrado
-                    if (!isEnded) {
-                        visibleBlockCount++; 
-                    }
+                    if (!isEnded) visibleBlockCount++; 
                 } else {
                     card.style.display = 'none';
                 }
@@ -646,294 +664,277 @@
             totalElement.textContent = `${visibleBlockCount} blocos encontrados.`;
         }
         
-        // Atualiza os marcadores do mapa conforme visibilidade
         if (window.markersMap && window.markersFeatureGroup) {
             Object.keys(window.markersMap).forEach(id => {
                 const markerObj = window.markersMap[id];
                 const isFav = favs.includes(id);
                 if (showOnly) {
                     if (isFav) {
-                        if (!window.markersFeatureGroup.hasLayer(markerObj.marker)) {
-                            window.markersFeatureGroup.addLayer(markerObj.marker);
-                        }
+                        if (!window.markersFeatureGroup.hasLayer(markerObj.marker)) window.markersFeatureGroup.addLayer(markerObj.marker);
                     } else {
-                        if (window.markersFeatureGroup.hasLayer(markerObj.marker)) {
-                            window.markersFeatureGroup.removeLayer(markerObj.marker);
+                        if (window.markersFeatureGroup.hasLayer(markerObj.marker)) window.markersFeatureGroup.removeLayer(markerObj.marker);
+                    }
+                } else {
+                    if (!window.markersFeatureGroup.hasLayer(markerObj.marker)) window.markersFeatureGroup.addLayer(markerObj.marker);
+                }
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const welcomeModal = document.getElementById('welcome-modal');
+        const closeWelcomeBtn = document.getElementById('close-welcome-btn');
+        const hasSeenWelcome = localStorage.getItem('seen_welcome_msg_v1');
+
+        if (!hasSeenWelcome && welcomeModal) {
+            setTimeout(() => { welcomeModal.classList.add('show'); }, 500);
+        }
+
+        if (closeWelcomeBtn && welcomeModal) {
+            closeWelcomeBtn.addEventListener('click', () => {
+                welcomeModal.classList.remove('show');
+                localStorage.setItem('seen_welcome_msg_v1', 'true');
+                trackEvent('fechar_tutorial', {'origem': 'modal_boas_vindas'});
+            });
+        }
+
+        const activeParams = new URLSearchParams(window.location.search);
+        const highlightId = activeParams.get('highlight_id');
+
+        cleanUrlParams();
+
+        flatpickr("#data_filtro", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m", locale: "pt", disableMobile: "true" });
+
+        const favToggle = document.getElementById('show-favorites-only');
+        if(favToggle) { 
+            favToggle.addEventListener('change', function() {
+                applyFavoritesUI();
+                trackEvent('filtrar_meus_blocos', { 'acao': this.checked ? 'ativar' : 'desativar' });
+            }); 
+        }
+        applyFavoritesUI();
+
+        const quickFilters = document.querySelectorAll('input[name="quick_filter"]');
+        quickFilters.forEach(qf => {
+            qf.addEventListener('change', function() {
+                if(this.checked) trackEvent('clique_filtro_rapido', {'filtro': this.value});
+            });
+        });
+
+        const mapElement = document.getElementById('map');
+        if (mapElement) {
+            const formLat = document.getElementById('center_lat').value;
+            const formLng = document.getElementById('center_lng').value;
+            const formZoom = document.getElementById('zoom').value;
+
+            let initialView = [-19.9167, -43.9345];
+            let initialZoom = 13;
+            let isSavedState = false;
+
+            if (formLat && formLng && formZoom) {
+                initialView = [parseFloat(formLat), parseFloat(formLng)];
+                initialZoom = parseInt(formZoom);
+                isSavedState = true;
+            } 
+            else if (!highlightId) {
+                const savedMapState = localStorage.getItem('mapState');
+                if (savedMapState) {
+                    try {
+                        const parsedState = JSON.parse(savedMapState);
+                        if (parsedState.lat && parsedState.lng && parsedState.zoom) {
+                            initialView = [parsedState.lat, parsedState.lng];
+                            initialZoom = parsedState.zoom;
                         }
-                    }
-                } else {
-                    if (!window.markersFeatureGroup.hasLayer(markerObj.marker)) {
-                        window.markersFeatureGroup.addLayer(markerObj.marker);
-                    }
+                    } catch(e) { console.error("Map state error", e); }
                 }
-            });
-        }
-    }
-
-document.addEventListener('DOMContentLoaded', function () {
-    
-    const welcomeModal = document.getElementById('welcome-modal');
-    const closeWelcomeBtn = document.getElementById('close-welcome-btn');
-    const hasSeenWelcome = localStorage.getItem('seen_welcome_msg_v1');
-
-    if (!hasSeenWelcome && welcomeModal) {
-        setTimeout(() => { welcomeModal.classList.add('show'); }, 500);
-    }
-
-    if (closeWelcomeBtn && welcomeModal) {
-        closeWelcomeBtn.addEventListener('click', () => {
-            welcomeModal.classList.remove('show');
-            localStorage.setItem('seen_welcome_msg_v1', 'true');
-            trackEvent('fechar_tutorial', {'origem': 'modal_boas_vindas'});
-        });
-    }
-
-    const activeParams = new URLSearchParams(window.location.search);
-    const highlightId = activeParams.get('highlight_id');
-
-    cleanUrlParams();
-
-    flatpickr("#data_filtro", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m", locale: "pt", disableMobile: "true" });
-
-    const favToggle = document.getElementById('show-favorites-only');
-    if(favToggle) { 
-        favToggle.addEventListener('change', function() {
-            applyFavoritesUI();
-            trackEvent('filtrar_meus_blocos', {
-                'acao': this.checked ? 'ativar' : 'desativar'
-            });
-        }); 
-    }
-    applyFavoritesUI();
-
-    const quickFilters = document.querySelectorAll('input[name="quick_filter"]');
-    quickFilters.forEach(qf => {
-        qf.addEventListener('change', function() {
-            if(this.checked) {
-                trackEvent('clique_filtro_rapido', {'filtro': this.value});
             }
-        });
-    });
 
-    const mapElement = document.getElementById('map');
-    if (mapElement) {
-        const formLat = document.getElementById('center_lat').value;
-        const formLng = document.getElementById('center_lng').value;
-        const formZoom = document.getElementById('zoom').value;
+            window.mapInstance = L.map('map', { zoomControl: false }).setView(initialView, initialZoom);
+            L.control.zoom({ position: 'topleft' }).addTo(window.mapInstance);
 
-        let initialView = [-19.9167, -43.9345];
-        let initialZoom = 13;
-        let isSavedState = false;
-
-        if (formLat && formLng && formZoom) {
-            initialView = [parseFloat(formLat), parseFloat(formLng)];
-            initialZoom = parseInt(formZoom);
-            isSavedState = true;
-        } 
-        else if (!highlightId) {
-            const savedMapState = localStorage.getItem('mapState');
-            if (savedMapState) {
-                try {
-                    const parsedState = JSON.parse(savedMapState);
-                    if (parsedState.lat && parsedState.lng && parsedState.zoom) {
-                        initialView = [parsedState.lat, parsedState.lng];
-                        initialZoom = parsedState.zoom;
-                    }
-                } catch(e) { console.error("Map state error", e); }
-            }
-        }
-
-        window.mapInstance = L.map('map', { zoomControl: false }).setView(initialView, initialZoom);
-        L.control.zoom({ position: 'topleft' }).addTo(window.mapInstance);
-
-        window.mapInstance.on('moveend', function() {
-            const center = window.mapInstance.getCenter();
-            const zoom = window.mapInstance.getZoom();
-            const state = { lat: center.lat, lng: center.lng, zoom: zoom };
-            localStorage.setItem('mapState', JSON.stringify(state));
-            
-            const searchBtn = document.getElementById('search-in-map-btn');
-            if(searchBtn) searchBtn.classList.add('visible');
-        });
-
-        const ResetViewControl = L.Control.extend({
-            options: { position: 'topright' },
-            onAdd: function(map) {
-                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom leaflet-control-reset');
-                const button = L.DomUtil.create('a', '', container);
-                button.title = "Visualizar Todos";
-                button.href = "#";
-                button.onclick = function(e) {
-                    e.preventDefault();
-                    if (window.markersFeatureGroup) {
-                        map.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [20, 20] });
-                    }
-                    return false;
-                };
-                return container;
-            }
-        });
-        window.mapInstance.addControl(new ResetViewControl());
-
-        const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { className: 'map-tiles' });
-        const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], className: 'satellite-tiles' });
-
-        const savedStyle = document.getElementById('map_style').value;
-        const satToggle = document.getElementById('satellite-toggle');
-        
-        const satContainer = document.getElementById('satellite-toggle-container');
-        if (satContainer) {
-            L.DomEvent.disableClickPropagation(satContainer);
-            L.DomEvent.disableScrollPropagation(satContainer);
-        }
-
-        if (savedStyle === 'satellite') { satelliteLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = true; } 
-        else { gpsLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = false; }
-
-        if (satToggle) {
-            satToggle.addEventListener('change', function() {
-                if (this.checked) {
-                    if (window.mapInstance.hasLayer(gpsLayer)) window.mapInstance.removeLayer(gpsLayer);
-                    satelliteLayer.addTo(window.mapInstance);
-                    document.getElementById('map_style').value = 'satellite';
-                } else {
-                    if (window.mapInstance.hasLayer(satelliteLayer)) window.mapInstance.removeLayer(satelliteLayer);
-                    gpsLayer.addTo(window.mapInstance);
-                    document.getElementById('map_style').value = 'gps';
-                }
-            });
-        }
-
-        const searchBtn = document.getElementById('search-in-map-btn');
-        if(searchBtn) {
-            searchBtn.addEventListener('click', () => { 
-                trackEvent('mapa_buscar_area', {'origem': 'mapa_btn_flutuante'});
-                const bounds = window.mapInstance.getBounds();
+            window.mapInstance.on('moveend', function() {
                 const center = window.mapInstance.getCenter();
                 const zoom = window.mapInstance.getZoom();
-                document.getElementById('ne_lat').value = bounds.getNorthEast().lat;
-                document.getElementById('ne_lng').value = bounds.getNorthEast().lng;
-                document.getElementById('sw_lat').value = bounds.getSouthWest().lat;
-                document.getElementById('sw_lng').value = bounds.getSouthWest().lng;
-                document.getElementById('center_lat').value = center.lat;
-                document.getElementById('center_lng').value = center.lng;
-                document.getElementById('zoom').value = zoom;
-                document.getElementById('filter-form').submit();
+                const state = { lat: center.lat, lng: center.lng, zoom: zoom };
+                localStorage.setItem('mapState', JSON.stringify(state));
+                
+                const searchBtn = document.getElementById('search-in-map-btn');
+                if(searchBtn) searchBtn.classList.add('visible');
             });
-        }
 
-        const locateBtn = document.getElementById('locate-btn');
-        let userMarker = null; 
-        let watchId = null; 
-        
-        if (locateBtn) {
-            locateBtn.addEventListener('click', function() {
-                trackEvent('mapa_localizacao_click', {'origem': 'mapa_btn'});
-                locateBtn.classList.add('active');
-
-                if (userMarker) {
-                    window.mapInstance.setView(userMarker.getLatLng(), 17);
-                    return; 
-                }
-
-                if (navigator.geolocation) {
-                    watchId = navigator.geolocation.watchPosition(
-                        function(position) {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            const newLatLng = [lat, lng];
-
-                            if (!userMarker) {
-                                const userIcon = L.divIcon({ className: 'user-location-marker', html: '<div class="user-dot"></div><div class="user-pulse"></div>', iconSize: [40, 40], iconAnchor: [20, 20] });
-                                userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
-                                window.mapInstance.setView(newLatLng, 17, { animate: true });
-                            } else {
-                                userMarker.setLatLng(newLatLng);
-                            }
-                        }, 
-                        function(error) { 
-                            alert("Erro ao obter localização ou permissão negada."); 
-                            locateBtn.classList.remove('active'); 
-                        }, 
-                        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
-                    );
-                } else {
-                    alert("Geolocalização não suportada.");
+            const ResetViewControl = L.Control.extend({
+                options: { position: 'topright' },
+                onAdd: function(map) {
+                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom leaflet-control-reset');
+                    const button = L.DomUtil.create('a', '', container);
+                    button.title = "Visualizar Todos";
+                    button.href = "#";
+                    button.onclick = function(e) {
+                        e.preventDefault();
+                        if (window.markersFeatureGroup) {
+                            map.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [20, 20] });
+                        }
+                        return false;
+                    };
+                    return container;
                 }
             });
-        }
+            window.mapInstance.addControl(new ResetViewControl());
 
-        window.markersFeatureGroup = L.featureGroup();
-        window.markersMap = {};
-        
-        const apiParams = new URLSearchParams(activeParams);
-        ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'].forEach(k => apiParams.delete(k));
-        
-        fetch("{{ url_for('api_eventos') }}?" + apiParams.toString())
-            .then(response => response.json())
-            .then(eventos => {
-                eventos.forEach(evento => {
-                    if (evento.status === 'encerrado') return; 
-                    if (evento.lat && evento.lon) {
-                        let radiusSize = 6; 
-                        if (evento.tamanho === 2) radiusSize = 10;
-                        if (evento.tamanho === 3) radiusSize = 16;
+            const gpsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { className: 'map-tiles' });
+            const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], className: 'satellite-tiles' });
 
-                        let tamanhoLabel = 'Pequeno 👤';
-                        if (evento.tamanho === 2) tamanhoLabel = 'Médio 👥';
-                        if (evento.tamanho === 3) tamanhoLabel = 'Grande 👥👥👥';
+            const savedStyle = document.getElementById('map_style').value;
+            const satToggle = document.getElementById('satellite-toggle');
+            
+            const satContainer = document.getElementById('satellite-toggle-container');
+            if (satContainer) {
+                L.DomEvent.disableClickPropagation(satContainer);
+                L.DomEvent.disableScrollPropagation(satContainer);
+            }
 
-                        const markerColor = statusColors[evento.status] || '#E91E63';
-                        const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
-                        const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
-                        
-                        marker.on('click', () => {
-                            selectCardFromMap(evento.id);
-                        });
-                        
-                        if (evento.id) window.markersMap[evento.id] = { marker: marker, defaultStyle: defaultStyle };
+            if (savedStyle === 'satellite') { satelliteLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = true; } 
+            else { gpsLayer.addTo(window.mapInstance); if(satToggle) satToggle.checked = false; }
+
+            if (satToggle) {
+                satToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        if (window.mapInstance.hasLayer(gpsLayer)) window.mapInstance.removeLayer(gpsLayer);
+                        satelliteLayer.addTo(window.mapInstance);
+                        document.getElementById('map_style').value = 'satellite';
+                    } else {
+                        if (window.mapInstance.hasLayer(satelliteLayer)) window.mapInstance.removeLayer(satelliteLayer);
+                        gpsLayer.addTo(window.mapInstance);
+                        document.getElementById('map_style').value = 'gps';
                     }
                 });
-                window.markersFeatureGroup.addTo(window.mapInstance);
-                
-                if (highlightId) {
-                    const card = document.querySelector(`.evento-card[data-id="${highlightId}"]`);
-                    if (card) {
-                        toggleCard(card);
-                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            const searchBtn = document.getElementById('search-in-map-btn');
+            if(searchBtn) {
+                searchBtn.addEventListener('click', () => { 
+                    trackEvent('mapa_buscar_area', {'origem': 'mapa_btn_flutuante'});
+                    const bounds = window.mapInstance.getBounds();
+                    const center = window.mapInstance.getCenter();
+                    const zoom = window.mapInstance.getZoom();
+                    document.getElementById('ne_lat').value = bounds.getNorthEast().lat;
+                    document.getElementById('ne_lng').value = bounds.getNorthEast().lng;
+                    document.getElementById('sw_lat').value = bounds.getSouthWest().lat;
+                    document.getElementById('sw_lng').value = bounds.getSouthWest().lng;
+                    document.getElementById('center_lat').value = center.lat;
+                    document.getElementById('center_lng').value = center.lng;
+                    document.getElementById('zoom').value = zoom;
+                    document.getElementById('filter-form').submit();
+                });
+            }
+
+            const locateBtn = document.getElementById('locate-btn');
+            let userMarker = null; 
+            
+            if (locateBtn) {
+                locateBtn.addEventListener('click', function() {
+                    trackEvent('mapa_localizacao_click', {'origem': 'mapa_btn'});
+                    locateBtn.classList.add('active');
+
+                    if (userMarker) {
+                        window.mapInstance.setView(userMarker.getLatLng(), 17);
+                        return; 
                     }
-                }
-                else if (hasActiveFilters && !isSavedState && window.markersFeatureGroup.getLayers().length > 0) {
-                    window.mapInstance.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [30, 30] });
-                }
-                
-                applyFavoritesUI();
-            })
-            .catch(err => console.error(err));
-    }
 
-    const mobileBtn = document.getElementById('mobile-filter-btn');
-    const modal = document.getElementById('mobile-filter-modal');
-    const closeBtn = document.getElementById('close-modal-btn');
-    const form = document.getElementById('filter-form');
-    const mobileContainer = document.getElementById('mobile-filters-container');
-    const desktopWrapper = document.querySelector('.filtros-container');
+                    if (navigator.geolocation) {
+                        navigator.geolocation.watchPosition(
+                            function(position) {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                const newLatLng = [lat, lng];
 
-    function adjustFilterLayout() {
-        if (window.innerWidth <= 768) {
-            if (form && mobileContainer && !mobileContainer.contains(form)) mobileContainer.appendChild(form);
-        } else {
-            if (form && desktopWrapper && !desktopWrapper.contains(form)) desktopWrapper.appendChild(form);
+                                if (!userMarker) {
+                                    const userIcon = L.divIcon({ className: 'user-location-marker', html: '<div class="user-dot"></div><div class="user-pulse"></div>', iconSize: [40, 40], iconAnchor: [20, 20] });
+                                    userMarker = L.marker(newLatLng, { icon: userIcon }).addTo(window.mapInstance);
+                                    window.mapInstance.setView(newLatLng, 17, { animate: true });
+                                } else {
+                                    userMarker.setLatLng(newLatLng);
+                                }
+                            }, 
+                            function(error) { 
+                                alert("Erro ao obter localização. Verifique as permissões."); 
+                                locateBtn.classList.remove('active'); 
+                            }, 
+                            { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                        );
+                    } else {
+                        alert("Geolocalização não suportada.");
+                    }
+                });
+            }
+
+            window.markersFeatureGroup = L.featureGroup();
+            window.markersMap = {};
+            
+            const apiParams = new URLSearchParams(activeParams);
+            ['ne_lat', 'ne_lng', 'sw_lat', 'sw_lng'].forEach(k => apiParams.delete(k));
+            
+            fetch("{{ url_for('api_eventos') }}?" + apiParams.toString())
+                .then(response => response.json())
+                .then(eventos => {
+                    eventos.forEach(evento => {
+                        if (evento.status === 'encerrado') return; 
+                        if (evento.lat && evento.lon) {
+                            let radiusSize = 6; 
+                            if (evento.tamanho === 2) radiusSize = 10;
+                            if (evento.tamanho === 3) radiusSize = 16;
+
+                            const markerColor = statusColors[evento.status] || '#E91E63';
+                            const defaultStyle = { radius: radiusSize, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.7 };
+                            const marker = L.circleMarker([evento.lat, evento.lon], defaultStyle).addTo(window.markersFeatureGroup);
+                            
+                            marker.on('click', () => {
+                                selectCardFromMap(evento.id);
+                            });
+                            
+                            if (evento.id) window.markersMap[evento.id] = { marker: marker, defaultStyle: defaultStyle };
+                        }
+                    });
+                    window.markersFeatureGroup.addTo(window.mapInstance);
+                    
+                    if (highlightId) {
+                        const card = document.querySelector(`.evento-card[data-id="${highlightId}"]`);
+                        if (card) {
+                            toggleCard(card);
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                    else if (hasActiveFilters && !isSavedState && window.markersFeatureGroup.getLayers().length > 0) {
+                        window.mapInstance.fitBounds(window.markersFeatureGroup.getBounds(), { padding: [30, 30] });
+                    }
+                    
+                    applyFavoritesUI();
+                })
+                .catch(err => console.error(err));
         }
-    }
-    window.addEventListener('resize', adjustFilterLayout);
-    adjustFilterLayout();
 
-    if (mobileBtn) {
-        mobileBtn.addEventListener('click', () => modal.classList.add('show'));
-        closeBtn.addEventListener('click', () => modal.classList.remove('show'));
-        window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
-    }
-});
+        const mobileBtn = document.getElementById('mobile-filter-btn');
+        const modal = document.getElementById('mobile-filter-modal');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const form = document.getElementById('filter-form');
+        const mobileContainer = document.getElementById('mobile-filters-container');
+        const desktopWrapper = document.querySelector('.filtros-container');
+
+        function adjustFilterLayout() {
+            if (window.innerWidth <= 768) {
+                if (form && mobileContainer && !mobileContainer.contains(form)) mobileContainer.appendChild(form);
+            } else {
+                if (form && desktopWrapper && !desktopWrapper.contains(form)) desktopWrapper.appendChild(form);
+            }
+        }
+        window.addEventListener('resize', adjustFilterLayout);
+        adjustFilterLayout();
+
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', () => modal.classList.add('show'));
+            closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+            window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+        }
+    });
 </script>
 {% endblock %}
