@@ -515,18 +515,60 @@ body.dark-mode .info-banner {
 /* --- REMOVIDA BORDA TRACEJADA DAQUI --- */
 .card-desc { margin-top: 6px; padding-top: 6px; border-top: none; font-size: 0.75rem; color: var(--text-primary); line-height: 1.3; }
 
-/* ACTIONS */
+/* ACTIONS (Atualização) */
 .expand-content { display: none; margin-top: 10px; border-top: none; padding-top: 10px; }
 .evento-card.expanded .expand-content { display: block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
 .card-actions { display: flex; gap: 10px; align-items: stretch; }
+
 .directions-btn { flex: 1; text-align: center; background-color: var(--primary-accent); color: white; padding: 10px; border-radius: 8px; font-size: 0.9em; font-weight: 600; text-decoration: none; transition: background-color 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; font-family: inherit; }
 .directions-btn:hover { background-color: #c2185b; }
-.feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; }
-.fav-btn { width: 44px; background: white; border: 1px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.2s; flex-shrink: 0; }
-.fav-btn:hover { color: var(--primary-accent); border-color: var(--primary-accent); }
-.evento-card.is-favorite .fav-btn svg { fill: var(--primary-accent); stroke: var(--primary-accent); }
-.evento-card.is-favorite .fav-btn { border-color: var(--primary-accent); color: var(--primary-accent); }
+
+.share-btn { width: 44px; background: white; border: 1px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #25D366; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.2s; flex-shrink: 0; }
+.share-btn:hover { background-color: #25D366; color: white; border-color: #25D366; }
+
+/* --- BOTÃO DE FAVORITO MODIFICADO --- */
+.fav-btn {
+    min-width: 44px; /* Garante tamanho mínimo */
+    padding: 0 10px; /* Mais espaço interno */
+    background: white; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    color: #ccc; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    transition: all 0.2s; 
+    flex-shrink: 0; 
+    gap: 4px; /* Espaço entre coração e número */
+}
+
+.fav-btn:hover { 
+    color: var(--primary-accent); 
+    border-color: var(--primary-accent); 
+}
+
+/* Quando favoritado */
+.evento-card.is-favorite .fav-btn svg { 
+    fill: var(--primary-accent); 
+    stroke: var(--primary-accent); 
+}
+.evento-card.is-favorite .fav-btn { 
+    border-color: var(--primary-accent); 
+    color: var(--primary-accent); 
+    background-color: rgba(233, 30, 99, 0.05); /* Fundo rosa bem suave */
+}
+
+/* Novo estilo para o contador */
+.like-count {
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: inherit; /* Pega a cor do botão */
+}
 
 /* MODAL */
 .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
