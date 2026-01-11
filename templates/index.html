@@ -161,6 +161,10 @@
                             </div>
                         {% endif %}
 
+                        <div class="mini-like-counter">
+                            💕 <span class="mini-like-val">{{ evento.likes }}</span>
+                        </div>
+
                         <div class="evento-info-compact">
                             <div class="card-header">
                                 <h2>{{ evento.titulo }}</h2>
@@ -480,7 +484,11 @@
         
         let favs = getFavorites();
         const card = document.querySelector(`.evento-card[data-id="${id}"]`);
+        
+        // Elementos dos contadores (Big button e Mini icon)
         const counterSpan = card ? card.querySelector('.like-count') : null; 
+        const miniCounterSpan = card ? card.querySelector('.mini-like-val') : null;
+
         let currentCount = parseInt(counterSpan ? counterSpan.innerText : 0);
         if (isNaN(currentCount)) currentCount = 0;
 
@@ -503,7 +511,10 @@
         
         localStorage.setItem('my_blocos', JSON.stringify(favs));
         applyFavoritesUI();
+        
+        // Atualiza AMBOS os contadores na hora
         if (counterSpan) counterSpan.innerText = currentCount;
+        if (miniCounterSpan) miniCounterSpan.innerText = currentCount;
 
         // NOVO: Monitoramento do Retorno do Servidor (Anti-Spam)
         fetch(`/api/like/${id}`, {
@@ -553,11 +564,17 @@
             const isFav = favs.includes(id);
             const isEnded = card.classList.contains('status-bg-encerrado');
             const counterSpan = card.querySelector('.like-count');
+            const miniCounterSpan = card.querySelector('.mini-like-val');
             
+            // Lógica para mostrar "1" se acabou de favoritar localmente, mesmo que servidor seja 0
             if (counterSpan) {
                 if (!counterSpan.dataset.serverCount) counterSpan.dataset.serverCount = counterSpan.innerText;
                 let count = parseInt(counterSpan.dataset.serverCount) || 0;
-                if (isFav && count === 0) counterSpan.innerText = "1";
+                
+                if (isFav && count === 0) {
+                     counterSpan.innerText = "1";
+                     if (miniCounterSpan) miniCounterSpan.innerText = "1";
+                }
             }
 
             if (isFav) card.classList.add('is-favorite');

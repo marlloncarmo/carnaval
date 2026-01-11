@@ -461,6 +461,34 @@ body.dark-mode .info-banner {
 .evento-card { background: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8em; position: relative; transition: transform 0.2s; box-shadow: 0 2px 4px var(--shadow-color); display: flex; flex-direction: column; cursor: pointer; overflow: hidden; }
 .evento-card:hover { transform: translateY(-3px); border-color: var(--primary-accent); }
 
+/* MINI LIKE COUNTER (NOVO) */
+.mini-like-counter {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-size: 0.75em;
+    color: var(--text-secondary); 
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.9); /* Fundo leve para leitura em cards coloridos */
+    padding: 2px 6px;
+    border-radius: 10px;
+    pointer-events: none; /* Deixa o clique passar para o card */
+    z-index: 3;
+}
+
+body.dark-mode .mini-like-counter {
+    background: rgba(45, 55, 72, 0.9);
+    color: var(--text-secondary);
+}
+
+/* Esconde o mini counter quando expandido */
+.evento-card.expanded .mini-like-counter {
+    display: none;
+}
+
 /* STATUS */
 .status-bg-em-andamento { background-color: rgba(39, 174, 96, 0.08); border-color: rgba(39, 174, 96, 0.4); }
 .status-bg-em-breve { background-color: rgba(33, 150, 243, 0.08); border-color: rgba(33, 150, 243, 0.4); }
@@ -509,7 +537,18 @@ body.dark-mode .info-banner {
 .meta-row { display: flex; align-items: center; margin-bottom: 2px; }
 .meta-row.date-row { justify-content: space-between; gap: 10px; }
 .date-wrapper { display: flex; align-items: center; gap: 5px; }
-.meta-row.address-row { gap: 5px; }
+
+/* AJUSTE PARA NÃO SOBREPOR O ÍCONE DE LIKES (Padding somente quando não expandido) */
+.meta-row.address-row { 
+    gap: 5px; 
+    padding-right: 50px; /* Garante que o texto quebre antes do ícone */
+}
+
+/* Quando expandido, remove o padding extra pois o ícone some */
+.evento-card.expanded .meta-row.address-row {
+    padding-right: 0;
+}
+
 .meta-row.address-row span { font-size: 0.75em; line-height: 1.2; }
 
 /* --- REMOVIDA BORDA TRACEJADA DAQUI --- */
