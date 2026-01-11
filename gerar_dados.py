@@ -8,6 +8,10 @@ import time
 from datetime import datetime
 from dotenv import load_dotenv
 
+# Imports para Retry (Tratamento de Erros de Rede)
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 # Carrega variáveis de ambiente
 load_dotenv()
 
@@ -15,7 +19,23 @@ load_dotenv()
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1s_Vm7BCW1ZYtCf79CKZ7clFdeRvEzqNbCQOhq6ZeG_U/export?format=csv&gid=1903941151"
 CACHE_FILE = 'latlon_cache.json'
-OUTPUT_FILE = 'eventos.json' # Arquivo final que o site vai ler
+OUTPUT_FILE = 'eventos.json' 
+
+# --- SESSÃO COM RETRY (ROBUSTEZ) ---
+def get_retry_session(retries=3, backoff_factor=1, status_forcelist=(500, 502, 503, 504)):
+    """Cria uma sessão Requests que tenta novamente em caso de falha."""
+    session = requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 # 1. FUNÇÕES DE CACHE E GEOCODING
 def load_cache():
@@ -31,11 +51,11 @@ def save_cache(cache_data):
     with open(CACHE_FILE, 'w', encoding='utf-8') as f:
         json.dump(cache_data, f, ensure_ascii=False, indent=4)
 
-def get_google_coords(address, neighborhood, cache):
+def get_google_coords(address, neighborhood, cache, session):
     key = f"{address} - {neighborhood}".strip()
     
     if not key:
-        return None, None, False # False indica que não houve chamada de API
+        return None, None, False
 
     # Se já está no cache, retorna
     if key in cache:
@@ -52,31 +72,39 @@ def get_google_coords(address, neighborhood, cache):
     
     try:
         print(f"   >>> Buscando na API: {key}...")
-        response = requests.get(url, timeout=5)
+        # Usa a sessão com retry
+        response = session.get(url, timeout=10) 
         data = response.json()
         
         if data['status'] == 'OK':
             location = data['results'][0]['geometry']['location']
             lat, lon = location['lat'], location['lng']
-            # Atualiza o cache na memória
             cache[key] = {'lat': lat, 'lon': lon}
-            return lat, lon, True # True indica que usou a API (para controle de taxa)
+            return lat, lon, True
+        elif data['status'] == 'OVER_QUERY_LIMIT':
+            print("   [!] Cota de API excedida ou rate limit.")
+            return None, None, False
+        else:
+            print(f"   [x] API retornou status: {data['status']}")
+            
     except Exception as e:
-        print(f"   [x] Erro API: {e}")
+        print(f"   [x] Erro Crítico API: {e}")
     
     return None, None, False
 
-# 2. PROCESSAMENTO DE DADOS (Lógica extraída do antigo main.py)
+# 2. PROCESSAMENTO DE DADOS
 def processar_dados():
-    print(">>> 1. Baixando planilha do Google Sheets...")
+    print(">>> 1. Iniciando Sessão Segura e Baixando planilha...")
+    session = get_retry_session()
+
     try:
-        response = requests.get(SHEET_CSV_URL)
+        response = session.get(SHEET_CSV_URL, timeout=15)
         response.encoding = 'utf-8'
         if response.status_code != 200:
-            print("   [x] Erro ao baixar planilha.")
+            print(f"   [x] Erro ao baixar planilha: Status {response.status_code}")
             return
     except Exception as e:
-        print(f"   [x] Erro de conexão: {e}")
+        print(f"   [x] Erro de conexão fatal: {e}")
         return
 
     csv_file = io.StringIO(response.text)
@@ -141,7 +169,7 @@ def processar_dados():
         # --- Data e Hora ---
         data_raw = row.get("DATA", "")
         hora_raw = row.get("HORÁRIO DA CONCENTRAÇÃO", "")
-        dt_iso = None # Vamos salvar em formato ISO string para o JSON
+        dt_iso = None 
         data_formatada = "A definir"
         
         if data_raw:
@@ -160,13 +188,13 @@ def processar_dados():
             except:
                 data_formatada = f"{data_raw} {hora_raw}"
 
-        # --- GEOCODING (Unificado) ---
-        lat, lon, used_api = get_google_coords(endereco, bairro, cache_geo)
+        # --- GEOCODING (Passando a sessão segura) ---
+        lat, lon, used_api = get_google_coords(endereco, bairro, cache_geo, session)
         
         if used_api:
             api_calls += 1
-            save_cache(cache_geo) # Salva cache a cada sucesso de API
-            time.sleep(0.2) # Pausa amigável
+            save_cache(cache_geo) 
+            time.sleep(0.2) 
 
         eventos_processados.append({
             "id": str(hash(titulo + data_formatada)),
@@ -174,7 +202,7 @@ def processar_dados():
             "local": bairro,
             "endereco": endereco,
             "data": data_formatada,
-            "dt_iso": dt_iso, # Campo novo: Data em formato padrão para o backend ler fácil
+            "dt_iso": dt_iso,
             "categoria": raw_categoria,
             "categoria_display": categoria_display,
             "descricao": clean_desc,
@@ -184,13 +212,17 @@ def processar_dados():
             "is_kids": is_kids,
             "is_lgbt": is_lgbt,
             "is_pet": is_pet
-            # Nota: 'status' não é salvo aqui, pois depende da hora exata do acesso
         })
 
-    # Ordena estilos
+    # --- TRAVA DE SEGURANÇA (CRÍTICO) ---
+    # Se a planilha veio vazia ou deu erro de parseamento, NÃO sobrescreva o JSON antigo.
+    if len(eventos_processados) < 5:
+        print(f"\n[!!!] ALERTA: Apenas {len(eventos_processados)} eventos encontrados.")
+        print("[!!!] Abortando salvamento para proteger os dados existentes.")
+        return
+
     estilos_finais = sorted(list(unique_styles))
     
-    # Salva arquivo final
     dados_finais = {
         "eventos": eventos_processados,
         "estilos": estilos_finais,

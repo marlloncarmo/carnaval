@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory, make_response, url_for
 import os
 import json
+import time  # Importado para controlar o tempo do cache
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
@@ -13,14 +14,18 @@ load_dotenv()
 def inject_ga():
     return dict(ga_measurement_id=os.environ.get("GA_MEASUREMENT_ID"))
 
-# Recupera a chave apenas para passar para o template HTML (mapa frontend)
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
-
-# Nome do arquivo gerado pelo script 'gerar_dados.py'
 DATA_FILE = 'eventos.json'
 
-# --- SOLUÇÃO DE CACHE (VERSIONAMENTO) ---
-# Adiciona um timestamp na URL dos arquivos estáticos (CSS/JS)
+# --- CONFIGURAÇÃO DO CACHE EM MEMÓRIA ---
+CACHE_TIMEOUT = 300  # 5 minutos em segundos
+DATA_CACHE = {
+    'eventos': [],
+    'estilos': [],
+    'last_update': 0
+}
+
+# --- SOLUÇÃO DE CACHE (VERSIONAMENTO DE ASSETS) ---
 def dated_url_for(endpoint, **values):
     if endpoint == 'static':
         filename = values.get('filename', None)
@@ -38,12 +43,11 @@ def override_url_for():
 
 # --- HELPER DE TEMPO ---
 def get_brasilia_time():
-    """Returns the current naive datetime in Brasilia Time (UTC-3)."""
     utc_now = datetime.utcnow()
     return utc_now - timedelta(hours=3)
 
 def events_status_logic(eventos_raw):
-    # Cria cópia para não mutar lista original
+    # Cria cópia para não mutar lista original do cache
     eventos = [e.copy() for e in eventos_raw]
     now = get_brasilia_time()
     
@@ -85,43 +89,67 @@ def events_status_logic(eventos_raw):
     eventos.sort(key=lambda x: (x['sort_weight'], x['_dt_obj'] if x['_dt_obj'] else datetime.max))
     return eventos
 
-def fetch_carnival_data():
+# --- FUNÇÃO DE CARREGAMENTO COM CACHE (SEM DISK I/O REPETITIVO) ---
+def load_raw_data_cached():
+    """
+    Carrega os arquivos do disco APENAS se o cache expirou.
+    Retorna a lista crua de eventos e estilos.
+    """
+    global DATA_CACHE
+    now_ts = time.time()
+
+    # Se o cache ainda é válido e tem dados, retorna da memória RAM
+    if DATA_CACHE['eventos'] and (now_ts - DATA_CACHE['last_update'] < CACHE_TIMEOUT):
+        return DATA_CACHE['eventos'], DATA_CACHE['estilos']
+
+    # Se expirou, lê do disco
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Cache expirado ou vazio. Lendo disco...")
     todos_eventos = []
     estilos_set = set()
 
-    # 1. Carrega Oficiais (se existir)
+    # 1. Carrega Oficiais
     if os.path.exists('eventos.json'):
         try:
             with open('eventos.json', 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 todos_eventos.extend(data.get('eventos', []))
-                # Coleta estilos apenas dos oficiais por enquanto
                 for est in data.get('estilos', []):
                     estilos_set.add(est)
         except Exception as e:
             print(f"Erro ao ler eventos.json: {e}")
 
-    # 2. Carrega Ensaios (se existir)
+    # 2. Carrega Ensaios
     if os.path.exists('ensaios.json'):
         try:
             with open('ensaios.json', 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                # Adiciona os ensaios à lista principal
                 todos_eventos.extend(data.get('eventos', []))
         except Exception as e:
             print(f"Erro ao ler ensaios.json: {e}")
 
-    # Reconverte data ISO para objeto datetime (necessário para a ordenação e status)
+    # Pré-processa as datas (Isso é feito 1 vez a cada 5 min)
     for e in todos_eventos:
         if e.get('dt_iso'):
             e['_dt_obj'] = datetime.fromisoformat(e['dt_iso'])
         else:
             e['_dt_obj'] = None
-            
-    # Calcula status (Ao Vivo, Encerrado) e ordena
-    eventos_com_status = events_status_logic(todos_eventos)
+
+    # Atualiza o Cache Global
+    DATA_CACHE['eventos'] = todos_eventos
+    DATA_CACHE['estilos'] = sorted(list(estilos_set))
+    DATA_CACHE['last_update'] = now_ts
     
-    return eventos_com_status, sorted(list(estilos_set))
+    return DATA_CACHE['eventos'], DATA_CACHE['estilos']
+
+def fetch_carnival_data():
+    # 1. Pega os dados brutos (da RAM ou do Disco se expirou)
+    eventos_raw, estilos = load_raw_data_cached()
+    
+    # 2. Calcula o status em tempo real (Rápido, processamento de CPU apenas)
+    # Isso garante que "Em Breve/Ao Vivo" esteja sempre certo, mesmo com cache de arquivo
+    eventos_com_status = events_status_logic(eventos_raw)
+    
+    return eventos_com_status, estilos
 
 def filtrar_eventos(eventos_todos, args):
     has_active_filters = False
@@ -220,7 +248,6 @@ def mostrar_eventos():
     eventos_filtrados, has_filters = filtrar_eventos(eventos_todos, request.args)
 
     bairros = sorted(list(set([e['local'] for e in eventos_todos if e['local']])))
-    
     total_ativos = len([e for e in eventos_filtrados if e.get('status') != 'encerrado'])
 
     response = make_response(render_template('index.html', 
@@ -231,6 +258,7 @@ def mostrar_eventos():
                            has_filters=has_filters,
                            google_maps_api_key=GOOGLE_MAPS_API_KEY))
     
+    # Headers de cache para o HTML (não cachear o HTML no navegador, cachear no Flask)
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
@@ -241,6 +269,8 @@ def api_eventos():
     eventos_todos, _ = fetch_carnival_data()
     eventos_filtrados, _ = filtrar_eventos(eventos_todos, request.args)
     geocoded = [e for e in eventos_filtrados if e['lat'] and e['lon']]
+    
+    # Remove objeto datetime para serialização JSON
     for e in geocoded:
         if '_dt_obj' in e: del e['_dt_obj']
     

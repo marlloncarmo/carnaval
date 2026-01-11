@@ -6,19 +6,35 @@ import re
 from datetime import datetime
 from io import BytesIO
 from dotenv import load_dotenv
-import openpyxl # Biblioteca para ler Excel
+import openpyxl 
+
+# Imports para Retry
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # Carrega variáveis de ambiente
 load_dotenv()
 
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
-
-# URL PARA BAIXAR COMO EXCEL (XLSX)
 SHEET_ID = "1THVJ8O_P19UkHq6DMgcfNF77fyD4lNWlmZA_rOM9FY4"
 SHEET_XLSX_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=xlsx"
-
 CACHE_FILE = 'latlon_cache.json'
 OUTPUT_FILE = 'ensaios.json'
+
+# --- SESSÃO COM RETRY ---
+def get_retry_session(retries=3, backoff_factor=1, status_forcelist=(500, 502, 503, 504)):
+    session = requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 def load_cache():
     if os.path.exists(CACHE_FILE):
@@ -33,7 +49,7 @@ def save_cache(cache_data):
     with open(CACHE_FILE, 'w', encoding='utf-8') as f:
         json.dump(cache_data, f, ensure_ascii=False, indent=4)
 
-def get_google_coords(local_text, cache):
+def get_google_coords(local_text, cache, session):
     key = local_text.strip()
     if not key: return None, None, False
     if key in cache: return cache[key]['lat'], cache[key]['lon'], False
@@ -43,7 +59,7 @@ def get_google_coords(local_text, cache):
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={search_query}&key={GOOGLE_MAPS_API_KEY}"
     
     try:
-        response = requests.get(url, timeout=5)
+        response = session.get(url, timeout=10)
         data = response.json()
         if data['status'] == 'OK':
             loc = data['results'][0]['geometry']['location']
@@ -54,27 +70,20 @@ def get_google_coords(local_text, cache):
     return None, None, False
 
 def extract_hyperlink(cell):
-    """
-    Tenta extrair link de uma célula do Excel.
-    Pode estar no atributo .hyperlink ou dentro de uma fórmula =HYPERLINK()
-    """
-    # 1. Hiperlink direto (Inserir > Link)
     if cell.hyperlink:
         return cell.hyperlink.target
-    
-    # 2. Fórmula =HYPERLINK("url", "texto")
     if cell.value and isinstance(cell.value, str) and str(cell.value).upper().startswith('=HYPERLINK'):
         match = re.search(r'"(http[^"]+)"', cell.value)
         if match:
             return match.group(1)
-            
     return ""
 
 def processar_ensaios():
-    print(">>> 1. Baixando planilha como EXCEL (.xlsx)...")
+    print(">>> 1. Iniciando Sessão Segura e baixando Excel...")
+    session = get_retry_session()
     
     try:
-        response = requests.get(SHEET_XLSX_URL)
+        response = session.get(SHEET_XLSX_URL, timeout=20)
         if response.status_code != 200:
             print(f"   [ERRO] Status Code: {response.status_code}")
             return
@@ -83,15 +92,9 @@ def processar_ensaios():
         return
 
     print(">>> 2. Lendo arquivo Excel em memória...")
-    
-    # Carrega o Excel da memória (sem salvar no disco)
     try:
-        wb = openpyxl.load_workbook(filename=BytesIO(response.content), data_only=True)
-        # data_only=True tenta pegar o valor calculado, mas remove formulas. 
-        # Porém precisamos das formulas para links as vezes. 
-        # Vamos usar o modo padrão e tratar manualmente.
         wb = openpyxl.load_workbook(filename=BytesIO(response.content))
-        ws = wb.active # Pega a primeira aba
+        ws = wb.active 
     except Exception as e:
         print(f"   [ERRO] Falha ao abrir Excel: {e}")
         return
@@ -101,14 +104,10 @@ def processar_ensaios():
     api_calls = 0
     dias_semana = {0: 'Seg', 1: 'Ter', 2: 'Qua', 3: 'Qui', 4: 'Sex', 5: 'Sáb', 6: 'Dom'}
 
-    # Mapa de índices
     idx_map = {} 
     header_found = False
 
-    # Itera sobre as linhas do Excel
-    # values_only=False para podermos acessar o objeto cell e pegar o hyperlink
     for row in ws.iter_rows():
-        # Pega o texto de cada célula (convertendo None para "")
         row_text = [str(cell.value).upper() if cell.value else "" for cell in row]
         
         # Detecção de cabeçalho
@@ -130,10 +129,8 @@ def processar_ensaios():
         if not header_found: continue
 
         try:
-            # Verifica tamanho da linha
             if len(row) <= max(idx_map.values(), default=0): continue
 
-            # Extração de dados (cell.value)
             cell_bloco = row[idx_map['BLOCO']]
             nome = str(cell_bloco.value).strip() if cell_bloco.value else ""
             
@@ -148,14 +145,12 @@ def processar_ensaios():
             cell_hora = row[idx_map['HORA']]
             hora_raw = str(cell_hora.value).strip() if cell_hora.value else ""
             
-            # --- Extração Link (Coluna Valor) ---
             link_ingresso = ""
             if 'VALOR' in idx_map:
                 cell_valor = row[idx_map['VALOR']]
                 link_ingresso = extract_hyperlink(cell_valor)
 
         except Exception as e:
-            # print(f"Erro linha: {e}")
             continue
 
         # --- Tratamento de Data ---
@@ -163,7 +158,6 @@ def processar_ensaios():
         data_display = f"{data_raw} - {hora_raw}"
         
         try:
-            # Excel as vezes retorna data como datetime object direto
             if isinstance(cell_data.value, datetime):
                 dia = cell_data.value.day
                 mes = cell_data.value.month
@@ -172,7 +166,6 @@ def processar_ensaios():
             
             ano = 2025 if mes > 6 else 2026
             
-            # Limpeza Hora
             hora_clean = hora_raw.lower().replace('h', ':').replace('30:00', '30')
             if hora_clean.endswith(':'): hora_clean += "00"
             if ':' not in hora_clean and hora_clean.isdigit(): hora_clean += ":00"
@@ -191,8 +184,8 @@ def processar_ensaios():
             data_display = f"{dia:02d}/{mes:02d} ({nome_dia}) - {hora_formatada}"
         except: pass
 
-        # --- Geolocalização ---
-        lat, lon, used = get_google_coords(local_raw, cache_geo)
+        # --- Geolocalização com Retry ---
+        lat, lon, used = get_google_coords(local_raw, cache_geo, session)
         if used:
             api_calls += 1
             save_cache(cache_geo)
@@ -218,6 +211,12 @@ def processar_ensaios():
             "is_pet": False,
             "status": "futuro"
         })
+
+    # --- TRAVA DE SEGURANÇA ---
+    if len(ensaios_processados) < 3:
+        print(f"\n[!!!] ALERTA: Apenas {len(ensaios_processados)} ensaios encontrados.")
+        print("[!!!] Abortando salvamento.")
+        return
 
     print(f"\n>>> 3. Salvando {len(ensaios_processados)} ensaios em '{OUTPUT_FILE}'...")
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
