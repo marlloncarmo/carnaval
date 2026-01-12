@@ -31,7 +31,11 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', '{{ ga_measurement_id }}');
+      // CONFIGURAÇÃO CORRIGIDA PARA VERCEL
+      gtag('config', '{{ ga_measurement_id }}', {
+          'cookie_domain': window.location.hostname,  // <--- Força o domínio exato (carnavalbh.vercel.app)
+          'cookie_flags': 'SameSite=None;Secure'      // Garante segurança em conexões modernas
+      });
     </script>
     {% endif %}
 
