@@ -19,7 +19,7 @@
                 {% include "map.html" %}
             </div>
 
-            <div class="desktop-map-ad">
+            <div class="desktop-map-ad" data-ad-id="sidebar_fixo" data-ad-location="sidebar_desktop">
                 <div class="ad-text">
                     <h3>Sua Marca Aqui! 🚀</h3>
                     <p>Milhares de foliões acessam este mapa. Divulgue seu negócio.</p>
@@ -246,7 +246,9 @@
                     </div>
 
                     {% if loop.index > 0 and loop.index % 5 == 0 %}
-                    <div class="evento-card ad-card in-feed">
+                    <div class="evento-card ad-card in-feed" 
+                         data-ad-id="feed_posicao_{{ loop.index }}" 
+                         data-ad-location="feed_lista">
                         <div class="ad-label">Publicidade</div>
                         <div class="ad-content">
                             <h3>Sua Marca Aqui! 🚀</h3>
@@ -335,10 +337,6 @@
         'em-andamento': '#27ae60', 'em-breve': '#2196F3', 'encerrando': '#d35400',
         'hoje': '#8e44ad', 'encerrado': '#95a5a6', 'futuro': '#E91E63'
     };
-
-    // ... (funções cleanUrlParams, resetApp, shareBlock, shareAllFavorites mantidas iguais) ...
-    // ... (funções getDirections, closeNavModal, openApp mantidas iguais) ...
-    // ... (listeners de window e mapa mantidos iguais) ...
 
     function cleanUrlParams() {
         const url = new URL(window.location);
@@ -463,13 +461,8 @@
         if (!uuid) {
             uuid = crypto.randomUUID ? crypto.randomUUID() : 'user-' + Date.now() + '-' + Math.random();
             localStorage.setItem('user_uuid', uuid);
-            
-            // NOVO: Evento GA4 - Novo Usuário Gerado
             trackEvent('gerar_uuid', { 'novo': 'sim' });
         }
-        
-        // NOVO: Configura o User-ID no GA4 (se gtag existir)
-        // Isso permite rastrear o mesmo usuário em sessões diferentes
         if (typeof gtag === 'function') {
             gtag('config', '{{ ga_measurement_id }}', {
                 'user_id': uuid
@@ -485,7 +478,6 @@
         let favs = getFavorites();
         const card = document.querySelector(`.evento-card[data-id="${id}"]`);
         
-        // Elementos dos contadores (Big button e Mini icon)
         const counterSpan = card ? card.querySelector('.like-count') : null; 
         const miniCounterSpan = card ? card.querySelector('.mini-like-val') : null;
 
@@ -499,24 +491,20 @@
             favs = favs.filter(fid => fid !== id);
             action = 'remove';
             currentCount = Math.max(0, currentCount - 1);
-            // GA4: Intenção do usuário (já existia)
             trackEvent('favoritar_bloco', { 'acao': 'remover', 'bloco_id': id });
         } else {
             favs.push(id);
             action = 'add';
             currentCount++;
-            // GA4: Intenção do usuário (já existia)
             trackEvent('favoritar_bloco', { 'acao': 'adicionar', 'bloco_id': id });
         }
         
         localStorage.setItem('my_blocos', JSON.stringify(favs));
         applyFavoritesUI();
         
-        // Atualiza AMBOS os contadores na hora
         if (counterSpan) counterSpan.innerText = currentCount;
         if (miniCounterSpan) miniCounterSpan.innerText = currentCount;
 
-        // NOVO: Monitoramento do Retorno do Servidor (Anti-Spam)
         fetch(`/api/like/${id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -524,33 +512,19 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Se o servidor ignorou (por limite de IP ou duplicidade), rastreamos isso
             if (data.status === 'ignored') {
                 console.warn("Voto ignorado pelo servidor (Anti-Spam).");
-                trackEvent('voto_status', { 
-                    'status': 'ignorado', 
-                    'motivo': 'limite_ip_ou_duplicidade', 
-                    'bloco_id': id 
-                });
-            } 
-            // Se deu sucesso real no banco
-            else if (data.status === 'ok') {
-                trackEvent('voto_status', { 
-                    'status': 'sucesso', 
-                    'bloco_id': id 
-                });
+                trackEvent('voto_status', { 'status': 'ignorado', 'motivo': 'limite_ip_ou_duplicidade', 'bloco_id': id });
+            } else if (data.status === 'ok') {
+                trackEvent('voto_status', { 'status': 'sucesso', 'bloco_id': id });
             }
         })
         .catch(err => {
             console.error("Erro rede like:", err);
-            trackEvent('voto_status', { 
-                'status': 'erro_rede', 
-                'bloco_id': id 
-            });
+            trackEvent('voto_status', { 'status': 'erro_rede', 'bloco_id': id });
         });
     }
 
-    // ... (função applyFavoritesUI mantida IGUAL, com a correção do contador visual) ...
     function applyFavoritesUI() {
         const favs = getFavorites();
         const cards = document.querySelectorAll('.evento-card');
@@ -566,7 +540,6 @@
             const counterSpan = card.querySelector('.like-count');
             const miniCounterSpan = card.querySelector('.mini-like-val');
             
-            // Lógica para mostrar "1" se acabou de favoritar localmente, mesmo que servidor seja 0
             if (counterSpan) {
                 if (!counterSpan.dataset.serverCount) counterSpan.dataset.serverCount = counterSpan.innerText;
                 let count = parseInt(counterSpan.dataset.serverCount) || 0;
@@ -607,9 +580,7 @@
         }
     }
 
-    // ... (DOMContentLoaded e listeners de mapa mantidos iguais) ...
     document.addEventListener('DOMContentLoaded', function () {
-        // ... (código existente) ...
         const welcomeModal = document.getElementById('welcome-modal');
         const closeWelcomeBtn = document.getElementById('close-welcome-btn');
         const hasSeenWelcome = localStorage.getItem('seen_welcome_msg_v1');
@@ -635,17 +606,13 @@
             }); 
         }
         applyFavoritesUI();
-        
-        // GERA UUID NO INÍCIO PARA GARANTIR RASTREIO
         getUserId();
 
-        // ... (restante do código de filtros e mapa igual) ...
         const quickFilters = document.querySelectorAll('input[name="quick_filter"]');
         quickFilters.forEach(qf => { qf.addEventListener('change', function() { if(this.checked) trackEvent('clique_filtro_rapido', {'filtro': this.value}); }); });
 
         const mapElement = document.getElementById('map');
         if (mapElement) {
-            // ... (inicialização do mapa igual) ...
             const formLat = document.getElementById('center_lat').value;
             const formLng = document.getElementById('center_lng').value;
             const formZoom = document.getElementById('zoom').value;
@@ -667,7 +634,6 @@
                 if(searchBtn) searchBtn.classList.add('visible');
             });
 
-            // ... (Controles do mapa iguais) ...
             const ResetViewControl = L.Control.extend({
                 options: { position: 'topright' },
                 onAdd: function(map) {
@@ -751,6 +717,42 @@
         function adjustFilterLayout() { if (window.innerWidth <= 768) { if (form && mobileContainer && !mobileContainer.contains(form)) mobileContainer.appendChild(form); } else { if (form && desktopWrapper && !desktopWrapper.contains(form)) desktopWrapper.appendChild(form); } }
         window.addEventListener('resize', adjustFilterLayout); adjustFilterLayout();
         if (mobileBtn) { mobileBtn.addEventListener('click', () => modal.classList.add('show')); closeBtn.addEventListener('click', () => modal.classList.remove('show')); window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); }); }
+
+        // --- ALTERAÇÃO 3: RASTREAMENTO DE IMPRESSÕES DE ANÚNCIOS (GA4) ---
+        // Observa quando os anúncios entram na tela para contabilizar visualização real
+        const observerOptions = {
+            root: null,        // viewport
+            rootMargin: '0px',
+            threshold: 0.5     // 50% do anúncio visível dispara o evento
+        };
+
+        const adObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const adElement = entry.target;
+                    
+                    // Pega os IDs definidos no HTML
+                    const adId = adElement.dataset.adId || 'desconhecido';
+                    const adLocation = adElement.dataset.adLocation || 'geral';
+
+                    // Envia para o GA4
+                    trackEvent('ad_impression', {
+                        'ad_id': adId,
+                        'ad_location': adLocation,
+                        'screen_type': window.innerWidth <= 768 ? 'mobile' : 'desktop'
+                    });
+
+                    // Para de observar para não contar múltiplas vezes na mesma sessão de scroll
+                    observer.unobserve(adElement);
+                }
+            });
+        }, observerOptions);
+
+        // Inicia a observação em todos os cards de anúncio
+        const adsToTrack = document.querySelectorAll('.ad-card, .desktop-map-ad');
+        adsToTrack.forEach(ad => {
+            adObserver.observe(ad);
+        });
     });
 </script>
 {% endblock %}
